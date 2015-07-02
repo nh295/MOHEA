@@ -14,6 +14,7 @@ import hh.credithistory.ICreditHistory;
  * @author nozomihitomi
  */
 public class MeanCredits extends SumCredits{
+    private static final long serialVersionUID = -1776736066673232634L;
     
     
     /**

@@ -16,6 +16,7 @@ import java.util.Iterator;
  * @author nozomihitomi
  */
 public class SumCredits implements ICreditAggregationStrategy{
+    private static final long serialVersionUID = 593719540602667696L;
 
     
     /**

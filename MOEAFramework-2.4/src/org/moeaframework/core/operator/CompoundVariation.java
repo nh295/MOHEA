@@ -17,6 +17,7 @@
  */
 package org.moeaframework.core.operator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,8 @@ import org.moeaframework.core.Variation;
  * <li>Otherwise, an exception is thrown.
  * </ol>
  */
-public class CompoundVariation implements Variation {
+public class CompoundVariation implements Variation, Serializable {
+    private static final long serialVersionUID = -7990263235722205167L;
 
 	/**
 	 * The variation operators in the order they are applied.

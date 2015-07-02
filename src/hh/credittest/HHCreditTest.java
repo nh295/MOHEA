@@ -15,6 +15,7 @@ import hh.creditdefinition.immediate.ParentDominationCredit;
 import hh.creditdefinition.immediate.ImmediateParetoFrontCredit;
 import hh.creditdefinition.immediate.ImmediateParetoRankCredit;
 import hh.credithistory.CreditHistory;
+import hh.credithistory.CreditHistoryWindow;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.heuristicselectors.AdaptivePursuit;
 import hh.heuristicselectors.DMAB;
@@ -78,26 +79,26 @@ public class HHCreditTest {
             int numberOfSeeds = 2;
             int maxEvaluations = 10100;
             
-            //Choose heuristics to be applied
+            //Choose heuristics to be applied. Use default values (probabilities)
             ArrayList<Variation> heuristics = new ArrayList<>();
             OperatorFactory of = OperatorFactory.getInstance();
             Properties heuristicProp = new Properties();
             heuristics.add(of.getVariation("um", heuristicProp, prob));
-            heuristics.add(of.getVariation("sbx", heuristicProp, prob));
-            heuristics.add(of.getVariation("de", heuristicProp, prob));
-            heuristics.add(of.getVariation("pcx", heuristicProp, prob));
-            heuristics.add(of.getVariation("undx", heuristicProp, prob));
-            heuristics.add(of.getVariation("spx", heuristicProp, prob));
+            heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
+            heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+            heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+            heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+            heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
             
             
             //setup algorithm
             double pmin = 0.05;
-            CreditHistoryRepository creditRepo = new CreditHistoryRepository(heuristics, new CreditHistory());
+            CreditHistoryRepository creditRepo = new CreditHistoryRepository(heuristics, new CreditHistoryWindow(300));
             INextHeuristic[] selectors= new INextHeuristic[]{
                 new RandomSelect(creditRepo),
                 new ProbabilityMatching(creditRepo, pmin),
                 new AdaptivePursuit(creditRepo, pmin),
-                new DMAB(creditRepo, 0.01, 0.1, 10)
+//                new DMAB(creditRepo, 0.01, 0.1, 10)
             };
             
             ICreditDefinition[] credDef = new ICreditDefinition[]{
@@ -105,9 +106,9 @@ public class HHCreditTest {
                 new ImmediateParetoFrontCredit(1.0, 0.0),
                 new ImmediateEArchiveCredit(1, 0,epsilonDouble),
                 new ImmediateParetoRankCredit(1.0, 0.0,5),
-                new AggregateParetoFrontCredit(1.0,0.0),
-                new AggregateEArchiveCredit(1.0, 0.0, epsilonDouble),
-                new AggregateParetoRankCredit(1.0, 0.0,5)
+//                new AggregateParetoFrontCredit(1.0,0.0),
+//                new AggregateEArchiveCredit(1.0, 0.0, epsilonDouble),
+//                new AggregateParetoRankCredit(1.0, 0.0,5)
             };
             
             for(INextHeuristic selector : selectors) {

@@ -8,12 +8,13 @@ package hh.creditaggregation;
 
 import hh.creditdefinition.Credit;
 import hh.credithistory.ICreditHistory;
+import java.io.Serializable;
 
 /**
  *
  * @author nozomihitomi
  */
-public interface ICreditAggregationStrategy {
+public interface ICreditAggregationStrategy extends Serializable{
     
     /**
      * Aggregates the history using an aggregation function to produce one 

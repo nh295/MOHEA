@@ -46,16 +46,17 @@ import org.moeaframework.util.TypedProperties;
  */
 public class TestRun implements Runnable {
 
-    TypedProperties properties;
-    Problem problem;
-    String probName;
-    String path;
-    INextHeuristic heuristicSelector;
-    ICreditDefinition creditDef;
-    Collection<Variation> heuristics;
-    double[] epsilonDouble;
-    int maxEvaluations;
-    double alpha;
+    private TypedProperties properties;
+    private Problem problem;
+    private String probName;
+    private String path;
+    private INextHeuristic heuristicSelector;
+    private ICreditDefinition creditDef;
+    private Collection<Variation> heuristics;
+    private double[] epsilonDouble;
+    private int maxEvaluations;
+    private double alpha;
+    private double PMprob;
 
     public TestRun(String path, Problem problem, String probName, TypedProperties properties,
             INextHeuristic heuristicSelector, ICreditDefinition creditDef,
@@ -85,9 +86,11 @@ public class TestRun implements Runnable {
             ICreditDefinition creditDef, Collection<Variation> heuristics) {
 
         int populationSize = (int) properties.getDouble("populationSize", 100);
-        alpha = properties.getDouble("alpha", 1);
+        alpha = properties.getDouble("alpha", 1.0);
+        PMprob = properties.getDouble("PMprob", 1.0/problem.getNumberOfVariables());
 
         System.out.println("alpha:" + alpha);
+        System.out.println("PMprob:" + PMprob);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -105,7 +108,7 @@ public class TestRun implements Runnable {
 
         HeMOEA hemoea = new HeMOEA(problem, population, archive,
                 selection, heuristics, initialization,
-                heuristicSelector, creditDef, alpha);
+                heuristicSelector, creditDef, alpha,PMprob);
 
         return hemoea;
     }
