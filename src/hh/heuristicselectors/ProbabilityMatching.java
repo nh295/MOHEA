@@ -68,14 +68,18 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
         double p = random.nextDouble();
         Iterator<Variation> iter = probabilities.keySet().iterator();
         double sum = 0.0;
-        Variation heuristic;
+        Variation heuristic = null;
         while(iter.hasNext()){
             heuristic = iter.next();
             sum+=probabilities.get(heuristic);
             if(sum>=p)
-                return heuristic;
+                break;
         }
-        throw new NullPointerException("No heuristic was selected by Probability matching heuristic selector. Check probabilities");
+        incrementIterations();
+        if(heuristic==null)
+            throw new NullPointerException("No heuristic was selected by Probability matching heuristic selector. Check probabilities");
+        else 
+            return heuristic;
     }
 
     /**
@@ -87,10 +91,10 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
     public void update(Variation heuristic, Credit credit) {
         
         creditRepo.update(heuristic, credit);
-        tmpCreditRepo.update(heuristic, creditRepo.getCurrentCredit(heuristic));
+        tmpCreditRepo.update(heuristic, creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
         
         //if current credit becomes negative, adjust to 0
-        if(tmpCreditRepo.getCurrentCredit(heuristic).getValue()<=0.0){
+        if(tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic).getValue()<=0.0){
             tmpCreditRepo.update(heuristic, new Credit(credit.getIteration(),0.0));
         }
         
@@ -99,7 +103,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
         Iterator<Variation> iter = probabilities.keySet().iterator();
         while(iter.hasNext()){
             Variation heuristic_next = iter.next();
-            sum+= tmpCreditRepo.getCurrentCredit(heuristic_next).getValue();
+            sum+= tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic_next).getValue();
         }
         
         // if the credits sum up to zero, apply uniform probabilty to  heuristics
@@ -113,7 +117,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
             while(iter.hasNext()){
                 Variation heuristic_i = iter.next();
                 double newProb = pmin + (1-probabilities.size()*pmin)
-                        * (tmpCreditRepo.getCurrentCredit(heuristic_i).getValue()/sum);
+                        * (tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic_i).getValue()/sum);
                 probabilities.put(heuristic_i,newProb);
             }
         }

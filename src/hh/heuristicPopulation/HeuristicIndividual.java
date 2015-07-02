@@ -8,8 +8,8 @@ package hh.heuristicPopulation;
 
 import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
-import hh.creditrepository.AbstractCreditHistory;
-import hh.creditrepository.ICreditHistory;
+import hh.credithistory.AbstractCreditHistory;
+import hh.credithistory.ICreditHistory;
 import hh.heuristicgenerators.HeuristicSequence;
 import org.moeaframework.core.Solution;
 

@@ -34,6 +34,7 @@ public class RandomSelect extends AbstractHeuristicSelector{
      */
     @Override
     public Variation nextHeuristic() {
+        incrementIterations();
         return getRandomHeuristic(creditRepo.getHeuristics());
     }
 

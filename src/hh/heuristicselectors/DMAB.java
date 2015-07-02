@@ -6,6 +6,7 @@
 
 package hh.heuristicselectors;
 
+import hh.creditaggregation.CreditAggregator;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
@@ -37,6 +38,11 @@ public class DMAB extends AbstractHeuristicSelector{
     private HeuristicSelectionHistory heuristicSelectionHistory;
     
     private HashMap<Variation,Arm> arms;
+    
+    /**
+     * Sums the credits stored in a credit history
+     */
+    private CreditAggregator creditAgg;
 
     /**
      * Constructor requires a credit repository type: only ICreditRepository
@@ -49,6 +55,7 @@ public class DMAB extends AbstractHeuristicSelector{
     public DMAB(CreditHistoryRepository creditRepo,double beta,double delta,double lambda) {
         super(creditRepo);
         this.beta = beta;
+        this.creditAgg = new CreditAggregator();
         
         heuristicSelectionHistory = new HeuristicSelectionHistory(creditRepo.getHeuristics());
         arms = new HashMap();
@@ -65,10 +72,13 @@ public class DMAB extends AbstractHeuristicSelector{
      */
     @Override
     public Variation nextHeuristic() {
+        Variation vari;
         if(heuristicSelectionHistory.getTotalSelectionCount()==0)
-            return getRandomHeuristic(creditRepo.getHeuristics());
+            vari= getRandomHeuristic(creditRepo.getHeuristics());
         else
-            return argMax(creditRepo.getHeuristics());
+            vari = argMax(creditRepo.getHeuristics());
+        incrementIterations();
+        return vari;
     }
 
     @Override
@@ -77,7 +87,7 @@ public class DMAB extends AbstractHeuristicSelector{
         creditRepo.update(heuristic, credit);
         //update the arm and execute PH test
         boolean PHtest = arms.get(heuristic).updateArm(credit, 
-                    ((CreditHistoryRepository)creditRepo).getAverageCredit(heuristic));
+                    creditAgg.sum(getNumberOfIterations(),((CreditHistoryRepository)creditRepo).getHistory(heuristic)));
        if(PHtest){
            //if PH test is true, reset all counters, credits, and arms
            reset();
@@ -89,9 +99,8 @@ public class DMAB extends AbstractHeuristicSelector{
         Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
         while(iter.hasNext()){
             Variation heuristic = iter.next();
-            update(heuristic,creditRepo.getCurrentCredit(heuristic));
+            update(heuristic,creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
         }
-    
     }
     
     /**
@@ -102,10 +111,10 @@ public class DMAB extends AbstractHeuristicSelector{
      */
     @Override
     protected double function2maximize(Variation heuristic) throws NoSuchMethodException{
-        double avgCredit = ((CreditHistoryRepository)creditRepo).getAverageCredit(heuristic).getValue();
+        Credit avgCredit = creditAgg.mean(getNumberOfIterations(),((CreditHistoryRepository)creditRepo).getHistory(heuristic));
         int numPlayed = heuristicSelectionHistory.getSelectedTimes(heuristic);
         int totalPlayCount = heuristicSelectionHistory.getTotalSelectionCount();
-        return avgCredit + beta * Math.sqrt(Math.log10(numPlayed)/totalPlayCount);
+        return avgCredit.getValue() + beta * Math.sqrt(Math.log10(numPlayed)/totalPlayCount);
     }
     
     /**
@@ -121,7 +130,6 @@ public class DMAB extends AbstractHeuristicSelector{
             arms.get(iter.next()).reset();
         }
     }
-    
     
     /**
      * An arm represents a heuristic. It maintains information on the deviations

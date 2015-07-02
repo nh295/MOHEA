@@ -6,7 +6,6 @@
 
 package hh.nextheuristic;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
 import java.util.ArrayList;
@@ -42,6 +41,11 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     protected final int nHeuristics;
     
     /**
+     * The number of times nextHeuristic() is called
+     */
+    protected int iterations;
+    
+    /**
      * Constructor requires a credit repository that stores credits earned by 
      * heuristics.
      * @param creditRepo Credit repository to store credits earned by heuristics
@@ -49,6 +53,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     public AbstractHeuristicSelector(ICreditRepository creditRepo){
         this.creditRepo = creditRepo;
         this.nHeuristics= creditRepo.getHeuristics().size();
+        this.iterations = 0;
     }
     
     /**
@@ -127,6 +132,22 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     }
     
     /**
+     * Increments the number of times nextHeuristic() has been called by one
+     */
+    protected void incrementIterations(){
+        iterations++;
+    }
+    
+    /**
+     * Returns the number of times nextHeuristic() has been called
+     * @return the number of times nextHeuristic() has been called
+     */
+    @Override
+    public int getNumberOfIterations(){
+        return iterations;
+    }
+    
+    /**
      * Clears credit reposit
      */
     @Override
@@ -138,7 +159,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     public HashMap<Variation, Credit> getAllCurrentCredits() {
         HashMap<Variation, Credit> out = new HashMap();
         for(Variation heuristic:creditRepo.getHeuristics()){
-            out.put(heuristic, creditRepo.getCurrentCredit(heuristic));
+            out.put(heuristic, creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
         }
         return out;
     }
@@ -149,7 +170,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
         Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
         while(iter.hasNext()){
             Variation heuristic = iter.next();
-            update(heuristic,creditRepo.getCurrentCredit(heuristic));
+            update(heuristic,creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
         }
     
     }

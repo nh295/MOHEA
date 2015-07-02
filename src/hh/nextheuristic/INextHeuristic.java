@@ -48,4 +48,10 @@ public interface INextHeuristic{
      * @return the current credits for each heuristic stored in the repository
      */
     public HashMap<Variation,Credit> getAllCurrentCredits();
+    
+    /**
+     * Returns the number of times nextHeuristic() has been called
+     * @return the number of times nextHeuristic() has been called
+     */
+    public int getNumberOfIterations();
 }

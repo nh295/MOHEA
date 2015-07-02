@@ -6,7 +6,9 @@
 
 package hh.creditrepository;
 
+import hh.creditaggregation.CreditAggregator;
 import hh.creditdefinition.Credit;
+import hh.credithistory.ICreditHistory;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,9 +23,9 @@ import org.moeaframework.core.Variation;
 public class CreditHistoryRepository extends CreditRepository implements Serializable{
     private static final long serialVersionUID = -151125984931862164L;
     
-    protected HashMap<Variation,ICreditHistory> creditHistory;    
+    protected HashMap<Variation,ICreditHistory> creditHistory;
     
-    int currentIteration;
+    private CreditAggregator creditAgg = new CreditAggregator();
     
     /**
      * This constructor creates the credit repository that initialize 0 credit for each heuristic
@@ -37,18 +39,6 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
         while(iter.hasNext()){
             creditHistory.put(iter.next(), history.getInstance());
         }
-        currentIteration=0;
-    }
-    
-    /**
-     * Returns the average credit, averaged over all credits stored in the 
-     * history, for the specified heuristic
-     * @param heuristic of interest for average credit
-     * @return the average credit, averaged over all credits stored in the 
-     * history, for the specified heuristic
-     */
-    public Credit getAverageCredit(Variation heuristic){
-        return creditHistory.get(heuristic).getAverageCredit(currentIteration);
     }
     
     /**
@@ -68,7 +58,6 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
     public void update(Variation heuristic, Credit credit) {
         super.update(heuristic, credit);
         creditHistory.get(heuristic).addCredit(credit);
-        currentIteration = credit.getIteration();
     }
     
     /**
@@ -84,12 +73,13 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
     
     /**
      * Gets the sum of all credit assigned to the specified heuristic, summed over the history
+     * @param iteration The iteration to take the sum to
      * @param heuristic the heuristic to query
      * @return the sum of all credit assigned to the specified heuristic, summed over the history
      */
     @Override
-    public Credit getCurrentCredit(Variation heuristic) {
-        return creditHistory.get(heuristic).getSumCredit(currentIteration);
+    public Credit getSumCredit(int iteration,Variation heuristic) {
+        return creditAgg.sum(iteration, creditHistory.get(heuristic));
     }
     
 }

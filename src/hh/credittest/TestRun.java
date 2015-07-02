@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package hh.credittest;
 
 import hh.IO.IOCreditHistory;
@@ -40,11 +39,13 @@ import org.moeaframework.core.operator.TournamentSelection;
 import org.moeaframework.util.TypedProperties;
 
 /**
+ * This sets up the experimental run. Need to define the problem, the
+ * hyperheuristic components, and the search parameters
  *
  * @author nozomihitomi
  */
-public class TestRun implements Runnable{
-    
+public class TestRun implements Runnable {
+
     TypedProperties properties;
     Problem problem;
     String probName;
@@ -55,11 +56,11 @@ public class TestRun implements Runnable{
     double[] epsilonDouble;
     int maxEvaluations;
     double alpha;
-    
-    public TestRun(String path,Problem problem,String probName, TypedProperties properties,
-                INextHeuristic heuristicSelector,ICreditDefinition creditDef, 
-                Collection<Variation> heuristics,double[] epsilonDouble, int maxEvaluations){
-        
+
+    public TestRun(String path, Problem problem, String probName, TypedProperties properties,
+            INextHeuristic heuristicSelector, ICreditDefinition creditDef,
+            Collection<Variation> heuristics, double[] epsilonDouble, int maxEvaluations) {
+
         this.properties = properties;
         this.creditDef = creditDef;
         this.problem = problem;
@@ -70,114 +71,111 @@ public class TestRun implements Runnable{
         this.maxEvaluations = maxEvaluations;
         this.path = path;
     }
-    
-    
+
     /**
      * Returns a new Hyper eMOEA instance.
      *
      * @param properties the properties for customizing the new {@code eMOEA}
-     *        instance
+     * instance
      * @param problem the problem
      * @return a new {@code eMOEA} instance
      */
     private IHyperHeuristic newHeMOEA(TypedProperties properties,
-            Problem problem,INextHeuristic heuristicSelector,
+            Problem problem, INextHeuristic heuristicSelector,
             ICreditDefinition creditDef, Collection<Variation> heuristics) {
-        
-        int populationSize = (int)properties.getDouble("populationSize", 100);
+
+        int populationSize = (int) properties.getDouble("populationSize", 100);
         alpha = properties.getDouble("alpha", 1);
-        
-            System.out.println("alpha:" + alpha);
-        
+
+        System.out.println("alpha:" + alpha);
+
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
-        
+
         Population population = new Population();
-        
+
         DominanceComparator comparator = new ParetoDominanceComparator();
-        
+
         EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(
                 properties.getDoubleArray("epsilon",
-                        new double[] { EpsilonHelper.getEpsilon(problem) }));
-        
+                        new double[]{EpsilonHelper.getEpsilon(problem)}));
+
         final TournamentSelection selection = new TournamentSelection(
                 2, comparator);
-        
+
         HeMOEA hemoea = new HeMOEA(problem, population, archive,
                 selection, heuristics, initialization,
-                heuristicSelector, creditDef,alpha);
-        
+                heuristicSelector, creditDef, alpha);
+
         return hemoea;
     }
-    
+
     @Override
     public void run() {
         IHyperHeuristic hh = newHeMOEA(properties, problem, heuristicSelector, creditDef, heuristics);
-        
+
         Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
-                    .withProblem(probName)
-                    .attachAdditiveEpsilonIndicatorCollector()
-                    .attachGenerationalDistanceCollector()
-                    .attachHypervolumeCollector()
-                    .withEpsilon(epsilonDouble)
-//                    .withEpsilon(10,0.1,0.1,0.1)
-                    .withReferenceSet(new File(path+File.separator+"pf"+File.separator + probName + ".dat"))
-                    .attachElapsedTimeCollector();
-            
-            Algorithm instAlgorithm = instrumenter.instrument(hh);
-            
-            // run the executor using the listener to collect results
-            SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd--HH-mm-ss" );
-            String stamp = dateFormat.format( new Date() );
-            System.out.println("Starting optimization on "+ problem.getName() + "_" + stamp);
-            
-            System.out.printf("Percent done: \n");
+                .withProblem(probName)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachHypervolumeCollector()
+                .withEpsilon(epsilonDouble)
+                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+                .attachElapsedTimeCollector();
+
+        Algorithm instAlgorithm = instrumenter.instrument(hh);
+
+        // run the executor using the listener to collect results
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss");
+        String stamp = dateFormat.format(new Date());
+        System.out.println("Starting optimization on " + problem.getName() + "_" + stamp);
+
+//            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
                 instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
 //                System.out.printf("%02.4f",(double)instAlgorithm.getNumberOfEvaluations()/(double)maxEvaluations);
             }
-            System.out.println("\nDone with optimization");
-            
-            Accumulator accum = ((InstrumentedAlgorithm)instAlgorithm).getAccumulator();
-            
-            File results = new File(path+File.separator+"results"+File.separator+problem.getName() + "_" +
-                    hh.getNextHeuristicSupplier() +"_"+hh.getCreditDefinition()+"_"+stamp+".res");
-            System.out.println("Saving results");
-            
-            try (FileWriter writer = new FileWriter(results)){
-                Set<String> keys = accum.keySet();
-                Iterator<String> keyIter = keys.iterator();
-                while(keyIter.hasNext()){
-                    String key = keyIter.next();
-                    int dataSize = accum.size(key);
-                    writer.append(key).append(",");
-                    for(int i=0;i<dataSize;i++){
-                        writer.append(accum.get(key, i).toString());
-                        if(i+1<dataSize)
-                            writer.append(",");
+        System.out.println("Done with optimization");
+
+        Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
+
+        File results = new File(path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".res");
+        System.out.println("Saving results");
+
+        try (FileWriter writer = new FileWriter(results)) {
+            Set<String> keys = accum.keySet();
+            Iterator<String> keyIter = keys.iterator();
+            while (keyIter.hasNext()) {
+                String key = keyIter.next();
+                int dataSize = accum.size(key);
+                writer.append(key).append(",");
+                for (int i = 0; i < dataSize; i++) {
+                    writer.append(accum.get(key, i).toString());
+                    if (i + 1 < dataSize) {
+                        writer.append(",");
                     }
-                    writer.append("\n");
                 }
-                
-                writer.flush();
+                writer.append("\n");
             }
-            catch(IOException ex){
-                Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            
-            //save selection history
-            IOSelectionHistory.saveHistory(((IHyperHeuristic)hh).getSelectionHistory(),
-                    path+File.separator+"results"+File.separator+problem.getName() + "_" +
-                            hh.getNextHeuristicSupplier() +"_"+hh.getCreditDefinition()+"_"+stamp+".hist");
-            
-            //save credit history
-            IOCreditHistory.saveHistory(((IHyperHeuristic)hh).getCreditHistory(),
-                    path+File.separator+"results"+File.separator+problem.getName() + "_" +
-                            hh.getNextHeuristicSupplier() +"_"+hh.getCreditDefinition()+"_"+stamp+".credit");
-            
-            hh.reset();
+
+            writer.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //save selection history
+        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+                path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".hist");
+
+        //save credit history
+        IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
+                path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
+
+        hh.reset();
     }
-    
+
 }

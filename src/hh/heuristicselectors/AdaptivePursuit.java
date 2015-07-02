@@ -83,7 +83,7 @@ public class AdaptivePursuit extends ProbabilityMatching{
      */
     @Override
     protected double function2maximize(Variation heuristic){
-        return creditRepo.getCurrentCredit(heuristic).getValue();
+        return creditRepo.getSumCredit(getNumberOfIterations(),heuristic).getValue();
     }
     
     @Override

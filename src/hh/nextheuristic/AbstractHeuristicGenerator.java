@@ -45,6 +45,11 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     protected ICreditRepository creditRepo;
     
     /**
+     * The number of iterations that counts how many times nextHeuristic() has been called
+     */
+    private int iterations;
+    
+    /**
      * Constructor requires the set of building blocks to generate a heuristic
      * @param creditRepo the credit repository to be used
      * @param buildingBlocks the set of building blocks to generate a heuristic
@@ -71,6 +76,7 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
             int randInt = random.nextInt(nBuildingBlocks);
             randHeuristic.appendOperator(buildingBlocks.get(randInt));
         }
+        incrementIterations();
         return randHeuristic;
     }
     
@@ -78,7 +84,7 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     public HashMap<Variation, Credit> getAllCurrentCredits() {
         HashMap<Variation, Credit> out = new HashMap();
         for(Variation heuristic:creditRepo.getHeuristics()){
-            out.put(heuristic, creditRepo.getCurrentCredit(heuristic));
+            out.put(heuristic, creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
         }
         return out;
     }
@@ -96,6 +102,22 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     @Override
     public void update(ICreditRepository creditRepo) {
         this.creditRepo = creditRepo;
+    }
+    
+    /**
+     * Increments the number of times nextHeuristic() has been called by one
+     */
+    protected void incrementIterations(){
+        iterations++;
+    }
+    
+    /**
+     * Returns the number of times nextHeuristic() has been called
+     * @return the number of times nextHeuristic() has been called
+     */
+    @Override
+    public int getNumberOfIterations(){
+        return iterations;
     }
     
 }

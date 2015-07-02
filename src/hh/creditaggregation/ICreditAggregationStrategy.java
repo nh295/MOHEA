@@ -7,7 +7,7 @@
 package hh.creditaggregation;
 
 import hh.creditdefinition.Credit;
-import hh.creditrepository.AbstractCreditHistory;
+import hh.credithistory.ICreditHistory;
 
 /**
  *
@@ -22,5 +22,5 @@ public interface ICreditAggregationStrategy {
      * @param creditHistory the history to aggregate
      * @return The aggregated credit
      */
-    public Credit aggregateCredit(int iteration, AbstractCreditHistory creditHistory);
+    public Credit aggregateCredit(int iteration, ICreditHistory creditHistory);
 }

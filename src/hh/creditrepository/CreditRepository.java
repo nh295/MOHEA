@@ -38,11 +38,12 @@ public class CreditRepository implements ICreditRepository,Serializable{
 
     /**
      * Gets the current credit assigned to the specified heuristic
+     * @param iteration the iteration to sum to
      * @param heuristic the heuristic to query
      * @return the credit currently assigned to the specified heuristic
      */
     @Override
-    public Credit getCurrentCredit(Variation heuristic) {
+    public Credit getSumCredit(int iteration,Variation heuristic) {
         return creditRepository.get(heuristic);
     }
 

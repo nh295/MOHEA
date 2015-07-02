@@ -14,7 +14,7 @@ import hh.creditdefinition.aggregate.AggregateParetoRankCredit;
 import hh.creditdefinition.immediate.ParentDominationCredit;
 import hh.creditdefinition.immediate.ImmediateParetoFrontCredit;
 import hh.creditdefinition.immediate.ImmediateParetoRankCredit;
-import hh.creditrepository.CreditHistory;
+import hh.credithistory.CreditHistory;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.heuristicselectors.AdaptivePursuit;
 import hh.heuristicselectors.DMAB;
@@ -47,12 +47,12 @@ public class HHCreditTest {
             
             String path;
             if(args.length == 0 )
-                path = "/Users/nozomihitomi/Dropbox/Cornell/CEE 6660 Systems Engineering Under Uncertainty/HHCreditTest";
+                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             else
                 path = args[0];
             
-            String probName = "UF"+args[1];
-//             String probName = "UF5";
+//            String probName = "UF"+args[1];
+             String probName = "UF5";
 //            String probName = problems[j];
             System.out.println(probName);
             Problem prob = ProblemFactory.getInstance().getProblem(probName);
@@ -75,7 +75,7 @@ public class HHCreditTest {
             prop.put("alpha", "0.6");
             prop.put("epsilon", epsilon);
             
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 2;
             int maxEvaluations = 10100;
             
             //Choose heuristics to be applied
@@ -127,7 +127,7 @@ public class HHCreditTest {
 //                        test.run();
 //                    });
                     
-                    System.out.println("Finished "+prob.getName() + "_"+ selector+"_"+credDef1);
+                    System.out.println("Finished "+prob.getName() + "_"+ selector+"_"+credDef1+"\n\n");
                 }
             }
         }

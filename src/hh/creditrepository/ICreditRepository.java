@@ -19,10 +19,11 @@ public interface ICreditRepository {
 
     /**
      * Method returns the current credit stored for the specified heuristic
+     * @param iteration the iteration to sum up to
      * @param heuristic
      * @return the current credit stored for the specified heuristic
      */
-    public Credit getCurrentCredit(Variation heuristic);
+    public Credit getSumCredit(int iteration,Variation heuristic);
     
     /**
      * Updates the credit history for the specified credit
