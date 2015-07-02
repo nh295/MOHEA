@@ -1,2 +1,2 @@
 # MOHEA
-Mutli-objective Hyper-heuristic Evolutionary Algorithm
+Multi-objective Hyper-heuristic Evolutionary Algorithm
