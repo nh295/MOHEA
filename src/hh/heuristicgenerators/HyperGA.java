@@ -63,7 +63,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
     /**
      * The method to weight credits earned over time.
      */
-    private ICreditAggregationStrategy aggregateStrategy;
+    private ICreditAggregationStrategy creditAgg;
     
     /**
      * Creates a new population that is empty.
@@ -75,11 +75,11 @@ public class HyperGA extends AbstractHeuristicGenerator {
      * @param mutationRate initial mutation rate
      * @param crossoverRate initial crossover rate
      * @param creditHistory The credit history to be used for an individual. Keeps track of credits earned over time
-     * @param aggregateStrategy The method to weight credits earned over time.
+     * @param creditAgg The method to weight credits earned over time.
      */
     public HyperGA(Collection<Variation> heuristics,int chromosomeLength,
             int thresholdGen, int keepN, int populationSize,  double mutationRate,
-            double crossoverRate,AbstractCreditHistory creditHistory, ICreditAggregationStrategy aggregateStrategy) {
+            double crossoverRate,AbstractCreditHistory creditHistory, ICreditAggregationStrategy creditAgg) {
         super(new CreditRepository(heuristics),heuristics);
         this.keepN = keepN;
         this.populationSize = populationSize;
@@ -90,7 +90,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
         this.origCrossRate = crossoverRate;
         this.thresholdGen = thresholdGen;
         this.creditHistory = creditHistory;
-        this.aggregateStrategy = aggregateStrategy;
+        this.creditAgg = creditAgg;
         population = new NondominatedSortingPopulation();
         heuristicIndex=0;
         avgFitnessHistory = new ArrayList();
@@ -104,7 +104,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
     private void generateRandomPopulation(){
         for(int i=0;i<populationSize;i++){
             HeuristicIndividual ind = new HeuristicIndividual(1, 1, 
-                    getRandomHeuristic(origChromosomeLength),creditHistory,aggregateStrategy);
+                    getRandomHeuristic(origChromosomeLength),creditHistory,creditAgg);
             population.add(ind);
         }
         averageHeuristicSequenceLength = (double)origChromosomeLength;
@@ -150,7 +150,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             double sumChromoFitness = 0;
             HeuristicIndividual chromo = (HeuristicIndividual)iter.next();
             for(Variation buildingBlock: chromo.getSequence().getSequence()){
-                sumChromoFitness+=creditRepo.getSumCredit(getNumberOfIterations(),buildingBlock).getValue();
+                sumChromoFitness+=creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),buildingBlock).getValue();
             }
             chromo.setObjective(0,sumChromoFitness);
             sumPopulationFitness+=sumChromoFitness;
@@ -212,7 +212,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             
             Iterator<HeuristicSequence> offspringIter = offspring.iterator();
             while(offspringIter.hasNext()){
-                crossedPop.add(new HeuristicIndividual(1,1,offspringIter.next(),creditHistory,aggregateStrategy));
+                crossedPop.add(new HeuristicIndividual(1,1,offspringIter.next(),creditHistory,creditAgg));
             }
         }
         return crossedPop;
@@ -233,7 +233,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
                 }else{
                     offspring = insertGoodMutation(ind);
                 }
-                mutatedPop.add(new HeuristicIndividual(1, 1, offspring,creditHistory,aggregateStrategy));
+                mutatedPop.add(new HeuristicIndividual(1, 1, offspring,creditHistory,creditAgg));
             }
         }
         return mutatedPop;
@@ -413,7 +413,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             HeuristicSequence challengerGene = new HeuristicSequence();
             for(int i=0;i<chromosome.getLength();i++){
                 Variation heuristic = chromosome.get(i);
-                if (creditRepo.getSumCredit(getNumberOfIterations(),heuristic).getValue()>0){ //yes improvement
+                if (creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),heuristic).getValue()>0){ //yes improvement
                     challengerGene.appendOperator(heuristic);
                 }else{
                     //check to see which gene is the longest one
@@ -440,7 +440,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             HeuristicSequence challengerGene = new HeuristicSequence();
             for(int i=0;i<chromosome.getLength();i++){
                 Variation heuristic = chromosome.get(i);
-                if (creditRepo.getSumCredit(getNumberOfIterations(),heuristic).getValue()<=0){ //yes improvement
+                if (creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),heuristic).getValue()<=0){ //yes improvement
                     challengerGene.appendOperator(heuristic);
                 }else{
                     //check to see which gene is the longest one

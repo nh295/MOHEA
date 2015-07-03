@@ -90,4 +90,16 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
     public int size(){
         return creditHistory.size();
     }
+    
+    /**
+     * Returns the latest credit in the history. If the history is empty, returns a Credit with 0.0 value
+     * @return 
+     */
+    @Override
+    public Credit getLatest(){
+        if(creditHistory.isEmpty())
+            return new Credit(-1,0.0);
+        else
+            return creditHistory.getFirst();
+    }
 }

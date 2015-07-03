@@ -28,6 +28,12 @@ public interface ICreditHistory extends Iterable<Credit>{
     public LinkedList<Credit> getHistory();
     
     /**
+     * Returns the latest credit in the history
+     * @return 
+     */
+    public Credit getLatest();
+    
+    /**
      * Returns an instance of credit history.
      * @return an instance of credit history
      */

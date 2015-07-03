@@ -15,11 +15,12 @@ import hh.credithistory.CreditHistory;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.CreditRepository;
 import hh.nextheuristic.INextHeuristic;
+import hh.qualityhistory.HeuristicQualityHistory;
 import hh.selectionhistory.HeuristicSelectionHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
 import org.apache.commons.lang3.ArrayUtils;
 import org.moeaframework.algorithm.EpsilonMOEA;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
@@ -30,8 +31,6 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
-import org.moeaframework.core.spi.OperatorFactory;
-import org.moeaframework.util.TypedProperties;
 
 /**
  *
@@ -76,6 +75,11 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * The learning rate for the decaying credit value
      */
     private final double alpha;
+    
+    /**
+     * The history of the heuristics' qualities over time
+     */
+    private HeuristicQualityHistory qualityHistory;
 
     
     /**
@@ -104,6 +108,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         this.heuristicSelectionHistory = new HeuristicSelectionHistory(variations);
         this.creditHistory = new CreditHistoryRepository(variations, new CreditHistory());
         this.heuristics = variations;
+        this.qualityHistory = new HeuristicQualityHistory(heuristics);
     }
 
     /**
@@ -157,6 +162,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 heuristicSelector.update(heuristic, new DecayingCredit(this.getNumberOfEvaluations(), creditValue, alpha));
                 heuristicSelectionHistory.add(heuristic);
                 updateCreditHistory();
+                updateQualityHistory();
             }
         }
 
@@ -195,7 +201,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             heuristicSelector.update(newCreditRepo);
             heuristicSelectionHistory.add(heuristic);
             updateCreditHistory();
-
+            updateQualityHistory();
         }
     }
 
@@ -204,9 +210,20 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * to the INextHeuristic class used
      */
     private void updateCreditHistory() {
-        HashMap<Variation, Credit> currentCredits = heuristicSelector.getAllCurrentCredits();
+        HashMap<Variation, Credit> currentCredits = heuristicSelector.getLatestCredits();
         for (Variation heuristic : heuristics) {
             creditHistory.update(heuristic, currentCredits.get(heuristic));
+        }
+    }
+    
+    /**
+     * Updates the quality history every iteration for each heuristic according
+     * to the INextHeuristic class used
+     */
+    private void updateQualityHistory(){
+        HashMap<Variation, Double> currentQualities = heuristicSelector.getQualities();
+        for (Variation heuristic : heuristics) {
+            qualityHistory.add(heuristic,currentQualities.get(heuristic));
         }
     }
 
@@ -229,6 +246,15 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public CreditHistoryRepository getCreditHistory() {
         return creditHistory;
     }
+    
+    /**
+     * gets the quality history stored for each heuristic in the hyper-heuristic
+     * @return 
+     */
+    @Override
+    public HeuristicQualityHistory getQualityHistory(){
+        return qualityHistory;
+    }
 
     /**
      * Reset the hyperheuristic. Clear all selection history and the credit
@@ -240,6 +266,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         heuristicSelector.reset();
         numberOfEvaluations = 0;
         creditHistory.clear();
+        qualityHistory.clear();
     }
 
     @Override

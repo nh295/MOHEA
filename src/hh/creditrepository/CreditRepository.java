@@ -6,6 +6,7 @@
 
 package hh.creditrepository;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import java.io.Serializable;
 import java.util.Collection;
@@ -37,13 +38,14 @@ public class CreditRepository implements ICreditRepository,Serializable{
     }
 
     /**
-     * Gets the current credit assigned to the specified heuristic
-     * @param iteration the iteration to sum to
-     * @param heuristic the heuristic to query
-     * @return the credit currently assigned to the specified heuristic
+     * Method returns the current aggregated credit stored for the specified heuristic
+     * @param creditAgg The method to aggregate the history of credits. In this implementation, a credit aggregation strategy is not needed
+     * @param iteration the iteration to aggregate up to. In this implementation, an iteration is not needed
+     * @param heuristic
+     * @return the current credit stored for the specified heuristic
      */
     @Override
-    public Credit getSumCredit(int iteration,Variation heuristic) {
+    public Credit getAggregateCredit(ICreditAggregationStrategy creditAgg, int iteration,Variation heuristic){
         return creditRepository.get(heuristic);
     }
 
@@ -75,6 +77,11 @@ public class CreditRepository implements ICreditRepository,Serializable{
         while(iter.hasNext()){
             creditRepository.put(iter.next(), new Credit(-1,0.0));
         }
+    }
+
+    @Override
+    public Credit getLatestCredit(Variation heuristic) {
+        return creditRepository.get(heuristic);
     }
     
 }

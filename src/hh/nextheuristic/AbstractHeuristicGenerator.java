@@ -7,12 +7,12 @@
 package hh.nextheuristic;
 
 import hh.creditdefinition.Credit;
-import hh.creditrepository.CreditRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.heuristicgenerators.HeuristicSequence;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 import org.moeaframework.core.Variation;
 
@@ -47,7 +47,13 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     /**
      * The number of iterations that counts how many times nextHeuristic() has been called
      */
-    private int iterations;
+    private int iterations;    
+    
+    /**
+     * Hashmap to store the qualities of the heuristics
+     */
+    protected HashMap<Variation,Double> qualities;
+    
     
     /**
      * Constructor requires the set of building blocks to generate a heuristic
@@ -58,6 +64,7 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
         this.creditRepo = creditRepo;
         this.buildingBlocks = new ArrayList(buildingBlocks);
         this.nBuildingBlocks = buildingBlocks.size();
+        this.qualities = new HashMap<>();
     }
     
     /**
@@ -81,12 +88,8 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     }
     
     @Override
-    public HashMap<Variation, Credit> getAllCurrentCredits() {
-        HashMap<Variation, Credit> out = new HashMap();
-        for(Variation heuristic:creditRepo.getHeuristics()){
-            out.put(heuristic, creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
-        }
-        return out;
+    public HashMap<Variation, Double> getQualities() {
+        return qualities;
     }
     
     @Override
@@ -97,6 +100,20 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     @Override
     public void reset() {
         creditRepo.clear();
+        resetQualities();
+    }
+    
+    
+    /**
+     * Clears qualities and resets them to 0.
+     */
+    public final void resetQualities(){
+        Collection<Variation> heuristics = creditRepo.getHeuristics();
+        Iterator<Variation> iter = heuristics.iterator();
+        while(iter.hasNext()){
+            //all heuristics have 0 quality at the beginning
+            qualities.put(iter.next(), 0.0);
+        }
     }
     
     @Override
@@ -118,6 +135,21 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     @Override
     public int getNumberOfIterations(){
         return iterations;
+    }
+    
+    /**
+     * Returns the latest credit received by each heuristic
+     * @return the latest credit received by each heuristic
+     */
+    @Override
+    public HashMap<Variation,Credit> getLatestCredits(){
+        HashMap<Variation,Credit> out = new HashMap<>();
+        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
+        while(iter.hasNext()){
+            Variation heuristic = iter.next();
+            out.put(heuristic,creditRepo.getLatestCredit(heuristic));
+        }
+        return out;
     }
     
 }

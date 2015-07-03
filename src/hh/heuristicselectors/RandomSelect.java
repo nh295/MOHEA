@@ -6,6 +6,7 @@
 
 package hh.heuristicselectors;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
@@ -22,9 +23,10 @@ public class RandomSelect extends AbstractHeuristicSelector{
      * RandomSelect does not really utilize the credit repository so any 
      * repository will do
      * @param creditRepo any ICreditRepository
+     * @param creditAgg the aggregation strategy to reward a heuristic a credit for the current iteration based on past performance
      */
-    public RandomSelect(ICreditRepository creditRepo) {
-        super(creditRepo);
+    public RandomSelect(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg) {
+        super(creditRepo,creditAgg);
     }
 
     /**

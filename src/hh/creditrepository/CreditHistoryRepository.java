@@ -7,6 +7,7 @@
 package hh.creditrepository;
 
 import hh.creditaggregation.CreditAggregator;
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.credithistory.ICreditHistory;
 import java.io.Serializable;
@@ -24,8 +25,6 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
     private static final long serialVersionUID = -151125984931862164L;
     
     protected HashMap<Variation,ICreditHistory> creditHistory;
-    
-    private CreditAggregator creditAgg = new CreditAggregator();
     
     /**
      * This constructor creates the credit repository that initialize 0 credit for each heuristic
@@ -78,8 +77,13 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
      * @return the sum of all credit assigned to the specified heuristic, summed over the history
      */
     @Override
-    public Credit getSumCredit(int iteration,Variation heuristic) {
-        return creditAgg.sum(iteration, creditHistory.get(heuristic));
+    public Credit getAggregateCredit(ICreditAggregationStrategy creditAgg, int iteration,Variation heuristic){
+        return creditAgg.aggregateCredit(iteration, creditHistory.get(heuristic));
+    }
+    
+    @Override
+    public Credit getLatestCredit(Variation heuristic) {
+        return creditHistory.get(heuristic).getLatest();
     }
     
 }

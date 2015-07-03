@@ -6,6 +6,7 @@
 
 package hh.heuristicselectors;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.CreditRepository;
 import hh.creditrepository.ICreditRepository;
@@ -43,17 +44,25 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * values
      */
     protected CreditRepository tmpCreditRepo;
+    
+    /**
+     * Adaptation rate
+     */
+    protected final double alpha;
 
     /**
      * Constructor to initialize probability map for selection
      * @param creditRepo the type of credit repository to be used
+     * @param creditAgg the aggregation strategy to reward a heuristic a credit for the current iteration based on past performance
      * @param pmin The minimum probability for a heuristic to be selected
+     * @param alpha The adaptation rate
      */
-    public ProbabilityMatching(ICreditRepository creditRepo, double pmin) {
-        super(creditRepo);
+    public ProbabilityMatching(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg, double pmin,double alpha) {
+        super(creditRepo,creditAgg);
         this.pmin = pmin;
         this.probabilities = new HashMap();
         this.tmpCreditRepo = new CreditRepository(creditRepo.getHeuristics());
+        this.alpha = alpha;
         reset();
     }
 
@@ -91,36 +100,55 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
     public void update(Variation heuristic, Credit credit) {
         
         creditRepo.update(heuristic, credit);
-        tmpCreditRepo.update(heuristic, creditRepo.getSumCredit(getNumberOfIterations(),heuristic));
+        updateQuality(heuristic);
         
-        //if current credit becomes negative, adjust to 0
-        if(tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic).getValue()<=0.0){
-            tmpCreditRepo.update(heuristic, new Credit(credit.getIteration(),0.0));
-        }
-        
-        //calculate the sum of all credits across all heuristics
-        double sum = 0.0;
-        Iterator<Variation> iter = probabilities.keySet().iterator();
-        while(iter.hasNext()){
-            Variation heuristic_next = iter.next();
-            sum+= tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic_next).getValue();
-        }
+        double sum = sumQualities();
         
         // if the credits sum up to zero, apply uniform probabilty to  heuristics
-        iter = probabilities.keySet().iterator();
+        Iterator<Variation> iter = probabilities.keySet().iterator();
         if(Math.abs(sum)<Math.pow(10.0, -14)){
             while(iter.hasNext()){
                 Variation heuristic_i = iter.next();
                 probabilities.put(heuristic_i,1.0/this.nHeuristics);
             }
-        }else{
+        }else{ //else update probabilities proportional to quality
             while(iter.hasNext()){
                 Variation heuristic_i = iter.next();
                 double newProb = pmin + (1-probabilities.size()*pmin)
-                        * (tmpCreditRepo.getSumCredit(getNumberOfIterations(),heuristic_i).getValue()/sum);
+                        * (qualities.get(heuristic)/sum);
                 probabilities.put(heuristic_i,newProb);
             }
         }
+    }
+    
+    /**
+     * Updates the quality of the heuristic based on the aggregation applied the
+     * heuristic's credit history. If the quality becomes negative, it is reset
+     * to 0.0
+     * @param heuristic for which to update the quality
+     */
+    protected void updateQuality(Variation heuristic){
+        double reward = creditRepo.getAggregateCredit(creditAgg, getNumberOfIterations(), heuristic).getValue();
+        qualities.put(heuristic, (1.0-alpha)*qualities.get(heuristic)+alpha*reward);
+        
+        //if current quality becomes negative, adjust to 0
+        if(qualities.get(heuristic)<0.0){
+            qualities.put(heuristic, 0.0);
+        }
+    }
+    
+    
+    /**
+     * calculate the sum of all qualities across the heuristics
+     * @return the sum of the heuristics' qualities
+     */
+    protected double sumQualities(){
+        double sum = 0.0;
+        Iterator<Variation> iter = probabilities.keySet().iterator();
+        while(iter.hasNext()){
+            sum+= qualities.get(iter.next());
+        }
+        return sum;
     }
     
     /**
@@ -128,6 +156,8 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      */
     @Override
     public final void reset(){
+        super.resetQualities();
+        super.reset();
         probabilities.clear();
         Collection<Variation> heuristics = creditRepo.getHeuristics();
         Iterator<Variation> iter = heuristics.iterator();
@@ -135,7 +165,6 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
             //all heuristics get uniform selection probability at beginning
             probabilities.put(iter.next(), 1.0/this.nHeuristics);
         }
-        creditRepo.clear();
         tmpCreditRepo.clear();
     }
     

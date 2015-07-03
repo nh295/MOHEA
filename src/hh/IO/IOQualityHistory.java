@@ -8,6 +8,8 @@ package hh.IO;
 
 import hh.creditdefinition.Credit;
 import hh.creditrepository.CreditHistoryRepository;
+import hh.qualityhistory.HeuristicQualityHistory;
+import hh.selectionhistory.HeuristicSelectionHistory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,33 +23,33 @@ import java.util.logging.Logger;
 import org.moeaframework.core.Variation;
 
 /**
- * This class is responsible for saving the heuristic credit history and 
- * other statistics regarding heuristic credit history.
+ * This class is responsible for saving the heuristic quality history and 
+ * other statistics regarding heuristic quality history.
  * @author nozomihitomi
  */
-public class IOCreditHistory {
+public class IOQualityHistory {
     /**
      * Saves the credit history at the specified filename. The file will be a
      * list of the credits received by each heuristic selected in order from 
      * beginning to end separated by the desired separator. Each row in the 
      * file will contain the history of one heuristic, with the heuristic name 
      * at the beginning of the row
-     * @param creditRepo The credit repository to save
+     * @param qualityHistory The quality history  to save
      * @param filename filename including the path and the extension.
      * @param separator the type of separator desired
      * @return true if the save is successful
      */
-    public static boolean saveHistory(CreditHistoryRepository creditRepo,String filename,String separator) {
+    public static boolean saveHistory(HeuristicQualityHistory qualityHistory,String filename,String separator) {
         try(FileWriter fw = new FileWriter(new File(filename))){
-            Iterator<Variation> heuristicIter = creditRepo.getHeuristics().iterator();
+            Iterator<Variation> heuristicIter = qualityHistory.getHeuristics().iterator();
             while(heuristicIter.hasNext()){
                 Variation heuristic = heuristicIter.next();
-                Iterator<Credit> historyIter= creditRepo.getHistory(heuristic).getHistory().iterator();
+                Iterator<Double> historyIter= qualityHistory.getHistory(heuristic).iterator();
                 String[] heuristicName = heuristic.toString().split("operator.");
                 String[] splitName = heuristicName[heuristicName.length-1].split("@");
                 fw.append(splitName[0]+separator);
                 while(historyIter.hasNext()){
-                    fw.append(Double.toString(historyIter.next().getValue()));
+                    fw.append(Double.toString(historyIter.next()));
                     if(historyIter.hasNext())
                         fw.append(separator);
                 }
@@ -56,41 +58,41 @@ public class IOCreditHistory {
             }
             fw.flush();
         } catch (IOException ex) {
-            Logger.getLogger(IOCreditHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
     }
     
      /**
-     * Saves the credit history at the specified filename as a java Object. The 
-     * file an instance of  CreditHistoryRepository
-     * @param creditRepo The credit repository to save
+     * Saves the quality history at the specified filename as a java Object. The 
+     * file an instance of  HeuristicQualityHistory
+     * @param qualityHistory The quality history  to save
      * @param filename filename including the path and the extension.
      */
-    public static void saveHistory(CreditHistoryRepository creditRepo,String filename){
+    public static void saveHistory(HeuristicQualityHistory qualityHistory,String filename){
         try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));){
-            os.writeObject(creditRepo);
+            os.writeObject(qualityHistory);
             os.close();
         } catch (IOException ex) {
-            Logger.getLogger(IOCreditHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
      
     /**
-     * Loads the CreditRepository instance saved by using saveHistory() from the filename. 
+     * Loads the HeuristicQualityHistory instance saved by using saveHistory() from the filename. 
      * @param filename the file name (path and extension included)
-     * @return the CreditRepository instance saved by using saveHistory()
+     * @return the HeuristicQualityHistory instance saved by using saveHistory()
      */
-    public static CreditHistoryRepository loadHistory(String filename){
-        CreditHistoryRepository repo = null;
+    public static HeuristicQualityHistory loadHistory(String filename){
+        HeuristicQualityHistory hist = null;
         try(ObjectInputStream is = new ObjectInputStream( new FileInputStream( filename ))){
-           repo = (CreditHistoryRepository)is.readObject();
+           hist = (HeuristicQualityHistory)is.readObject();
         } catch (IOException ex) {
-            Logger.getLogger(IOCreditHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(IOCreditHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return repo;
+        return hist;
     }
 }

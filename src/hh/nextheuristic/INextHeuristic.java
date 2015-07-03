@@ -39,15 +39,21 @@ public interface INextHeuristic{
     public void update(ICreditRepository creditRepo);
     
     /**
-     * Resets all stored history and credits
+     * Resets all stored history, qualities and credits
      */
     public void reset();
     
     /**
-     * Gets the current credits for each heuristic stored in the repository
-     * @return the current credits for each heuristic stored in the repository
+     * Gets the current quality of each heuristic stored
+     * @return the current quality for each heuristic stored
      */
-    public HashMap<Variation,Credit> getAllCurrentCredits();
+    public HashMap<Variation,Double> getQualities();
+    
+    /**
+     * Returns the latest credit received by each heuristic
+     * @return the latest credit received by each heuristic
+     */
+    public HashMap<Variation,Credit> getLatestCredits();
     
     /**
      * Returns the number of times nextHeuristic() has been called

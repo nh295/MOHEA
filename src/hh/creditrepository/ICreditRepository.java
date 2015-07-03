@@ -6,24 +6,26 @@
 
 package hh.creditrepository;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
 
 /**
- *
+ * Intergace to store the credit histories of multiple heuristics
  * @author nozomihitomi
  */
 public interface ICreditRepository {
     
 
     /**
-     * Method returns the current credit stored for the specified heuristic
-     * @param iteration the iteration to sum up to
+     * Method returns the current aggregated credit stored for the specified heuristic
+     * @param creditAgg The method to aggregate the history of credits
+     * @param iteration the iteration to aggregate up to
      * @param heuristic
      * @return the current credit stored for the specified heuristic
      */
-    public Credit getSumCredit(int iteration,Variation heuristic);
+    public Credit getAggregateCredit(ICreditAggregationStrategy creditAgg, int iteration,Variation heuristic);
     
     /**
      * Updates the credit history for the specified credit
@@ -42,4 +44,11 @@ public interface ICreditRepository {
      * Clears the credit stored in the repository
      */
     public void clear();
+    
+    /**
+     * gets the most recent credit in the repository for a specified heuristic
+     * @param heuristic of interest
+     * @return the most recent credit in the repository for the specified heuristic
+     */
+    public Credit getLatestCredit(Variation heuristic);
 }

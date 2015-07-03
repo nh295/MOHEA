@@ -6,6 +6,8 @@
 
 package hh.credittest;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.creditaggregation.MeanCredits;
 import hh.creditdefinition.immediate.ImmediateEArchiveCredit;
 import hh.creditdefinition.ICreditDefinition;
 import hh.creditdefinition.aggregate.AggregateEArchiveCredit;
@@ -73,7 +75,7 @@ public class HHCreditTest {
             Properties prop = new Properties();
             prop.put("populationSize", "100");
 //            prop.put("alpha", args[2]);
-            prop.put("alpha", "0.6");
+            prop.put("alpha", "1.0");
             prop.put("epsilon", epsilon);
             
             int numberOfSeeds = 2;
@@ -90,14 +92,18 @@ public class HHCreditTest {
             heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
             heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
             
+            //Choose credit aggregation method
+            ICreditAggregationStrategy creditAgg = new MeanCredits();
             
             //setup algorithm
-            double pmin = 0.05;
+            double pmin = 0.1;
+            double alpha = 0.8;
+            double beta = 0.8;
             CreditHistoryRepository creditRepo = new CreditHistoryRepository(heuristics, new CreditHistoryWindow(300));
             INextHeuristic[] selectors= new INextHeuristic[]{
-                new RandomSelect(creditRepo),
-                new ProbabilityMatching(creditRepo, pmin),
-                new AdaptivePursuit(creditRepo, pmin),
+//                new RandomSelect(creditRepo,creditAgg),
+                new ProbabilityMatching(creditRepo, creditAgg, pmin,alpha),
+                new AdaptivePursuit(creditRepo, creditAgg, pmin,alpha,beta),
 //                new DMAB(creditRepo, 0.01, 0.1, 10)
             };
             

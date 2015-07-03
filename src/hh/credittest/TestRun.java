@@ -6,6 +6,7 @@
 package hh.credittest;
 
 import hh.IO.IOCreditHistory;
+import hh.IO.IOQualityHistory;
 import hh.IO.IOSelectionHistory;
 import hh.creditdefinition.ICreditDefinition;
 import hh.hyperheuristics.HeMOEA;
@@ -175,6 +176,11 @@ public class TestRun implements Runnable {
 
         //save credit history
         IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
+                path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
+        
+        //save quality history
+        IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
                 path + File.separator + "results" + File.separator + problem.getName() + "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
 

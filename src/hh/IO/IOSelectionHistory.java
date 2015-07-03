@@ -49,7 +49,7 @@ public class IOSelectionHistory {
             }
             fw.flush();
         } catch (IOException ex) {
-            Logger.getLogger(HeuristicSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
@@ -66,7 +66,7 @@ public class IOSelectionHistory {
             os.writeObject(history);
             os.close();
         } catch (IOException ex) {
-            Logger.getLogger(HeuristicSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
      
@@ -80,9 +80,9 @@ public class IOSelectionHistory {
         try(ObjectInputStream is = new ObjectInputStream( new FileInputStream( filename ))){
            history = (IHeuristicSelectionHistory)is.readObject();
         } catch (IOException ex) {
-            Logger.getLogger(HeuristicSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(IOCreditHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
         }
         return history;
     }
@@ -108,7 +108,7 @@ public class IOSelectionHistory {
             }
             fw.flush();
         } catch (IOException ex) {
-            Logger.getLogger(HeuristicSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         return true;
