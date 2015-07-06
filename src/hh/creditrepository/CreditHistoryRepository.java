@@ -81,9 +81,4 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
         return creditAgg.aggregateCredit(iteration, creditHistory.get(heuristic));
     }
     
-    @Override
-    public Credit getLatestCredit(Variation heuristic) {
-        return creditHistory.get(heuristic).getLatest();
-    }
-    
 }

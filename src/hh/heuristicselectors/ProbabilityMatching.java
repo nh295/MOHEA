@@ -37,13 +37,6 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      */
     protected final double pmin;
     
-    /**
-     * A temporary credit repository used in the update process. Stores the 
-     * current credits for each heuristic. Its use allows for handling 
-     * situations when the current credit becomes negative by storing them as 0 
-     * values
-     */
-    protected CreditRepository tmpCreditRepo;
     
     /**
      * Adaptation rate
@@ -61,7 +54,6 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
         super(creditRepo,creditAgg);
         this.pmin = pmin;
         this.probabilities = new HashMap();
-        this.tmpCreditRepo = new CreditRepository(creditRepo.getHeuristics());
         this.alpha = alpha;
         reset();
     }
@@ -115,7 +107,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
             while(iter.hasNext()){
                 Variation heuristic_i = iter.next();
                 double newProb = pmin + (1-probabilities.size()*pmin)
-                        * (qualities.get(heuristic)/sum);
+                        * (qualities.get(heuristic_i)/sum);
                 probabilities.put(heuristic_i,newProb);
             }
         }
@@ -165,7 +157,6 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
             //all heuristics get uniform selection probability at beginning
             probabilities.put(iter.next(), 1.0/this.nHeuristics);
         }
-        tmpCreditRepo.clear();
     }
     
     @Override

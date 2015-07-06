@@ -73,13 +73,13 @@ public class HHCreditTest {
             
             //Setup algorithm parameters
             Properties prop = new Properties();
-            prop.put("populationSize", "100");
+            prop.put("populationSize", "600");
 //            prop.put("alpha", args[2]);
             prop.put("alpha", "1.0");
             prop.put("epsilon", epsilon);
             
-            int numberOfSeeds = 2;
-            int maxEvaluations = 10100;
+            int numberOfSeeds = 30;
+            int maxEvaluations = 300000;
             
             //Choose heuristics to be applied. Use default values (probabilities)
             ArrayList<Variation> heuristics = new ArrayList<>();
@@ -101,17 +101,17 @@ public class HHCreditTest {
             double beta = 0.8;
             CreditHistoryRepository creditRepo = new CreditHistoryRepository(heuristics, new CreditHistoryWindow(300));
             INextHeuristic[] selectors= new INextHeuristic[]{
-//                new RandomSelect(creditRepo,creditAgg),
-                new ProbabilityMatching(creditRepo, creditAgg, pmin,alpha),
-                new AdaptivePursuit(creditRepo, creditAgg, pmin,alpha,beta),
+                new RandomSelect(creditRepo,creditAgg),
+//                new ProbabilityMatching(creditRepo, creditAgg, pmin,alpha),
+//                new AdaptivePursuit(creditRepo, creditAgg, pmin,alpha,beta),
 //                new DMAB(creditRepo, 0.01, 0.1, 10)
             };
             
             ICreditDefinition[] credDef = new ICreditDefinition[]{
                 new ParentDominationCredit(1, 0, 0),
-                new ImmediateParetoFrontCredit(1.0, 0.0),
-                new ImmediateEArchiveCredit(1, 0,epsilonDouble),
-                new ImmediateParetoRankCredit(1.0, 0.0,5),
+//                new ImmediateParetoFrontCredit(1.0, 0.0),
+//                new ImmediateEArchiveCredit(1, 0,epsilonDouble),
+//                new ImmediateParetoRankCredit(1.0, 0.0,5),
 //                new AggregateParetoFrontCredit(1.0,0.0),
 //                new AggregateEArchiveCredit(1.0, 0.0, epsilonDouble),
 //                new AggregateParetoRankCredit(1.0, 0.0,5)
@@ -120,9 +120,13 @@ public class HHCreditTest {
             for(INextHeuristic selector : selectors) {
                 for (ICreditDefinition credDef1 : credDef) {
                     //loop through the set of algorithms to experiment with
-                    TestRun test = new TestRun(path, prob, probName, 
-                            new TypedProperties(prop), selector, credDef1, 
-                            heuristics, epsilonDouble, maxEvaluations);
+//                    TestRun test = new TestRun(path, prob, probName, 
+//                            new TypedProperties(prop), selector, credDef1, 
+//                            heuristics, epsilonDouble, maxEvaluations);
+                    
+                    //benchmark built-in MOEA
+                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
+                            prop, "MOEAD", epsilonDouble, maxEvaluations);
                     
                     //create a list to use foreach method
                     ArrayList<Integer> parList = new ArrayList<>(numberOfSeeds);

@@ -93,13 +93,12 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * @param heuristicSelector the heuristic selector to use in the hyper-heuristic
      * @param creditDef the credit definition to score the performance of the low-level heuristics
      * @param alpha the decay factor used for memory in the credit history [0,1]
-     * @param PMProb probability used by the polynomial mutation 
      */
     public HeMOEA(Problem problem, Population population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Collection<Variation> variations, Initialization initialization,
             INextHeuristic heuristicSelector, ICreditDefinition creditDef, 
-            double alpha, double PMProb) {
+            double alpha) {
         super(problem, population, archive, selection, null, initialization);
         this.selection = selection;
         this.heuristicSelector = heuristicSelector;

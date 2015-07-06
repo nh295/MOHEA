@@ -47,17 +47,15 @@ import org.moeaframework.util.TypedProperties;
  */
 public class TestRun implements Runnable {
 
-    private TypedProperties properties;
-    private Problem problem;
-    private String probName;
-    private String path;
+    protected TypedProperties properties;
+    protected Problem problem;
+    protected String probName;
+    protected String path;
     private INextHeuristic heuristicSelector;
     private ICreditDefinition creditDef;
     private Collection<Variation> heuristics;
-    private double[] epsilonDouble;
-    private int maxEvaluations;
-    private double alpha;
-    private double PMprob;
+    protected double[] epsilonDouble;
+    protected int maxEvaluations;
 
     public TestRun(String path, Problem problem, String probName, TypedProperties properties,
             INextHeuristic heuristicSelector, ICreditDefinition creditDef,
@@ -86,12 +84,10 @@ public class TestRun implements Runnable {
             Problem problem, INextHeuristic heuristicSelector,
             ICreditDefinition creditDef, Collection<Variation> heuristics) {
 
-        int populationSize = (int) properties.getDouble("populationSize", 100);
-        alpha = properties.getDouble("alpha", 1.0);
-        PMprob = properties.getDouble("PMprob", 1.0/problem.getNumberOfVariables());
+        int populationSize = (int) properties.getDouble("populationSize", 600);
+        double alpha = properties.getDouble("alpha", 1.0);
 
         System.out.println("alpha:" + alpha);
-        System.out.println("PMprob:" + PMprob);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -109,7 +105,7 @@ public class TestRun implements Runnable {
 
         HeMOEA hemoea = new HeMOEA(problem, population, archive,
                 selection, heuristics, initialization,
-                heuristicSelector, creditDef, alpha,PMprob);
+                heuristicSelector, creditDef, alpha);
 
         return hemoea;
     }
@@ -118,7 +114,7 @@ public class TestRun implements Runnable {
     public void run() {
         IHyperHeuristic hh = newHeMOEA(properties, problem, heuristicSelector, creditDef, heuristics);
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
@@ -132,7 +128,7 @@ public class TestRun implements Runnable {
         // run the executor using the listener to collect results
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss");
         String stamp = dateFormat.format(new Date());
-        System.out.println("Starting optimization on " + problem.getName() + "_" + stamp);
+        System.out.println("Starting "+ heuristicSelector + creditDef +" on " + problem.getName() + "_" + stamp);
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
@@ -170,19 +166,19 @@ public class TestRun implements Runnable {
         }
 
         //save selection history
-        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
-                path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".hist");
+//        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+//                path + File.separator + "results" + File.separator + problem.getName() + "_"
+//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".hist");
 
         //save credit history
-        IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
-                path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
+//        IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
+//                path + File.separator + "results" + File.separator + problem.getName() + "_"
+//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
         
         //save quality history
-        IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
-                path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
+//        IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
+//                path + File.separator + "results" + File.separator + problem.getName() + "_"
+//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
 
         hh.reset();
     }
