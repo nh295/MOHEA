@@ -26,7 +26,6 @@ import org.moeaframework.core.Variation;
 public class ImmediateEArchiveCredit extends ArchiveBasedCredit{
 
     protected EpsilonBoxDominanceArchive ndpop;
-    protected double[] epsilon;
     /**
      * Credit received if a new solution is in the archive 
      */
@@ -48,7 +47,6 @@ public class ImmediateEArchiveCredit extends ArchiveBasedCredit{
         this.notInArchive = notInArchive;
         this.inArchive = inArchive;
         this.ndpop = new EpsilonBoxDominanceArchive(epsilon);
-        this.epsilon = epsilon;
     }
     
     /**

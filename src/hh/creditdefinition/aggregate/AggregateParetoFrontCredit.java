@@ -42,6 +42,7 @@ public class AggregateParetoFrontCredit extends ImmediateParetoFrontCredit imple
      * credits to be assigned
      * @param population
      * @param heuristic
+     * @param iteration
      * @return 
      */
     protected double compute(Population population,Variation heuristic,int iteration){

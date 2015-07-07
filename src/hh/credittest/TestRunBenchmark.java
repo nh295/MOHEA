@@ -25,6 +25,8 @@ import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.InstrumentedAlgorithm;
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
+import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.util.TypedProperties;
@@ -46,7 +48,7 @@ public class TestRunBenchmark extends TestRun{
     }
     
     @Override
-    public void run() {
+    public Object call() {
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop, problem);
         
@@ -54,6 +56,7 @@ public class TestRunBenchmark extends TestRun{
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
                 .withEpsilon(epsilonDouble)
                 .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
@@ -75,9 +78,10 @@ public class TestRunBenchmark extends TestRun{
         System.out.println("Done with optimization");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
-
-        File results = new File(path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + algorithm + "_" + stamp + ".res");
+        
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + algorithm + "_" + stamp;
+        File results = new File(filename + ".res");
         System.out.println("Saving results");
 
         try (FileWriter writer = new FileWriter(results)) {
@@ -100,6 +104,13 @@ public class TestRunBenchmark extends TestRun{
         } catch (IOException ex) {
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+//        NondominatedPopulation ndPop = instAlgorithm.getResult();
+//        try {
+//            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         //save selection history
 //        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
@@ -117,6 +128,7 @@ public class TestRunBenchmark extends TestRun{
 //                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
 
         alg.terminate();
+        return alg;
     }
     
 }

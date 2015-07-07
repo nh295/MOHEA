@@ -68,8 +68,14 @@ public class AggregateEArchiveCredit extends ImmediateEArchiveCredit implements 
        return false;
     }
     
-    
-        @Override
+    /**
+     * 
+     * @param population the archive to check 
+     * @param heuristics
+     * @param iteration
+     * @return 
+     */
+    @Override
     public CreditRepository compute(Population population, Collection<Variation> heuristics,int iteration) {
         CreditRepository creditRepo = new CreditRepository(heuristics);
         for(Variation heuristic:heuristics){

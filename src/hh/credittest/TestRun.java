@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.Instrumenter;
@@ -30,7 +31,9 @@ import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
@@ -45,7 +48,7 @@ import org.moeaframework.util.TypedProperties;
  *
  * @author nozomihitomi
  */
-public class TestRun implements Runnable {
+public class TestRun implements Callable {
 
     protected TypedProperties properties;
     protected Problem problem;
@@ -110,14 +113,20 @@ public class TestRun implements Runnable {
         return hemoea;
     }
 
+    /**
+     * Goes through one run of the algorithm. Returns the algorithm object. Can get the population from the algorithm object
+     * @return the algorithm object. Can get the population from the algorithm object
+     * @throws Exception 
+     */
     @Override
-    public void run() {
+    public Object call() throws Exception {
         IHyperHeuristic hh = newHeMOEA(properties, problem, heuristicSelector, creditDef, heuristics);
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
                 .withEpsilon(epsilonDouble)
                 .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
@@ -140,8 +149,9 @@ public class TestRun implements Runnable {
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
-        File results = new File(path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".res");
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp;
+        File results = new File(filename + ".res");
         System.out.println("Saving results");
 
         try (FileWriter writer = new FileWriter(results)) {
@@ -164,6 +174,15 @@ public class TestRun implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //save the approximation set
+//        NondominatedPopulation ndPop = instAlgorithm.getResult();
+//        try {
+//            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
 
         //save selection history
 //        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
@@ -180,7 +199,8 @@ public class TestRun implements Runnable {
 //                path + File.separator + "results" + File.separator + problem.getName() + "_"
 //                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
 
-        hh.reset();
+        hh.terminate();
+        return instAlgorithm;
     }
 
 }
