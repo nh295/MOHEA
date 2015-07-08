@@ -146,5 +146,10 @@ public class CompoundVariation implements Variation, Serializable {
 	public int getArity() {
 		return operators.get(0).getArity();
 	}
+        
+        @Override
+        public String toString(){
+            return getName();
+        }
 
 }

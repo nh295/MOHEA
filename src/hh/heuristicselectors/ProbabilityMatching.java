@@ -7,11 +7,8 @@
 package hh.heuristicselectors;
 
 import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
-import hh.creditrepository.CreditRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
-import hh.nextheuristic.INextHeuristic;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;

@@ -48,6 +48,11 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
     public ICreditHistory getHistory(Variation heuristic){
         return creditHistory.get(heuristic);
     }
+    
+    protected void updateSuper(Variation heuristic, Credit credit){
+        super.update(heuristic, credit);
+    }
+    
     /**
      * Adds the new credit to the history of the credits
      * @param heuristic the heuristic to query
@@ -55,7 +60,7 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
      */
     @Override
     public void update(Variation heuristic, Credit credit) {
-        super.update(heuristic, credit);
+        updateSuper(heuristic, credit);
         creditHistory.get(heuristic).addCredit(credit);
     }
     

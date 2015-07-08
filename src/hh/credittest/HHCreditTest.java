@@ -99,7 +99,7 @@ public class HHCreditTest {
             int windowSize = 300;
 
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM", "AP"};
+            String[] selectors = new String[]{ "AP"};
             TypedProperties hhProp = new TypedProperties();
 
             //setup credit definitions

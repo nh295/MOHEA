@@ -100,6 +100,11 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * parallel purpose random generator
      */
     private final ParallelPRNG pprng;
+    
+    /**
+     * Iteration count
+     */
+    private int iteration = 0;
 
     /**
      * Creates an instance of a hyper heuristic e-MOEA
@@ -168,6 +173,8 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      */
     @Override
     public void iterate() {
+        iteration++;
+        
         //select next heuristic
         Variation heuristic = heuristicSelector.nextHeuristic();
 
@@ -208,12 +215,14 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
-                creditRepo.update(heuristic, new DecayingCredit(this.getNumberOfEvaluations(), creditValue, alpha));
+                creditRepo.update(heuristic, new DecayingCredit(iteration, creditValue, alpha));
                 heuristicSelector.update(creditRepo, creditAgg);
                 heuristicSelectionHistory.add(heuristic);
                 updateCreditHistory();
                 updateQualityHistory();
+                System.out.println(heuristic+": "+creditValue);
             }
+            
         }
 
         //add all solutions to the population/archive
