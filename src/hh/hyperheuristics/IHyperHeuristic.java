@@ -6,6 +6,7 @@
 
 package hh.hyperheuristics;
 
+import hh.creditdefinition.Credit;
 import hh.creditdefinition.ICreditDefinition;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.nextheuristic.INextHeuristic;
@@ -56,4 +57,10 @@ public interface IHyperHeuristic extends Algorithm{
      * @return 
      */
     public INextHeuristic getNextHeuristicSupplier();
+    
+    /**
+     * Returns the latest credit received by each heuristic
+     * @return the latest credit received by each heuristic
+     */
+    public HashMap<Variation,Credit> getLatestCredits();
 }

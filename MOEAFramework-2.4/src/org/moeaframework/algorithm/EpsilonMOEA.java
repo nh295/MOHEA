@@ -24,7 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.EpsilonBoxEvolutionaryAlgorithm;
 import org.moeaframework.core.Initialization;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Selection;
@@ -62,6 +62,11 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 	 * The variation operator.
 	 */
 	private final Variation variation;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs the &epsilon;-MOEA algorithm with the specified components.
@@ -100,6 +105,7 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 		this.variation = variation;
 		this.selection = selection;
 		this.dominanceComparator = dominanceComparator;
+                this.pprng = new ParallelPRNG();
 	}
 
 	@Override
@@ -111,10 +117,10 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 		} else {
 			parents = ArrayUtils.add(
 					selection.select(variation.getArity() - 1, population),
-					archive.get(PRNG.nextInt(archive.size())));
+					archive.get(pprng.nextInt(archive.size())));
 		}
 		
-		PRNG.shuffle(parents);
+		pprng.shuffle(parents);
 
 		Solution[] children = variation.evolve(parents);
 
@@ -148,10 +154,10 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 		}
 
 		if (!dominates.isEmpty()) {
-			population.remove(dominates.get(PRNG.nextInt(dominates.size())));
+			population.remove(dominates.get(pprng.nextInt(dominates.size())));
 			population.add(newSolution);
 		} else if (!dominated) {
-			population.remove(PRNG.nextInt(population.size()));
+			population.remove(pprng.nextInt(population.size()));
 			population.add(newSolution);
 		}
 	}

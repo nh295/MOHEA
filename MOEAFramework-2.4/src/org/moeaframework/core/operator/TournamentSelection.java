@@ -17,7 +17,7 @@
  */
 package org.moeaframework.core.operator;
 
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
@@ -50,6 +50,11 @@ public class TournamentSelection implements Selection {
 	 * the tournament winner is selected.
 	 */
 	private int size;
+        
+        /**
+        * parallel purpose random generator
+        */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a binary tournament selection operator using Pareto dominance.
@@ -89,6 +94,7 @@ public class TournamentSelection implements Selection {
 		super();
 		this.size = size;
 		this.comparator = comparator;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -139,11 +145,11 @@ public class TournamentSelection implements Selection {
 	 * @return the winner of tournament selection
 	 */
 	private Solution select(Population population) {
-		Solution winner = population.get(PRNG.nextInt(population.size()));
+		Solution winner = population.get(pprng.nextInt(population.size()));
 
 		for (int i = 1; i < size; i++) {
 			Solution candidate = population
-					.get(PRNG.nextInt(population.size()));
+					.get(pprng.nextInt(population.size()));
 
 			int flag = comparator.compare(winner, candidate);
 

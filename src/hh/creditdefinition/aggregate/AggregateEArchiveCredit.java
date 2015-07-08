@@ -10,6 +10,7 @@ import hh.creditdefinition.Credit;
 import hh.creditdefinition.immediate.ImmediateEArchiveCredit;
 import hh.creditrepository.CreditRepository;
 import java.util.Collection;
+import java.util.HashMap;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Variation;
 
@@ -76,11 +77,11 @@ public class AggregateEArchiveCredit extends ImmediateEArchiveCredit implements 
      * @return 
      */
     @Override
-    public CreditRepository compute(Population population, Collection<Variation> heuristics,int iteration) {
-        CreditRepository creditRepo = new CreditRepository(heuristics);
+    public HashMap<Variation,Credit> compute(Population population, Collection<Variation> heuristics,int iteration) {
+        HashMap<Variation,Credit> credits = new HashMap();
         for(Variation heuristic:heuristics){
-            creditRepo.update(heuristic, new Credit(-1,compute(population,heuristic, iteration)));
+            credits.put(heuristic, new Credit(-1,compute(population,heuristic, iteration)));
         }
-        return creditRepo;
+        return credits;
     }
 }

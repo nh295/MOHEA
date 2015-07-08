@@ -6,8 +6,10 @@
 
 package hh.creditdefinition.aggregate;
 
+import hh.creditdefinition.Credit;
 import hh.creditrepository.CreditRepository;
 import java.util.Collection;
+import java.util.HashMap;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Variation;
 
@@ -24,5 +26,5 @@ public interface IAggregateCredit {
      * @param iteration
      * @return 
      */
-    public CreditRepository compute(Population population,Collection<Variation> heuristics,int iteration);
+    public HashMap<Variation, Credit> compute(Population population,Collection<Variation> heuristics,int iteration);
 }

@@ -9,6 +9,7 @@ package hh.creditrepository;
 import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +25,12 @@ public class CreditRepository implements ICreditRepository,Serializable{
     private static final long serialVersionUID = 1004365209150732930L;
     
     protected HashMap<Variation,Credit> creditRepository;
-
+    
+    /**
+     * The most recently rewarded heuristic. There maybe multiple if using aggregated type credit definition
+     */
+    private ArrayList<Variation> lastRewardedHeuristic = new ArrayList();
+    
     /**
      * This constructor creates the credit repository that initialize 0 credit for each heuristic
      * @param heuristics An iterable set of the candidate heuristics to be used
@@ -57,6 +63,19 @@ public class CreditRepository implements ICreditRepository,Serializable{
     @Override
     public void update(Variation heuristic, Credit credit) {
         creditRepository.put(heuristic, credit);
+        lastRewardedHeuristic.clear();
+        lastRewardedHeuristic.add(heuristic);
+    }
+    
+    @Override
+    public void update(HashMap<Variation,Credit> credits) {
+        lastRewardedHeuristic.clear();
+        Iterator<Variation> iter = credits.keySet().iterator();
+        while(iter.hasNext()){
+            Variation heuristic = iter.next();
+            creditRepository.put(heuristic, credits.get(heuristic));
+            lastRewardedHeuristic.add(heuristic);
+        }
     }
     
     /**
@@ -82,6 +101,11 @@ public class CreditRepository implements ICreditRepository,Serializable{
     @Override
     public Credit getLatestCredit(Variation heuristic) {
         return creditRepository.get(heuristic);
+    }
+
+    @Override
+    public Collection<Variation> getLastRewardedHeuristic() {
+        return lastRewardedHeuristic;
     }
     
 }

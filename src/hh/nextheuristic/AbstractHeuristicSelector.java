@@ -26,31 +26,14 @@ import org.moeaframework.core.Variation;
 public abstract class AbstractHeuristicSelector implements INextHeuristic{
     
     /**
-     * Credit repository to store credits earned by heuristics.
-     */
-    protected ICreditRepository creditRepo;
-    
-    /**
-     * the aggregation strategy to reward a heuristic a credit for the current iteration based on past performance.
-     */
-    protected final ICreditAggregationStrategy creditAgg;
-    
-    
-    /**
      * Random number generator for selecting heuristics.
      */
     protected final Random random = new Random();
     
     /**
-     * the number of heuristics to be used.
-     */
-    protected final int nHeuristics;
-    
-    /**
      * The number of times nextHeuristic() is called
      */
     private int iterations;
-    
     
     /**
      * Hashmap to store the qualities of the heuristics
@@ -58,17 +41,18 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     protected HashMap<Variation,Double> qualities;
     
     /**
+     * The heuristics from which the selector can choose from
+     */
+    protected Collection<Variation> heuristics;
+    
+    /**
      * Constructor requires a credit repository that stores credits earned by 
      * heuristics.
-     * @param creditRepo Credit repository to store credits earned by heuristics
-     * @param creditAgg the aggregation strategy to reward a heuristic a credit for the current iteration based on past performance
      */
-    public AbstractHeuristicSelector(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg){
-        this.creditRepo = creditRepo;
-        this.nHeuristics= creditRepo.getHeuristics().size();
+    public AbstractHeuristicSelector(Collection<Variation> heuristics){
         this.iterations = 0;
-        this.creditAgg = creditAgg;
         this.qualities = new HashMap<>();
+        this.heuristics = heuristics;
         resetQualities();
     }
     
@@ -168,7 +152,6 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      */
     @Override
     public void reset(){
-        creditRepo.clear();
         resetQualities();
     }
     
@@ -176,7 +159,6 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      * Clears qualities and resets them to 0.
      */
     public final void resetQualities(){
-        Collection<Variation> heuristics = creditRepo.getHeuristics();
         Iterator<Variation> iter = heuristics.iterator();
         while(iter.hasNext()){
             //all heuristics have 0 quality at the beginning
@@ -189,30 +171,15 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
         return qualities;
     }
     
-    @Override
-    public void update(ICreditRepository creditRepo) {
-        this.creditRepo = creditRepo;
-        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
-        while(iter.hasNext()){
-            Variation heuristic = iter.next();
-            update(heuristic,creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),heuristic));
-        }
-    
-    }
-    
     /**
-     * Returns the latest credit received by each heuristic
-     * @return the latest credit received by each heuristic
+     * Gets the heuristics available to the hyper-heuristic.
+     * @return 
      */
     @Override
-    public HashMap<Variation,Credit> getLatestCredits(){
-        HashMap<Variation,Credit> out = new HashMap<>();
-        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
-        while(iter.hasNext()){
-            Variation heuristic = iter.next();
-            out.put(heuristic,creditRepo.getLatestCredit(heuristic));
-        }
-        return out;
+    public Collection<Variation> getHeuristics(){
+        return heuristics;
     }
     
+
+//    
 }

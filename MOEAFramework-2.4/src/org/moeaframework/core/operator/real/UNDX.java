@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.variable.RealVariable;
@@ -73,6 +73,11 @@ public class UNDX implements Variation,Serializable{
 	 * where {@code n} is the number of decision variables.
 	 */
 	private final double eta;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a UNDX operator with the specified number of parents and 
@@ -108,7 +113,8 @@ public class UNDX implements Variation,Serializable{
 		this.numberOfOffspring = numberOfOffspring;
 		this.zeta = zeta;
 		this.eta = eta;
-	}
+                this.pprng = new ParallelPRNG();
+        }
 
 	/**
 	 * Returns the number of parents required by this operator.
@@ -173,7 +179,7 @@ public class UNDX implements Variation,Serializable{
 		double[] v = new double[n];
 
 		for (int i = 0; i < n; i++) {
-			v[i] = PRNG.nextGaussian();
+			v[i] = pprng.nextGaussian();
 		}
 
 		return v;
@@ -238,12 +244,12 @@ public class UNDX implements Variation,Serializable{
 		double[] variables = g;
 
 		for (int i = 0; i < e_zeta.size(); i++) {
-			variables = Vector.add(variables, Vector.multiply(PRNG
+			variables = Vector.add(variables, Vector.multiply(pprng
 					.nextGaussian(0.0, zeta), e_zeta.get(i)));
 		}
 
 		for (int i = 0; i < e_eta.size(); i++) {
-			variables = Vector.add(variables, Vector.multiply(PRNG
+			variables = Vector.add(variables, Vector.multiply(pprng
 					.nextGaussian(0.0, eta / Math.sqrt(n)), e_eta.get(i)));
 		}
 

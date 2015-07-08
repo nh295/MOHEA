@@ -9,6 +9,7 @@ package hh.creditrepository;
 import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import java.util.Collection;
+import java.util.HashMap;
 import org.moeaframework.core.Variation;
 
 /**
@@ -35,6 +36,13 @@ public interface ICreditRepository {
     public void update(Variation heuristic, Credit credit);
     
     /**
+     * Used when updating the credit repository with more than one heuristic at 
+     * a time (e.g when using aggregated credit definitions)
+     * @param credits
+     */
+    public void update(HashMap<Variation,Credit> credits);
+    
+    /**
      * Gets the collection of heuristics stored in the credit repository
      * @return the collection of heuristics stored in the credit repository
      */
@@ -44,6 +52,12 @@ public interface ICreditRepository {
      * Clears the credit stored in the repository
      */
     public void clear();
+    
+    /**
+     * Gets the heuristic that was rewarded the most recently
+     * @return 
+     */
+    public Collection<Variation> getLastRewardedHeuristic();
     
     /**
      * gets the most recent credit in the repository for a specified heuristic

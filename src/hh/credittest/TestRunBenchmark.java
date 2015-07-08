@@ -42,7 +42,7 @@ public class TestRunBenchmark extends TestRun{
     
 
     public TestRunBenchmark(String path, Problem problem, String probName, Properties properties, String algorithm, double[] epsilonDouble, int maxEvaluations) {
-        super(path, problem, probName, new TypedProperties(properties), null, null, null, epsilonDouble, maxEvaluations);
+        super(path, problem, probName, new TypedProperties(properties), null,null, epsilonDouble, maxEvaluations);
         this.algorithm = algorithm;
         this.prop = properties;
     }
@@ -128,7 +128,7 @@ public class TestRunBenchmark extends TestRun{
 //                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
 
         alg.terminate();
-        return alg;
+        return null;
     }
     
 }

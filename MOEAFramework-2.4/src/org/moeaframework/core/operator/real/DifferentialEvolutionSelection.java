@@ -17,7 +17,7 @@
  */
 package org.moeaframework.core.operator.real;
 
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
@@ -37,12 +37,18 @@ public class DifferentialEvolutionSelection implements Selection {
 	 * The current index.
 	 */
 	private int currentIndex;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a differential evolution selection operator.
 	 */
 	public DifferentialEvolutionSelection() {
 		super();
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -69,7 +75,7 @@ public class DifferentialEvolutionSelection implements Selection {
 
 			do {
 				isDuplicate = false;
-				indices[i] = PRNG.nextInt(population.size());
+				indices[i] = pprng.nextInt(population.size());
 
 				for (int j = 0; j < i; j++) {
 					if (indices[i] == indices[j]) {

@@ -7,9 +7,9 @@
 package hh.heuristicselectors;
 
 import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
+import java.util.Collection;
 import org.moeaframework.core.Variation;
 
 /**
@@ -18,15 +18,14 @@ import org.moeaframework.core.Variation;
  * @author nozomihitomi
  */
 public class RandomSelect extends AbstractHeuristicSelector{
-
+    
     /**
      * RandomSelect does not really utilize the credit repository so any 
      * repository will do
-     * @param creditRepo any ICreditRepository
-     * @param creditAgg the aggregation strategy to reward a heuristic a credit for the current iteration based on past performance
+     * @param heuristics from which to select from 
      */
-    public RandomSelect(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg) {
-        super(creditRepo,creditAgg);
+    public RandomSelect(Collection<Variation> heuristics) {
+        super(heuristics);
     }
 
     /**
@@ -37,24 +36,17 @@ public class RandomSelect extends AbstractHeuristicSelector{
     @Override
     public Variation nextHeuristic() {
         incrementIterations();
-        return getRandomHeuristic(creditRepo.getHeuristics());
-    }
-
-    /**
-     * Updates the credit repository in order for credit history to be extracted
-     * from hyperheuristic for post--analysis
-     * @param heuristic heuristic who receives credit
-     * @param credit credit earned by heuristic
-     */
-    @Override
-    public void update(Variation heuristic, Credit credit) {
-        creditRepo.update(heuristic, credit);
+        return super.getRandomHeuristic(heuristics);
     }
 
     @Override
     public String toString() {
         return "RandomSelect";
     }
-    
+
+    @Override
+    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+        //no need to do any updates
+    }
     
 }

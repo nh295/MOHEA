@@ -6,8 +6,8 @@
 package hh.heuristicselectors;
 
 import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
+import java.util.Collection;
 import java.util.Iterator;
 import org.moeaframework.core.Variation;
 
@@ -26,7 +26,6 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * number of heuristics used and pmin is the minimum selection probability
      */
     double pmax;
-    private final ICreditAggregationStrategy creditAgg;
 
     /**
      * The Learning Rate
@@ -39,18 +38,15 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * the number of heuristics defined in the given credit repository and pmin
      * is the minimum selection probability
      *
-     * @param creditRepo the type of credit repository to be used
-     * @param creditAgg the aggregation strategy to reward a heuristic a credit
-     * for the current iteration based on past performance
+     * @param heuristics from which to select from 
      * @param pmin the minimum selection probability
      * @param alpha the adaptation rate
      * @param beta the learning rate
      */
-    public AdaptivePursuit(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg, double pmin, double alpha, double beta) {
-        super(creditRepo, creditAgg, pmin, alpha);
+    public AdaptivePursuit(Collection<Variation> heuristics, double pmin, double alpha, double beta) {
+        super(heuristics, pmin, alpha);
         this.pmax = 1 - (probabilities.size() - 1) * pmin;
         this.beta = beta;
-        this.creditAgg = creditAgg;
         if (pmax < pmin) {
             throw new IllegalArgumentException("the implicit maxmimm selection "
                     + "probability " + pmax + " is less than the minimum selection probability " + pmin);
@@ -74,18 +70,16 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * Updates the probabilities stored in the map by finding the heuristic with
      * the most credits and apply pmax to that heuristic and pmin to all other
      * heuristics
-     *
-     * @param heuristic heuristic that just earned credit
-     * @param credit that was earned by the heuristic
+     * @param creditRepo the credit repository that store the past earned credits
+     * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
-    public void update(Variation heuristic, Credit credit) {
-        creditRepo.update(heuristic, credit);
-        super.updateQuality(heuristic);
+    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+        super.updateQuality(creditRepo, creditAgg);
 
         Variation leadHeuristic = argMax(creditRepo.getHeuristics());
 
-        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
+        Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {
             Variation heuristic_i = iter.next();
             double prevProb = probabilities.get(heuristic_i);
@@ -112,4 +106,5 @@ public class AdaptivePursuit extends ProbabilityMatching {
     public String toString() {
         return "AdaptivePursuit";
     }
+    
 }

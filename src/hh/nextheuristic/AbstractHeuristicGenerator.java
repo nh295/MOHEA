@@ -6,6 +6,7 @@
 
 package hh.nextheuristic;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
 import hh.heuristicgenerators.HeuristicSequence;
@@ -93,16 +94,10 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     }
     
     @Override
-    public void update(Variation heuristic, Credit credit) {
-        creditRepo.update(heuristic, credit);
-    }
-    
-    @Override
     public void reset() {
         creditRepo.clear();
         resetQualities();
     }
-    
     
     /**
      * Clears qualities and resets them to 0.
@@ -117,7 +112,7 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     }
     
     @Override
-    public void update(ICreditRepository creditRepo) {
+    public void update(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg) {
         this.creditRepo = creditRepo;
     }
     
@@ -138,18 +133,12 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     }
     
     /**
-     * Returns the latest credit received by each heuristic
-     * @return the latest credit received by each heuristic
+     * Gets the building blocks available to the hyper-heuristic.
+     * @return 
      */
     @Override
-    public HashMap<Variation,Credit> getLatestCredits(){
-        HashMap<Variation,Credit> out = new HashMap<>();
-        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
-        while(iter.hasNext()){
-            Variation heuristic = iter.next();
-            out.put(heuristic,creditRepo.getLatestCredit(heuristic));
-        }
-        return out;
+    public Collection<Variation> getHeuristics(){
+        return buildingBlocks;
     }
     
 }

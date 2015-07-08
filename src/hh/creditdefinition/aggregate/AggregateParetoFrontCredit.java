@@ -12,6 +12,7 @@ import hh.creditdefinition.immediate.*;
 import hh.creditrepository.CreditRepository;
 import hh.hyperheuristics.SerializableVal;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
@@ -76,12 +77,12 @@ public class AggregateParetoFrontCredit extends ImmediateParetoFrontCredit imple
     }
 
     @Override
-    public CreditRepository compute(Population population, Collection<Variation> heuristics,int iteration) {
+    public HashMap<Variation,Credit> compute(Population population, Collection<Variation> heuristics,int iteration) {
         NondominatedPopulation ndpop = new NondominatedPopulation(population);
-        CreditRepository creditRepo = new CreditRepository(heuristics);
+        HashMap<Variation,Credit> credits = new HashMap<>();
         for(Variation heuristic:heuristics){
-            creditRepo.update(heuristic, new Credit(-1,compute(ndpop,heuristic,iteration)));
+            credits.put(heuristic, new Credit(-1,compute(ndpop,heuristic,iteration)));
         }
-        return creditRepo;
+        return credits;
     }
 }

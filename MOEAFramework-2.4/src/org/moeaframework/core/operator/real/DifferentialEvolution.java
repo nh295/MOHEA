@@ -18,7 +18,7 @@
 package org.moeaframework.core.operator.real;
 
 import java.io.Serializable;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.variable.RealVariable;
@@ -59,6 +59,11 @@ public class DifferentialEvolution implements Variation,Serializable {
 	 * The scaling factor or step size.
 	 */
 	private final double F;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a differential evolution operator with the specified crossover
@@ -70,6 +75,7 @@ public class DifferentialEvolution implements Variation,Serializable {
 	public DifferentialEvolution(double CR, double F) {
 		this.CR = CR;
 		this.F = F;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -99,10 +105,10 @@ public class DifferentialEvolution implements Variation,Serializable {
 	public Solution[] evolve(Solution[] parents) {
 		Solution result = parents[0].copy();
 
-		int jrand = PRNG.nextInt(result.getNumberOfVariables());
+		int jrand = pprng.nextInt(result.getNumberOfVariables());
 
 		for (int j = 0; j < result.getNumberOfVariables(); j++) {
-			if ((PRNG.nextDouble() <= CR) || (j == jrand)) {
+			if ((pprng.nextDouble() <= CR) || (j == jrand)) {
 				RealVariable v0 = (RealVariable)result.getVariable(j);
 				RealVariable v1 = (RealVariable)parents[1].getVariable(j);
 				RealVariable v2 = (RealVariable)parents[2].getVariable(j);

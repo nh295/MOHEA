@@ -6,8 +6,10 @@
 
 package hh.nextheuristic;
 
+import hh.creditaggregation.ICreditAggregationStrategy;
 import hh.creditdefinition.Credit;
 import hh.creditrepository.ICreditRepository;
+import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Variation;
 
@@ -26,17 +28,12 @@ public interface INextHeuristic{
     public Variation nextHeuristic();
     
     /**
-     * Method to update the selector's or generator's internal probabilities
-     * @param heuristic the heuristic who just received credit
-     * @param credit the credit received by the heuristic
-     */
-    public void update(Variation heuristic, Credit credit);
-    
-    /**
-     * Method to replace the selector's or generator's credit repository 
+     * Method to update the internals of the hyper-heuristic selector or 
+     * generator based on the given CreditRepository
      * @param creditRepo the new credit repository
+     * @param creditAgg the credit aggregation strategy to compute the quality of the heuristic
      */
-    public void update(ICreditRepository creditRepo);
+    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg);
     
     /**
      * Resets all stored history, qualities and credits
@@ -50,14 +47,14 @@ public interface INextHeuristic{
     public HashMap<Variation,Double> getQualities();
     
     /**
-     * Returns the latest credit received by each heuristic
-     * @return the latest credit received by each heuristic
-     */
-    public HashMap<Variation,Credit> getLatestCredits();
-    
-    /**
      * Returns the number of times nextHeuristic() has been called
      * @return the number of times nextHeuristic() has been called
      */
     public int getNumberOfIterations();
+    
+    /**
+     * Gets the heuristics available to the hyper-heuristic.
+     * @return 
+     */
+    public Collection<Variation> getHeuristics();
 }

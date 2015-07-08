@@ -18,7 +18,7 @@
 package org.moeaframework.core.operator.real;
 
 import java.io.Serializable;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Settings;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variable;
@@ -58,7 +58,12 @@ public class SBX implements Variation,Serializable{
 	 * The distribution index of this SBX operator.
 	 */
 	private final double distributionIndex;
-
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
+        
 	/**
 	 * Constructs a SBX operator with the specified probability and
 	 * distribution index.
@@ -70,6 +75,7 @@ public class SBX implements Variation,Serializable{
 	public SBX(double probability, double distributionIndex) {
 		this.probability = probability;
 		this.distributionIndex = distributionIndex;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -100,12 +106,12 @@ public class SBX implements Variation,Serializable{
 		Solution result1 = parents[0].copy();
 		Solution result2 = parents[1].copy();
 
-		if (PRNG.nextDouble() <= probability) {
+		if (pprng.nextDouble() <= probability) {
 			for (int i = 0; i < result1.getNumberOfVariables(); i++) {
 				Variable variable1 = result1.getVariable(i);
 				Variable variable2 = result2.getVariable(i);
 
-				if (PRNG.nextBoolean() && (variable1 instanceof RealVariable)
+				if (pprng.nextBoolean() && (variable1 instanceof RealVariable)
 						&& (variable2 instanceof RealVariable)) {
 					evolve((RealVariable)variable1, (RealVariable)variable2,
 							distributionIndex);
@@ -158,7 +164,7 @@ public class SBX implements Variation,Serializable{
 	 * @param v2 the second variable
 	 * @param distributionIndex the distribution index of this SBX operator
 	 */
-	public static void evolve(RealVariable v1, RealVariable v2,
+	public void evolve(RealVariable v1, RealVariable v2,
 			double distributionIndex) {
 		double x0 = v1.getValue();
 		double x1 = v2.getValue();
@@ -188,7 +194,7 @@ public class SBX implements Variation,Serializable{
 
 			double p_bl = 1 - 1 / (2 * Math.pow(bl, distributionIndex + 1));
 			double p_bu = 1 - 1 / (2 * Math.pow(bu, distributionIndex + 1));
-			double u = PRNG.nextDouble();
+			double u = pprng.nextDouble();
 			
 			//prevent out-of-bounds values if PRNG draws the value 1.0
 			if (u == 1.0) {
@@ -222,7 +228,7 @@ public class SBX implements Variation,Serializable{
 
 			//this makes PISA's SBX compatible with other implementations
 			//which swap the values
-			if (PRNG.nextBoolean()) {
+			if (pprng.nextBoolean()) {
 				double temp = v1.getValue();
 				v1.setValue(v2.getValue());
 				v2.setValue(temp);

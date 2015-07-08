@@ -12,6 +12,7 @@ import hh.credithistory.AbstractCreditHistory;
 import hh.creditrepository.CreditRepository;
 import hh.heuristicPopulation.HeuristicIndividual;
 import hh.nextheuristic.AbstractHeuristicGenerator;
+import hh.nextheuristic.INextHeuristic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -509,12 +510,12 @@ public class HyperGA extends AbstractHeuristicGenerator {
         }
     }
     
-    @Override 
-    public void update(Variation heuristic, Credit credit) {
-        if(!lastHeuristicSelected.equals(heuristic))
-            throw new IllegalArgumentException("Input Variation " + heuristic + " is not the most recently selected Variation");
-        ((HeuristicIndividual)population.get(heuristicIndex-1)).updateCredit(credit);
-    }
+//    @Override 
+//    public void update(Variation heuristic, Credit credit) {
+//        if(!lastHeuristicSelected.equals(heuristic))
+//            throw new IllegalArgumentException("Input Variation " + heuristic + " is not the most recently selected Variation");
+//        ((HeuristicIndividual)population.get(heuristicIndex-1)).updateCredit(credit);
+//    }
 
     @Override
     public String toString() {
@@ -530,5 +531,6 @@ public class HyperGA extends AbstractHeuristicGenerator {
         heuristicIndex=0;
         avgFitnessHistory = new ArrayList();
     }
+
 }
 

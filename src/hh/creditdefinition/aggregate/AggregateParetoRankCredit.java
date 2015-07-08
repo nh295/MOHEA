@@ -10,6 +10,7 @@ import hh.creditdefinition.Credit;
 import hh.creditdefinition.immediate.*;
 import hh.creditrepository.CreditRepository;
 import java.util.Collection;
+import java.util.HashMap;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
@@ -67,13 +68,13 @@ public class AggregateParetoRankCredit extends ImmediateParetoRankCredit impleme
     }
     
     @Override
-    public CreditRepository compute(Population population, Collection<Variation> heuristics,int iteration) {
+    public HashMap<Variation,Credit> compute(Population population, Collection<Variation> heuristics,int iteration) {
         Population pop = new Population(population);
-        CreditRepository creditRepo = new CreditRepository(heuristics);
+        HashMap<Variation,Credit> credits = new HashMap();
         for(Variation heuristic:heuristics){
-            creditRepo.update(heuristic, new Credit(-1,compute(pop,heuristic,iteration)));
+            credits.put(heuristic, new Credit(-1,compute(pop,heuristic,iteration)));
         }
-        return creditRepo;
+        return credits;
     }
 
     

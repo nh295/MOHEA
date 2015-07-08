@@ -18,7 +18,7 @@
 package org.moeaframework.core.operator.real;
 
 import java.io.Serializable;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.variable.RealVariable;
@@ -61,6 +61,11 @@ public class SPX implements Variation,Serializable {
 	 * The expansion rate of this operator.
 	 */
 	private final double epsilon;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a SPX operator with the specified number of parents and 
@@ -87,6 +92,7 @@ public class SPX implements Variation,Serializable {
 		this.numberOfParents = numberOfParents;
 		this.numberOfOffspring = numberOfOffspring;
 		this.epsilon = epsilon;
+                this.pprng = new ParallelPRNG();
 	}
 
 	@Override
@@ -125,7 +131,7 @@ public class SPX implements Variation,Serializable {
 			Solution child = parents[n - 1].copy();
 
 			for (int i = 0; i < n - 1; i++) {
-				r[i] = Math.pow(PRNG.nextDouble(), 1.0 / (i + 1.0));
+				r[i] = Math.pow(pprng.nextDouble(), 1.0 / (i + 1.0));
 			}
 
 			for (int i = 0; i < n; i++) {

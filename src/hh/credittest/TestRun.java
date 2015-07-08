@@ -5,10 +5,11 @@
  */
 package hh.credittest;
 
-import hh.IO.IOCreditHistory;
-import hh.IO.IOQualityHistory;
-import hh.IO.IOSelectionHistory;
+import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.creditdefinition.CreditDefFactory;
 import hh.creditdefinition.ICreditDefinition;
+import hh.creditrepository.ICreditRepository;
+import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.nextheuristic.INextHeuristic;
@@ -19,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -31,10 +31,9 @@ import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
-import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
-import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
+import org.moeaframework.core.Selection;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
@@ -54,22 +53,23 @@ public class TestRun implements Callable {
     protected Problem problem;
     protected String probName;
     protected String path;
-    private INextHeuristic heuristicSelector;
     private ICreditDefinition creditDef;
-    private Collection<Variation> heuristics;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
+    private final ICreditAggregationStrategy creditAgg;
+    private final Collection<Variation> heuristics;
+    private ICreditRepository creditRepo;
 
     public TestRun(String path, Problem problem, String probName, TypedProperties properties,
-            INextHeuristic heuristicSelector, ICreditDefinition creditDef,
-            Collection<Variation> heuristics, double[] epsilonDouble, int maxEvaluations) {
+            ICreditAggregationStrategy creditAgg, ICreditRepository creditRepo,
+            double[] epsilonDouble, int maxEvaluations) {
 
+        this.heuristics = creditRepo.getHeuristics();
+        this.creditRepo = creditRepo;
+        this.creditAgg = creditAgg;
         this.properties = properties;
-        this.creditDef = creditDef;
         this.problem = problem;
         this.probName = probName;
-        this.heuristics = heuristics;
-        this.heuristicSelector = heuristicSelector;
         this.epsilonDouble = epsilonDouble;
         this.maxEvaluations = maxEvaluations;
         this.path = path;
@@ -83,14 +83,12 @@ public class TestRun implements Callable {
      * @param problem the problem
      * @return a new {@code eMOEA} instance
      */
-    private IHyperHeuristic newHeMOEA(TypedProperties properties,
-            Problem problem, INextHeuristic heuristicSelector,
-            ICreditDefinition creditDef, Collection<Variation> heuristics) {
-
+    private IHyperHeuristic newHeMOEA() {
+        
         int populationSize = (int) properties.getDouble("populationSize", 600);
-        double alpha = properties.getDouble("alpha", 1.0);
+        double crediMemory = properties.getDouble("crediMemory", 1.0);
 
-        System.out.println("alpha:" + alpha);
+        System.out.println("alpha:" + crediMemory);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -105,14 +103,18 @@ public class TestRun implements Callable {
 
         final TournamentSelection selection = new TournamentSelection(
                 2, comparator);
-
-        HeMOEA hemoea = new HeMOEA(problem, population, archive,
-                selection, heuristics, initialization,
-                heuristicSelector, creditDef, alpha);
+        
+        //Use default values for selectors
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
+        creditDef = CreditDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  new TypedProperties());
+                
+        HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
+            initialization, selector, creditDef, creditRepo,
+            creditAgg, crediMemory);
 
         return hemoea;
     }
-
+    
     /**
      * Goes through one run of the algorithm. Returns the algorithm object. Can get the population from the algorithm object
      * @return the algorithm object. Can get the population from the algorithm object
@@ -120,7 +122,7 @@ public class TestRun implements Callable {
      */
     @Override
     public Object call() throws Exception {
-        IHyperHeuristic hh = newHeMOEA(properties, problem, heuristicSelector, creditDef, heuristics);
+        IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
                 .withProblem(probName)
@@ -137,7 +139,7 @@ public class TestRun implements Callable {
         // run the executor using the listener to collect results
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss");
         String stamp = dateFormat.format(new Date());
-        System.out.println("Starting "+ heuristicSelector + creditDef +" on " + problem.getName() + "_" + stamp);
+        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + creditDef +" on " + problem.getName() + "_" + stamp);
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
@@ -200,7 +202,8 @@ public class TestRun implements Callable {
 //                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
 
         hh.terminate();
-        return instAlgorithm;
+        hh = null;
+        return hh;
     }
 
 }

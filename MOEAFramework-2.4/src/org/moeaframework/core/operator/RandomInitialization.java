@@ -17,8 +17,9 @@
  */
 package org.moeaframework.core.operator;
 
+import java.util.Random;
 import org.moeaframework.core.Initialization;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variable;
@@ -46,6 +47,11 @@ public class RandomInitialization implements Initialization {
 	 * The initial population size.
 	 */
 	private final int populationSize;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a random initialization operator.
@@ -57,6 +63,7 @@ public class RandomInitialization implements Initialization {
 		super();
 		this.problem = problem;
 		this.populationSize = populationSize;
+                pprng = new ParallelPRNG();
 	}
 
 	@Override
@@ -86,34 +93,34 @@ public class RandomInitialization implements Initialization {
 	protected void initialize(Variable variable) {
 		if (variable instanceof RealVariable) {
 			RealVariable real = (RealVariable)variable;
-			real.setValue(PRNG.nextDouble(real.getLowerBound(), real
+			real.setValue(pprng.nextDouble(real.getLowerBound(), real
 					.getUpperBound()));
 		} else if (variable instanceof BinaryVariable) {
 			BinaryVariable binary = (BinaryVariable)variable;
 
 			for (int i = 0; i < binary.getNumberOfBits(); i++) {
-				binary.set(i, PRNG.nextBoolean());
+				binary.set(i, pprng.nextBoolean());
 			}
 		} else if (variable instanceof Permutation) {
 			Permutation permutation = (Permutation)variable;
 
 			int[] array = permutation.toArray();
-			PRNG.shuffle(array);
+			pprng.shuffle(array);
 			permutation.fromArray(array);
 		} else if (variable instanceof Grammar) {
 			Grammar grammar = (Grammar)variable;
 
 			int[] array = grammar.toArray();
 			for (int i = 0; i < array.length; i++) {
-				array[i] = PRNG.nextInt(grammar.getMaximumValue());
+				array[i] = pprng.nextInt(grammar.getMaximumValue());
 			}
 			grammar.fromArray(array);
 		} else if (variable instanceof Program) {
 			// ramped half-and-half initialization
 			Program program = (Program)variable;
 			Rules rules = program.getRules();
-			int depth = PRNG.nextInt(2, rules.getMaxInitializationDepth());
-			boolean isFull = PRNG.nextBoolean();
+			int depth = pprng.nextInt(2, rules.getMaxInitializationDepth());
+			boolean isFull = pprng.nextBoolean();
 			Node root = null;
 			
 			if (isFull) {

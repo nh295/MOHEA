@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.variable.RealVariable;
@@ -66,6 +66,11 @@ public class PCX implements Variation,Serializable{
 	 * of solutions in the directions defined by the remaining parents.
 	 */
 	private final double zeta;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a PCX operator with the specified number of parents and 
@@ -100,6 +105,7 @@ public class PCX implements Variation,Serializable{
 		this.numberOfOffspring = numberOfOffspring;
 		this.eta = eta;
 		this.zeta = zeta;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -155,7 +161,7 @@ public class PCX implements Variation,Serializable{
 		parents = parents.clone(); // prevent reordering of parents
 
 		for (int i = 0; i < numberOfOffspring; i++) {
-			int index = PRNG.nextInt(parents.length);
+			int index = pprng.nextInt(parents.length);
 			Solution temp = parents[index];
 			parents[index] = parents[parents.length - 1];
 			parents[parents.length - 1] = temp;
@@ -217,10 +223,10 @@ public class PCX implements Variation,Serializable{
 		// construct the offspring
 		double[] variables = x[k - 1];
 
-		variables = Vector.add(variables, Vector.multiply(PRNG.nextGaussian(
+		variables = Vector.add(variables, Vector.multiply(pprng.nextGaussian(
 				0.0, zeta), e_eta.get(0)));
 
-		double eta = PRNG.nextGaussian(0.0, this.eta);
+		double eta = pprng.nextGaussian(0.0, this.eta);
 		for (int i = 1; i < e_eta.size(); i++) {
 			variables = Vector.add(variables, Vector.multiply(eta * D, e_eta
 					.get(i)));

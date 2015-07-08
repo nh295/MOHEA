@@ -18,7 +18,7 @@
 package org.moeaframework.core.operator.real;
 
 import java.io.Serializable;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variable;
 import org.moeaframework.core.Variation;
@@ -58,6 +58,11 @@ public class PM implements Variation, Serializable {
 	 * The distribution index controlling the shape of the polynomial mutation.
 	 */
 	private final double distributionIndex;
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
 
 	/**
 	 * Constructs a polynomial mutation operator with the specified probability
@@ -72,6 +77,7 @@ public class PM implements Variation, Serializable {
 		super();
 		this.probability = probability;
 		this.distributionIndex = distributionIndex;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -103,7 +109,7 @@ public class PM implements Variation, Serializable {
 		for (int i = 0; i < result.getNumberOfVariables(); i++) {
 			Variable variable = result.getVariable(i);
 
-			if ((PRNG.nextDouble() <= probability)
+			if ((pprng.nextDouble() <= probability)
 					&& (variable instanceof RealVariable)) {
 				evolve((RealVariable)variable, distributionIndex);
 			}
@@ -154,8 +160,8 @@ public class PM implements Variation, Serializable {
 	 * @param distributionIndex the distribution index controlling the shape of
 	 *        the polynomial mutation
 	 */
-	public static void evolve(RealVariable v, double distributionIndex) {
-		double u = PRNG.nextDouble();
+	public void evolve(RealVariable v, double distributionIndex) {
+		double u = pprng.nextDouble();
 		double x = v.getValue();
 		double lb = v.getLowerBound();
 		double ub = v.getUpperBound();

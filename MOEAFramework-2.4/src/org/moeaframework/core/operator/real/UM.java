@@ -18,7 +18,7 @@
 package org.moeaframework.core.operator.real;
 
 import java.io.Serializable;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variable;
 import org.moeaframework.core.Variation;
@@ -44,7 +44,12 @@ public class UM implements Variation,Serializable{
 	 * The probability of mutating each variable in a solution.
 	 */
 	private final double probability;
-
+        
+        /**
+         * parallel purpose random generator
+         */
+        private final ParallelPRNG pprng;
+        
 	/**
 	 * Constructs a uniform mutation operator.
 	 * 
@@ -54,6 +59,7 @@ public class UM implements Variation,Serializable{
 	public UM(double probability) {
 		super();
 		this.probability = probability;
+                this.pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -72,7 +78,7 @@ public class UM implements Variation,Serializable{
 		for (int i = 0; i < result.getNumberOfVariables(); i++) {
 			Variable variable = result.getVariable(i);
 
-			if ((PRNG.nextDouble() <= probability)
+			if ((pprng.nextDouble() <= probability)
 					&& (variable instanceof RealVariable)) {
 				evolve((RealVariable)variable);
 			}
@@ -86,8 +92,8 @@ public class UM implements Variation,Serializable{
 	 * 
 	 * @param variable the variable to be mutated
 	 */
-	public static void evolve(RealVariable variable) {
-		variable.setValue(PRNG.nextDouble(variable.getLowerBound(), variable
+	public void evolve(RealVariable variable) {
+		variable.setValue(pprng.nextDouble(variable.getLowerBound(), variable
 				.getUpperBound()));
 	}
 
