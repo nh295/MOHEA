@@ -6,8 +6,8 @@
 
 package hh.nextheuristic;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.ICreditRepository;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import org.moeaframework.core.Variation;
  * @author nozomihitomi
  */
 public interface INextHeuristic{
-    
+        
     /**
      * Method to select or generate the next heuristic based on some selection 
      * or generation method
@@ -33,7 +33,7 @@ public interface INextHeuristic{
      * @param creditRepo the new credit repository
      * @param creditAgg the credit aggregation strategy to compute the quality of the heuristic
      */
-    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg);
+    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg);
     
     /**
      * Resets all stored history, qualities and credits

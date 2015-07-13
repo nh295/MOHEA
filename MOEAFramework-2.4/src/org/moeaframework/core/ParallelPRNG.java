@@ -17,6 +17,7 @@
  */
 package org.moeaframework.core;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -35,8 +36,9 @@ import org.apache.commons.math3.random.RandomAdaptor;
  * implementation is known to be thread-safe, assume that {@code PRNG} is not
  * thread-safe.
  */
-public class ParallelPRNG {
-
+public class ParallelPRNG implements Serializable{
+    private static final long serialVersionUID = 3687060339895977192L;
+    
     /**
      * Internal source of randomness.
      */

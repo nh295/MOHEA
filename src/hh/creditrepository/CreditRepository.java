@@ -6,8 +6,8 @@
 
 package hh.creditrepository;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +24,7 @@ import org.moeaframework.core.Variation;
 public class CreditRepository implements ICreditRepository,Serializable{
     private static final long serialVersionUID = 1004365209150732930L;
     
-    protected HashMap<Variation,Credit> creditRepository;
+    protected HashMap<Variation,Reward> creditRepository;
     
     /**
      * The most recently rewarded heuristic. There maybe multiple if using aggregated type credit definition
@@ -39,7 +39,7 @@ public class CreditRepository implements ICreditRepository,Serializable{
         creditRepository = new HashMap(heuristics.size());
         Iterator<Variation> iter = heuristics.iterator();
         while(iter.hasNext()){
-            creditRepository.put(iter.next(), new Credit(-1,0.0));
+            creditRepository.put(iter.next(), new Reward(-1,0.0));
         }
     }
 
@@ -51,7 +51,7 @@ public class CreditRepository implements ICreditRepository,Serializable{
      * @return the current credit stored for the specified heuristic
      */
     @Override
-    public Credit getAggregateCredit(ICreditAggregationStrategy creditAgg, int iteration,Variation heuristic){
+    public Reward getAggregateCredit(IQualityEstimation creditAgg, int iteration,Variation heuristic){
         return creditRepository.get(heuristic);
     }
 
@@ -61,14 +61,14 @@ public class CreditRepository implements ICreditRepository,Serializable{
      * @param credit that will replace old credit
      */
     @Override
-    public void update(Variation heuristic, Credit credit) {
+    public void update(Variation heuristic, Reward credit) {
         creditRepository.put(heuristic, credit);
         lastRewardedHeuristic.clear();
         lastRewardedHeuristic.add(heuristic);
     }
     
     @Override
-    public void update(HashMap<Variation,Credit> credits) {
+    public void update(HashMap<Variation,Reward> credits) {
         lastRewardedHeuristic.clear();
         Iterator<Variation> iter = credits.keySet().iterator();
         while(iter.hasNext()){
@@ -94,12 +94,12 @@ public class CreditRepository implements ICreditRepository,Serializable{
     public void clear() {
         Iterator<Variation> iter = creditRepository.keySet().iterator();
         while(iter.hasNext()){
-            creditRepository.put(iter.next(), new Credit(-1,0.0));
+            creditRepository.put(iter.next(), new Reward(-1,0.0));
         }
     }
 
     @Override
-    public Credit getLatestCredit(Variation heuristic) {
+    public Reward getLatestCredit(Variation heuristic) {
         return creditRepository.get(heuristic);
     }
 

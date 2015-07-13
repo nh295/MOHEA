@@ -6,27 +6,32 @@
 package hh.credittest;
 
 import com.sun.org.apache.bcel.internal.generic.AALOAD;
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditaggregation.MeanCredits;
-import hh.creditdefinition.CreditDefFactory;
-import hh.creditdefinition.immediate.ImmediateEArchiveCredit;
-import hh.creditdefinition.ICreditDefinition;
-import hh.creditdefinition.aggregate.AggregateEArchiveCredit;
-import hh.creditdefinition.aggregate.AggregateParetoFrontCredit;
-import hh.creditdefinition.aggregate.AggregateParetoRankCredit;
-import hh.creditdefinition.immediate.ParentDominationCredit;
-import hh.creditdefinition.immediate.ImmediateParetoFrontCredit;
-import hh.creditdefinition.immediate.ImmediateParetoRankCredit;
+import hh.IO.IOQualityHistory;
+import hh.IO.IOSelectionHistory;
+import hh.qualityestimation.IQualityEstimation;
+import hh.qualityestimation.MeanRewards;
+import hh.rewarddefinition.RewardDefFactory;
+import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
+import hh.rewarddefinition.IRewardDefinition;
+import hh.rewarddefinition.populationcontribution.EArchiveContribution;
+import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
+import hh.rewarddefinition.populationcontribution.ParetoRankContribution;
+import hh.rewarddefinition.offspringparent.ParentDomination;
+import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
+import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
 import hh.credithistory.CreditHistory;
 import hh.credithistory.CreditHistoryWindow;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
+import hh.creditrepository.SlidingWindowRepository;
 import hh.heuristicselectors.AdaptivePursuit;
 import hh.heuristicselectors.DMAB;
 import hh.heuristicselectors.ProbabilityMatching;
 import hh.heuristicselectors.RandomSelect;
 import hh.hyperheuristics.HHFactory;
+import hh.hyperheuristics.IHyperHeuristic;
 import hh.nextheuristic.INextHeuristic;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.spi.OperatorFactory;
@@ -55,17 +61,17 @@ public class HHCreditTest {
     /**
      * List of future tasks to perform
      */
-    private static ArrayList<Future<TestRun>> futures;
+    private static ArrayList<Future<IHyperHeuristic>> futures;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-//        String[] problems = new String[]{"UF1"};
+//        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
-        String[] epsilons = new String[]{"0.001", "0.005", "0.0008", "0.005", "0.000001", "0.000001", "0.005", "0.0045", "0.008", "0.001"};
 
+        pool = Executors.newFixedThreadPool(15);
         for (int j = 0; j < problems.length; j++) {
 
             String path;
@@ -82,46 +88,37 @@ public class HHCreditTest {
             System.out.println(probName);
             Problem prob = ProblemFactory.getInstance().getProblem(probName);
 
-            String eps = epsilons[j];
-            int nobjs = prob.getNumberOfObjectives();
-            String epsilon = "";
-            double[] epsilonDouble = new double[nobjs];
-            for (int i = 0; i < nobjs; i++) {
-                epsilon += eps;
-                if (i < nobjs - 1) {
-                    epsilon += ",";
-                }
-                epsilonDouble[i] = Double.parseDouble(eps);
+            double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
+            for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
+                epsilonDouble[i] = EpsilonHelper.getEpsilon(prob);
             }
 
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 1;
             int maxEvaluations = 300000;
             int windowSize = 300;
 
             //Setup heuristic selectors
-            String[] selectors = new String[]{ "AP"};
-            TypedProperties hhProp = new TypedProperties();
+//            String[] selectors = new String[]{"PM", "AP"};
+            String[] selectors = new String[]{"Random"};
 
             //setup credit definitions
-            String[] creditDefs = new String[]{"ODP","IPF","IEA","APF","AEA"};
-            TypedProperties credDefProp = new TypedProperties();
+//            String[] creditDefs = new String[]{"ODP", "IPF", "IEA", "CPF", "CEA"};
+            String[] creditDefs = new String[]{"IPF"};
 
+            futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
             for (String selector : selectors) {
                 for (String credDefStr : creditDefs) {
-                    pool = Executors.newFixedThreadPool(1);
                     //parallel process all runs
-                    futures = new ArrayList<>();
+                    futures.clear();
                     for (int k = 0; k < numberOfSeeds; k++) {
-
                         //Setup algorithm parameters
                         Properties prop = new Properties();
                         prop.put("populationSize", "600");
 //                      prop.put("alpha", args[2]);
                         prop.put("crediMemory", "1.0");
-                        prop.put("epsilon", epsilon);
-                        prop.put("HH",selector);
-                        prop.put("CredDef",credDefStr);
+                        prop.put("HH", selector);
+                        prop.put("CredDef", credDefStr);
 
                         //Choose heuristics to be applied. Use default values (probabilities)
                         ArrayList<Variation> heuristics = new ArrayList<>();
@@ -135,30 +132,53 @@ public class HHCreditTest {
                         heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
-                        ICreditAggregationStrategy creditAgg = new MeanCredits();
+                        IQualityEstimation creditAgg = new MeanRewards();
 
-                        ICreditRepository credRepo = new CreditHistoryRepository(heuristics, new CreditHistoryWindow(windowSize));
+                        ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new CreditHistoryWindow(windowSize), windowSize);
 
+                        TypedProperties typeProp = new TypedProperties(prop);
+                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
                         TestRun test = new TestRun(path, prob, probName,
-                                new TypedProperties(prop), creditAgg, credRepo,
-                                epsilonDouble, maxEvaluations);
+                                typeProp, creditAgg, credRepo,
+                                maxEvaluations);
 
                         //benchmark built-in MOEA
 //                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
-//                            prop, "NSGAII", epsilonDouble, maxEvaluations);
+//                            typeProp, "MOEAD", maxEvaluations);
                         futures.add(pool.submit(test));
                     }
-                    for (Future<TestRun> run : futures) {
+                    for (Future<IHyperHeuristic> run : futures) {
                         try {
-                            run.get();
+                            IHyperHeuristic hh = run.get();
+
+                            //save the approximation set
+//                            NondominatedPopulation ndPop = instAlgorithm.getResult();
+//                            try {
+//                                PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+//                            } catch (IOException ex) {
+//                                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+//                            }
+                            //save selection history
+//                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+//                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".hist");
+
+                            //save credit history
+//                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
+//                          path + File.separator + "results" + File.separator + problem.getName() + "_"
+//                          + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".credit");
+                            //save quality history
+//                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
+//                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".qual");
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    pool.shutdown();
                     System.out.println("Finished " + prob.getName() + "_" + selector + "_" + credDefStr + "\n\n");
                 }
             }
         }
+        pool.shutdown();
     }
 }

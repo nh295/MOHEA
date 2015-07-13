@@ -5,7 +5,7 @@
  */
 package hh.creditrepository;
 
-import hh.creditdefinition.Credit;
+import hh.rewarddefinition.Reward;
 import hh.credithistory.ICreditHistory;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,23 +36,22 @@ public class SlidingWindowRepository extends CreditHistoryRepository{
      * @param credit that will be added to the history
      */
     @Override
-    public void update(Variation heuristic, Credit credit) {
+    public void update(Variation heuristic, Reward credit) {
         updateSuper(heuristic, credit);
         creditHistory.get(heuristic).addCredit(credit);
-        truncateHistroy(credit, creditHistory.get(heuristic));
+        
+        for(Variation heur:getHeuristics())
+            truncateHistroy(credit, creditHistory.get(heuristic));
     }
     
     /**
      * Truncates the credits from the history that is past specified window size. Assumes the input credit has the current iteration count
      */
-    private void truncateHistroy(Credit currentCredit,ICreditHistory history){
+    private void truncateHistroy(Reward currentCredit,ICreditHistory history){
         int currentIter = currentCredit.getIteration();
-        LinkedList<Credit> hist = history.getHistory();
-        while(true){
-            if(currentIter - hist.getLast().getIteration()>windowSize)
-               break;
-            
-            
+        LinkedList<Reward> hist = history.getHistory();
+        while(currentIter - hist.getLast().getIteration()>windowSize){
+            hist.removeLast();
         }
     }
     

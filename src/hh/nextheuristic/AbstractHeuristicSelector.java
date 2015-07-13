@@ -6,8 +6,8 @@
 
 package hh.nextheuristic;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.ICreditRepository;
 import java.util.ArrayList;
 import java.util.Collection;

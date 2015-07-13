@@ -5,9 +5,9 @@
  */
 package hh.heuristicselectors;
 
-import hh.creditaggregation.CreditAggregator;
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.QualityEstimator;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
@@ -54,7 +54,7 @@ public class DMAB extends AbstractHeuristicSelector {
     /**
      * Sums/averages the credits stored in a credit history
      */
-    private CreditAggregator crediAggregator;
+    private QualityEstimator crediAggregator;
 
     /**
      * Constructor requires a credit repository type: only ICreditRepository
@@ -69,7 +69,7 @@ public class DMAB extends AbstractHeuristicSelector {
     public DMAB(Collection<Variation> heuristics, double beta, double delta, double lambda) {
         super(heuristics);
         this.beta = beta;
-        this.crediAggregator = new CreditAggregator();
+        this.crediAggregator = new QualityEstimator();
 
         heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
         arms = new HashMap();
@@ -133,7 +133,7 @@ public class DMAB extends AbstractHeuristicSelector {
      * @param creditAgg
      */
     @Override
-    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
         Collection<Variation> heuristicsRewarded = creditRepo.getLastRewardedHeuristic();
         Iterator<Variation> rewardIter = heuristicsRewarded.iterator();
         while (rewardIter.hasNext()) {
@@ -208,7 +208,7 @@ public class DMAB extends AbstractHeuristicSelector {
          * received this iteration
          * @return true if PH test detects change
          */
-        public boolean updateArm(Credit receivedCredit, Credit averageCredit) {
+        public boolean updateArm(Reward receivedCredit, Reward averageCredit) {
             avg = averageCredit.getValue();
             avgDev = avgDev + (avg - receivedCredit.getValue() + delta);
             maxDev = Math.max(maxDev, avgDev);

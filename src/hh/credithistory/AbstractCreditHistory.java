@@ -6,8 +6,8 @@
 
 package hh.credithistory;
 
-import hh.creditaggregation.CreditAggregator;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.QualityEstimator;
+import hh.rewarddefinition.Reward;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -19,19 +19,19 @@ import java.util.LinkedList;
 public abstract class AbstractCreditHistory implements ICreditHistory, Serializable{
     private static final long serialVersionUID = -41148639682799251L;
 
-    protected LinkedList<Credit> creditHistory;
-    protected CreditAggregator creditAdder;
+    protected LinkedList<Reward> creditHistory;
+    protected QualityEstimator creditAdder;
     
     public AbstractCreditHistory(){
         creditHistory = new LinkedList<>();
-        creditAdder = new CreditAggregator();
+        creditAdder = new QualityEstimator();
     }
     
     /**
      * Gets the most recent credit in the credit history
      * @return the most recent credit in the credit history
      */
-    public Credit getMostRecentCredit(){
+    public Reward getMostRecentCredit(){
         return creditHistory.getFirst();
     }
     
@@ -40,7 +40,7 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      * @param i the index of the credit desired. i=0 is the most recent credit
      * @return the ith most recent credit.
      */
-    public Credit get(int i){
+    public Reward get(int i){
         return creditHistory.get(i);
     }
     
@@ -49,7 +49,7 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      * @param credit to add
      */
     @Override
-    public void addCredit(Credit credit) {
+    public void addCredit(Reward credit) {
         creditHistory.addFirst(credit);
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      * @return entire stored history as a linkedList
      */
     @Override
-    public LinkedList<Credit> getHistory() {
+    public LinkedList<Reward> getHistory() {
         return creditHistory;
     }
     
@@ -70,7 +70,7 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      * @return iterator that iterates over the credits in the history
      */
     @Override
-    public Iterator<Credit> iterator() {
+    public Iterator<Reward> iterator() {
         return creditHistory.iterator();
     }
     
@@ -96,9 +96,9 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      * @return 
      */
     @Override
-    public Credit getLatest(){
+    public Reward getLatest(){
         if(creditHistory.isEmpty())
-            return new Credit(-1,0.0);
+            return new Reward(-1,0.0);
         else
             return creditHistory.getFirst();
     }

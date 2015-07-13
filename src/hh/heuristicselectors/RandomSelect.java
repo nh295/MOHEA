@@ -6,7 +6,7 @@
 
 package hh.heuristicselectors;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.qualityestimation.IQualityEstimation;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
 import java.util.Collection;
@@ -45,7 +45,7 @@ public class RandomSelect extends AbstractHeuristicSelector{
     }
 
     @Override
-    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
         //no need to do any updates
     }
     

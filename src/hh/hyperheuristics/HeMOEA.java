@@ -5,20 +5,22 @@
  */
 package hh.hyperheuristics;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
-import hh.creditdefinition.DecayingCredit;
-import hh.creditdefinition.ICreditDefinition;
-import hh.creditdefinition.ParentBasedCredit;
-import hh.creditdefinition.PopulationBasedCredit;
-import hh.creditdefinition.aggregate.IAggregateCredit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
+import hh.rewarddefinition.DecayingReward;
+import hh.rewarddefinition.IRewardDefinition;
 import hh.credithistory.CreditHistory;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
+import hh.rewarddefinition.RewardDefinitionType;
+import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
+import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
+import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
 import hh.selectionhistory.HeuristicSelectionHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.moeaframework.algorithm.EpsilonMOEA;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
@@ -48,7 +51,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * The Credit definition to be used that defines how much credit to receive
      * for certain types of solutions
      */
-    private final ICreditDefinition creditDef;
+    private final IRewardDefinition creditDef;
 
     /**
      * The repository that will store all the credits earned by the heuristics
@@ -59,7 +62,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * the credit aggregation scheme used to process the credits from previous
      * iterations
      */
-    private final ICreditAggregationStrategy creditAgg;
+    private final IQualityEstimation creditAgg;
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -100,11 +103,21 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * parallel purpose random generator
      */
     private final ParallelPRNG pprng;
-    
+
     /**
      * Iteration count
      */
     private int iteration = 0;
+
+    /**
+     * Name to id the hyper-heuristic
+     */
+    private String name;
+
+    /**
+     * Pareto Front
+     */
+    private NondominatedPopulation paretoFront;
 
     /**
      * Creates an instance of a hyper heuristic e-MOEA
@@ -128,13 +141,12 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public HeMOEA(Problem problem, Population population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Initialization initialization, INextHeuristic heuristicSelector,
-            ICreditDefinition creditDef, ICreditRepository creditRepo,
-            ICreditAggregationStrategy creditAgg, double alpha) {
+            IRewardDefinition creditDef, ICreditRepository creditRepo,
+            IQualityEstimation creditAgg, double alpha) {
         super(problem, population, archive, selection, null, initialization);
 
         checkHeuristics(heuristicSelector, creditRepo);
         this.heuristics = heuristicSelector.getHeuristics();
-
         this.selection = selection;
         this.heuristicSelector = heuristicSelector;
         this.creditRepo = creditRepo;
@@ -145,6 +157,10 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         this.creditHistory = new CreditHistoryRepository(heuristics, new CreditHistory());
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
+        
+        //Initialize the stored pareto front
+        super.initialize();
+        this.paretoFront = new NondominatedPopulation(getPopulation());
     }
 
     /**
@@ -165,6 +181,16 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * An iterations of this algorithm will select the next heuristic to be
      * applied, select the parents for that heuristic and select one child to
@@ -172,9 +198,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * random offspring will be selected with uniform probability
      */
     @Override
-    public void iterate() {
+    public void iterate() {        
         iteration++;
-        
+
         //select next heuristic
         Variation heuristic = heuristicSelector.nextHeuristic();
 
@@ -187,70 +213,72 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     selection.select(heuristic.getArity() - 1, population),
                     archive.get(pprng.nextInt(archive.size())));
         }
-
         pprng.shuffle(parents);
 
         Solution[] children = heuristic.evolve(parents);
 
-        //RECONSIDER some other policy other than taking one random offspring
+        //RECONSIDER some other policy other than using binary tournament
         Solution randChild = children[pprng.nextInt(children.length)];
         children = new Solution[]{randChild};
 
-        if (creditDef.isImmediate()) {
+        if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT || creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
             for (Solution child : children) {
                 evaluate(child);
 
                 double creditValue;
-                switch (creditDef.getType()) {
+
+                //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
+                switch (creditDef.getOperatesOn()) {
                     case PARENT:
-                        creditValue = ((ParentBasedCredit) creditDef).compute(child, parents, heuristic);
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, Arrays.asList(parents), heuristic);
                         break;
                     case POPULATION:
-                        creditValue = ((PopulationBasedCredit) creditDef).compute(child, population, heuristic);
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
+                        paretoFront.add(child);
+                        archive.add(child);
+                        break;
+                    case PARETOFRONT:
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront, heuristic);
+                        population.add(child);
+                        archive.add(child);
                         break;
                     case ARCHIVE:
-                        creditValue = ((PopulationBasedCredit) creditDef).compute(child, archive, heuristic);
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive, heuristic);
+                        population.add(child);
+                        paretoFront.add(child);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
-                creditRepo.update(heuristic, new DecayingCredit(iteration, creditValue, alpha));
+                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
                 heuristicSelector.update(creditRepo, creditAgg);
                 heuristicSelectionHistory.add(heuristic);
                 updateCreditHistory();
                 updateQualityHistory();
-                System.out.println(heuristic+": "+creditValue);
+//                System.out.println(heuristic+": "+creditValue);
             }
-            
-        }
+        } else {
 
-        //add all solutions to the population/archive
-        for (Solution child : children) {
-            addToPopulation(child);
-            archive.add(child);
-        }
-
-        if (!creditDef.isImmediate()) {
             for (Solution child : children) {
                 evaluate(child);
-//                Map<String,Object> attribute = new HashMap();
+                population.add(child);
+                paretoFront.add(child);
+                archive.add(child);
                 child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
                 child.setAttribute("heuristic", new SerializableVal(heuristic.getClass().getSimpleName()));
                 child.setAttribute("alpha", new SerializableVal(alpha));
-//                child.addAttributes(attribute);
             }
-
-            HashMap<Variation,Credit> aggCredits;
-            switch (creditDef.getType()) {
-//                case PARENT:
-//                    newCreditRepo = ((IAggregateCredit)creditDef).computeAll(children, parents,heuristic).get(0);
-//                    break;
+            HashMap<Variation, Reward> aggCredits;
+            switch (creditDef.getOperatesOn()) {
                 case POPULATION:
-                    aggCredits = ((IAggregateCredit) creditDef).compute(population, heuristics, this.getNumberOfEvaluations());
+                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(population, heuristics, this.getNumberOfEvaluations());
+                    break;
+                case PARETOFRONT:
+                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(paretoFront, heuristics, this.getNumberOfEvaluations());
                     break;
                 case ARCHIVE:
-                    aggCredits = ((IAggregateCredit) creditDef).compute(archive, heuristics, this.getNumberOfEvaluations());
+                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(archive, heuristics, this.getNumberOfEvaluations());
                     break;
                 default:
                     throw new NullPointerException("Credit definition not "
@@ -329,7 +357,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     }
 
     @Override
-    public ICreditDefinition getCreditDefinition() {
+    public IRewardDefinition getCreditDefinition() {
         return creditDef;
     }
 
@@ -344,8 +372,8 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * @return the latest credit received by each heuristic
      */
     @Override
-    public HashMap<Variation, Credit> getLatestCredits() {
-        HashMap<Variation, Credit> out = new HashMap<>();
+    public HashMap<Variation, Reward> getLatestCredits() {
+        HashMap<Variation, Reward> out = new HashMap<>();
         Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
         while (iter.hasNext()) {
             Variation heuristic = iter.next();

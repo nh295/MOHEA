@@ -6,12 +6,15 @@
 
 package hh.credittest;
 
-import hh.creditdefinition.ICreditDefinition;
+import hh.rewarddefinition.IRewardDefinition;
+import hh.creditrepository.CreditRepository;
+import hh.hyperheuristics.IHyperHeuristic;
 import hh.nextheuristic.INextHeuristic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,19 +41,19 @@ import org.moeaframework.util.TypedProperties;
 public class TestRunBenchmark extends TestRun{
     
     private String algorithm;
-    private final Properties prop;
+    private final TypedProperties prop;
     
 
-    public TestRunBenchmark(String path, Problem problem, String probName, Properties properties, String algorithm, double[] epsilonDouble, int maxEvaluations) {
-        super(path, problem, probName, new TypedProperties(properties), null,null, epsilonDouble, maxEvaluations);
+    public TestRunBenchmark(String path, Problem problem, String probName, TypedProperties properties, String algorithm, int maxEvaluations) {
+        super(path, problem, probName, properties, null,new CreditRepository(new ArrayList()), maxEvaluations);
         this.algorithm = algorithm;
         this.prop = properties;
     }
     
     @Override
-    public Object call() {
+    public IHyperHeuristic call() {
         StandardAlgorithms sa = new StandardAlgorithms();
-        Algorithm alg = sa.getAlgorithm(algorithm, prop, problem);
+        Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
         Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
                 .withProblem(probName)

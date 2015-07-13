@@ -55,12 +55,18 @@ public class EpsilonHelper {
 		} else if (name.startsWith("UF")) {
 			if (name.equals("UF1")) {
 				return 0.001;
+                        } else if (name.equals("UF2")) {
+				return 0.005;
 			} else if (name.equals("UF3")) {
 				return 0.0008;
+                        } else if (name.equals("UF4")) {
+				return 0.005;
 			} else if (name.equals("UF5")) {
 				return 0.000001;
 			} else if (name.equals("UF6")) {
 				return 0.000001;
+                        } else if (name.equals("UF7")) {
+				return 0.005;
 			} else if (name.equals("UF8")) {
 				return 0.0045;
 			} else if (name.equals("UF9")) {
