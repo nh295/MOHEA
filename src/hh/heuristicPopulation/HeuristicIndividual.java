@@ -6,8 +6,8 @@
 
 package hh.heuristicPopulation;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.credithistory.AbstractCreditHistory;
 import hh.credithistory.ICreditHistory;
 import hh.heuristicgenerators.HeuristicSequence;
@@ -30,7 +30,7 @@ public class HeuristicIndividual extends Solution{
     /**
      * The method to weight credits earned over time.
      */
-    private final ICreditAggregationStrategy aggregateStrategy;
+    private final IQualityEstimation aggregateStrategy;
     
     /**
      * The sequence of building blocks that create the heuristic
@@ -39,7 +39,7 @@ public class HeuristicIndividual extends Solution{
     
     public HeuristicIndividual(int numberOfVariables, int numberOfObjectives,
             HeuristicSequence heuristicSequence,AbstractCreditHistory creditHistory,
-            ICreditAggregationStrategy aggregateStrategy) {
+            IQualityEstimation aggregateStrategy) {
         super(numberOfVariables, numberOfObjectives);
         this.heuristicSequence = heuristicSequence;
         this.creditHistory = (AbstractCreditHistory)creditHistory.getInstance();
@@ -50,9 +50,9 @@ public class HeuristicIndividual extends Solution{
         return heuristicSequence;
     }
     
-    public void updateCredit(Credit credit){
+    public void updateCredit(Reward credit){
         creditHistory.addCredit(credit);
-        Credit currentCredit = 
+        Reward currentCredit = 
                 aggregateStrategy.aggregateCredit(credit.getIteration(), creditHistory);
         setObjective(0, currentCredit.getValue());
     }

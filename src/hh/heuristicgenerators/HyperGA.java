@@ -6,8 +6,8 @@
 
 package hh.heuristicgenerators;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.credithistory.AbstractCreditHistory;
 import hh.creditrepository.CreditRepository;
 import hh.heuristicPopulation.HeuristicIndividual;
@@ -64,7 +64,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
     /**
      * The method to weight credits earned over time.
      */
-    private ICreditAggregationStrategy creditAgg;
+    private IQualityEstimation creditAgg;
     
     /**
      * Creates a new population that is empty.
@@ -80,7 +80,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
      */
     public HyperGA(Collection<Variation> heuristics,int chromosomeLength,
             int thresholdGen, int keepN, int populationSize,  double mutationRate,
-            double crossoverRate,AbstractCreditHistory creditHistory, ICreditAggregationStrategy creditAgg) {
+            double crossoverRate,AbstractCreditHistory creditHistory, IQualityEstimation creditAgg) {
         super(new CreditRepository(heuristics),heuristics);
         this.keepN = keepN;
         this.populationSize = populationSize;

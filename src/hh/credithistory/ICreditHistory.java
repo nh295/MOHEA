@@ -6,32 +6,32 @@
 
 package hh.credithistory;
 
-import hh.creditdefinition.Credit;
+import hh.rewarddefinition.Reward;
 import java.util.LinkedList;
 
 /**
  *
  * @author Nozomi
  */
-public interface ICreditHistory extends Iterable<Credit>{
+public interface ICreditHistory extends Iterable<Reward>{
     
     /**
      * Adds credit to the history
      * @param credit to add to the history
      */
-    public void addCredit(Credit credit);
+    public void addCredit(Reward credit);
     
     /**
      * Returns the credit history
      * @return the credit history
      */
-    public LinkedList<Credit> getHistory();
+    public LinkedList<Reward> getHistory();
     
     /**
      * Returns the latest credit in the history
      * @return 
      */
-    public Credit getLatest();
+    public Reward getLatest();
     
     /**
      * Returns an instance of credit history.

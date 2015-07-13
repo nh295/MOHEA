@@ -6,7 +6,7 @@
 
 package hh.heuristicselectors;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.qualityestimation.IQualityEstimation;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
 import java.util.Collection;
@@ -86,7 +86,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * @param creditRepo the credit repository that store the past earned credits
      * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
-    protected void updateQuality(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg){
+    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation creditAgg){
         Collection<Variation> heuristicsRewarded = creditRepo.getLastRewardedHeuristic();
         Iterator<Variation> rewardIter = heuristicsRewarded.iterator();
         while (rewardIter.hasNext()) {
@@ -140,7 +140,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
-    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
         updateQuality(creditRepo, creditAgg);
         
         double sum = sumQualities();

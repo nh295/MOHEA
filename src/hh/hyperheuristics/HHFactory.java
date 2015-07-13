@@ -5,11 +5,12 @@
  */
 package hh.hyperheuristics;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.qualityestimation.IQualityEstimation;
 import hh.creditrepository.ICreditRepository;
 import hh.heuristicgenerators.HyperGA;
 import hh.heuristicselectors.AdaptivePursuit;
 import hh.heuristicselectors.ProbabilityMatching;
+import hh.heuristicselectors.RandomSelect;
 import hh.nextheuristic.AbstractHeuristicGenerator;
 import hh.nextheuristic.AbstractHeuristicSelector;
 import java.util.Collection;
@@ -49,6 +50,9 @@ public class HHFactory {
         AbstractHeuristicSelector heuristicSelector = null;
         
         switch(name){
+            case "Random": //uniform random selection
+                heuristicSelector = new RandomSelect(heuristics);
+                break;
             case "PM":{ //Probability matching
                 double pmin = properties.getDouble("pmin", 0.1);
                 double alpha = properties.getDouble("alpha", 0.8);

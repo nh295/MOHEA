@@ -6,8 +6,8 @@
 
 package hh.hyperheuristics;
 
-import hh.creditdefinition.Credit;
-import hh.creditdefinition.ICreditDefinition;
+import hh.rewarddefinition.Reward;
+import hh.rewarddefinition.IRewardDefinition;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
@@ -50,7 +50,7 @@ public interface IHyperHeuristic extends Algorithm{
      * Gets the credit definition being used.
      * @return 
      */
-    public ICreditDefinition getCreditDefinition();
+    public IRewardDefinition getCreditDefinition();
     
     /**
      * Gets the strategy that is used to generate or select the next heuristic 
@@ -62,5 +62,17 @@ public interface IHyperHeuristic extends Algorithm{
      * Returns the latest credit received by each heuristic
      * @return the latest credit received by each heuristic
      */
-    public HashMap<Variation,Credit> getLatestCredits();
+    public HashMap<Variation,Reward> getLatestCredits();
+    
+    /**
+     * Sets the hyper-heuristic's name
+     * @param name
+     */
+    public void setName(String name);
+    
+    /**
+     * Gets the hyper-heuristic's name
+     * @return 
+     */
+    public String getName();
 }

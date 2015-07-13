@@ -5,9 +5,11 @@
  */
 package hh.credittest;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.CreditDefFactory;
-import hh.creditdefinition.ICreditDefinition;
+import hh.IO.IOQualityHistory;
+import hh.IO.IOSelectionHistory;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.RewardDefFactory;
+import hh.rewarddefinition.IRewardDefinition;
 import hh.creditrepository.ICreditRepository;
 import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
@@ -53,24 +55,25 @@ public class TestRun implements Callable {
     protected Problem problem;
     protected String probName;
     protected String path;
-    private ICreditDefinition creditDef;
+    private IRewardDefinition creditDef;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
-    private final ICreditAggregationStrategy creditAgg;
+    private final IQualityEstimation creditAgg;
     private final Collection<Variation> heuristics;
     private ICreditRepository creditRepo;
 
     public TestRun(String path, Problem problem, String probName, TypedProperties properties,
-            ICreditAggregationStrategy creditAgg, ICreditRepository creditRepo,
-            double[] epsilonDouble, int maxEvaluations) {
+            IQualityEstimation creditAgg, ICreditRepository creditRepo,
+            int maxEvaluations) {
 
         this.heuristics = creditRepo.getHeuristics();
         this.creditRepo = creditRepo;
         this.creditAgg = creditAgg;
         this.properties = properties;
         this.problem = problem;
+        this.epsilonDouble = properties.getDoubleArray("ArchiveEpsilon",
+                        new double[]{EpsilonHelper.getEpsilon(problem)});
         this.probName = probName;
-        this.epsilonDouble = epsilonDouble;
         this.maxEvaluations = maxEvaluations;
         this.path = path;
     }
@@ -86,7 +89,7 @@ public class TestRun implements Callable {
     private IHyperHeuristic newHeMOEA() {
         
         int populationSize = (int) properties.getDouble("populationSize", 600);
-        double crediMemory = properties.getDouble("crediMemory", 1.0);
+        double crediMemory = properties.getDouble("creditMemory", 1.0);
 
         System.out.println("alpha:" + crediMemory);
 
@@ -97,16 +100,14 @@ public class TestRun implements Callable {
 
         DominanceComparator comparator = new ParetoDominanceComparator();
 
-        EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(
-                properties.getDoubleArray("epsilon",
-                        new double[]{EpsilonHelper.getEpsilon(problem)}));
-
+        EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(epsilonDouble);
+                
         final TournamentSelection selection = new TournamentSelection(
                 2, comparator);
         
         //Use default values for selectors
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
-        creditDef = CreditDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  new TypedProperties());
+        creditDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties);
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
             initialization, selector, creditDef, creditRepo,
@@ -121,7 +122,7 @@ public class TestRun implements Callable {
      * @throws Exception 
      */
     @Override
-    public Object call() throws Exception {
+    public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
@@ -137,9 +138,7 @@ public class TestRun implements Callable {
         Algorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss");
-        String stamp = dateFormat.format(new Date());
-        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + creditDef +" on " + problem.getName() + "_" + stamp);
+        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + creditDef +" on " + problem.getName());
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
@@ -147,12 +146,15 @@ public class TestRun implements Callable {
 //                System.out.print("\b\b\b\b\b\b");
 //                System.out.printf("%02.4f",(double)instAlgorithm.getNumberOfEvaluations()/(double)maxEvaluations);
             }
+            
+        hh.terminate();
         System.out.println("Done with optimization");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
+        hh.setName(String.valueOf(System.nanoTime()));
         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp;
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
@@ -176,33 +178,7 @@ public class TestRun implements Callable {
         } catch (IOException ex) {
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        //save the approximation set
-//        NondominatedPopulation ndPop = instAlgorithm.getResult();
-//        try {
-//            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
-//        } catch (IOException ex) {
-//            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
-//        }
 
-
-        //save selection history
-//        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
-//                path + File.separator + "results" + File.separator + problem.getName() + "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".hist");
-
-        //save credit history
-//        IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
-//                path + File.separator + "results" + File.separator + problem.getName() + "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".credit");
-        
-        //save quality history
-//        IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
-//                path + File.separator + "results" + File.separator + problem.getName() + "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + stamp + ".qual");
-
-        hh.terminate();
-        hh = null;
         return hh;
     }
 

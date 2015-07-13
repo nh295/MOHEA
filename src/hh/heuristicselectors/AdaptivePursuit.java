@@ -5,7 +5,7 @@
  */
 package hh.heuristicselectors;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
+import hh.qualityestimation.IQualityEstimation;
 import hh.creditrepository.ICreditRepository;
 import java.util.Collection;
 import java.util.Iterator;
@@ -74,7 +74,7 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
-    public void update(ICreditRepository creditRepo, ICreditAggregationStrategy creditAgg) {
+    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
         super.updateQuality(creditRepo, creditAgg);
 
         Variation leadHeuristic = argMax(creditRepo.getHeuristics());

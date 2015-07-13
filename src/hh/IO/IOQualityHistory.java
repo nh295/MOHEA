@@ -6,7 +6,7 @@
 
 package hh.IO;
 
-import hh.creditdefinition.Credit;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.qualityhistory.HeuristicQualityHistory;
 import hh.selectionhistory.HeuristicSelectionHistory;

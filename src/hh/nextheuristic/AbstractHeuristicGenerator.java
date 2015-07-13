@@ -6,8 +6,8 @@
 
 package hh.nextheuristic;
 
-import hh.creditaggregation.ICreditAggregationStrategy;
-import hh.creditdefinition.Credit;
+import hh.qualityestimation.IQualityEstimation;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.ICreditRepository;
 import hh.heuristicgenerators.HeuristicSequence;
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public abstract class AbstractHeuristicGenerator implements INextHeuristic{
     }
     
     @Override
-    public void update(ICreditRepository creditRepo,ICreditAggregationStrategy creditAgg) {
+    public void update(ICreditRepository creditRepo,IQualityEstimation creditAgg) {
         this.creditRepo = creditRepo;
     }
     

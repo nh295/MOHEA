@@ -6,7 +6,7 @@
 
 package hh.IO;
 
-import hh.creditdefinition.Credit;
+import hh.rewarddefinition.Reward;
 import hh.creditrepository.CreditHistoryRepository;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +42,7 @@ public class IOCreditHistory {
             Iterator<Variation> heuristicIter = creditRepo.getHeuristics().iterator();
             while(heuristicIter.hasNext()){
                 Variation heuristic = heuristicIter.next();
-                Iterator<Credit> historyIter= creditRepo.getHistory(heuristic).getHistory().iterator();
+                Iterator<Reward> historyIter= creditRepo.getHistory(heuristic).getHistory().iterator();
                 String[] heuristicName = heuristic.toString().split("operator.");
                 String[] splitName = heuristicName[heuristicName.length-1].split("@");
                 fw.append(splitName[0]+separator);

@@ -25,10 +25,9 @@
 % creditDef = {'Parent','ImmediateParetoFront','ImmediateParetoRank','ImmediateEArchive'...
 %     'AggregateParetoFront','AggregateParetoRank','AggregateEArchive'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-selectors = {'Probabil'};
-creditDef = {'Parent'};
+selectors = {'NSGAII'};
+creditDef = {'NSGAII'};
 problemName = {'UF2'};
-numObj = {2};
 
 % selectorsAbv = {'R','PM','AP','DMAB'};
 % credDefAbv = {'P','IPF','IPR','IEA','APF','APR','AEA'};
@@ -47,21 +46,21 @@ HVattainmentPer = zeros(length(creditDef)*length(selectors),length(problemName))
 AllHVvals = zeros(length(creditDef)*length(selectors),length(problemName),30);
 AllIGDvals = zeros(length(creditDef)*length(selectors),length(problemName),30);
 
-path ='/Users/nozomihitomi/Dropbox/MOHEA/results';
+path ='C:\Users\SEAK2\Nozomi\MOHEA\results';
 
 ind = 1;
 for j=1:length(selectors)
     for i=1:length(creditDef)
         for k=1:length(problemName)
 %             fprintf('%s %s\n',selectors{j},creditDef{i});
-            [EI,IGD,HV] = getAllResults(path,selectors{j},creditDef{i},problemName{k},numObj{k});
-            bestVals(ind,k,1) = min(EI(:,end));
+            [AEI,GD,HV,IGD] = getAllResults(path,selectors{j},creditDef{i},problemName{k});
+            bestVals(ind,k,1) = min(AEI(:,end));
             bestVals(ind,k,2) = min(IGD(:,end));
             bestVals(ind,k,3) = max(HV(:,end));
-            worstVals(ind,k,1) = max(EI(:,end));
+            worstVals(ind,k,1) = max(AEI(:,end));
             worstVals(ind,k,2) = max(IGD(:,end));
             worstVals(ind,k,3) = min(HV(:,end));
-            avgVals(ind,k,1) = mean(EI(:,end));
+            avgVals(ind,k,1) = mean(AEI(:,end));
             avgVals(ind,k,2) = mean(IGD(:,end));
             avgVals(ind,k,3) = mean(HV(:,end));
             AllHVvals(ind,k,:) = HV(:,end);

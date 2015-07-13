@@ -6,7 +6,7 @@
 
 package hh.credithistory;
 
-import hh.creditdefinition.Credit;
+import hh.rewarddefinition.Reward;
 
 /**
  * Credit history with a sliding window that keeps the last W earned Credits. Window of credits is first-in-first-out
@@ -32,7 +32,7 @@ public class CreditHistoryWindow extends AbstractCreditHistory{
      * @param credit to add
      */
     @Override
-    public void addCredit(Credit credit) {
+    public void addCredit(Reward credit) {
         creditHistory.addFirst(credit);
         if(creditHistory.size()>windowSize)
             creditHistory.removeLast();
