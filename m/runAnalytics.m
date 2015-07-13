@@ -24,51 +24,34 @@
 % selectors = {'Random','Probability','Adaptive','DMAB'};
 % creditDef = {'Parent','ImmediateParetoFront','ImmediateParetoRank','ImmediateEArchive'...
 %     'AggregateParetoFront','AggregateParetoRank','AggregateEArchive'};
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-selectors = {'Probabil'};
-creditDef = {'Parent'};
-problemName = {'UF2'};
-numObj = {2};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+selectors = {'Probability','Adaptive'};
+creditDef = { 'Parent','ImmediateParetoFront','ImmediateEArchive' };
+% problemName = {'UF2'};
 
-% selectorsAbv = {'R','PM','AP','DMAB'};
-% credDefAbv = {'P','IPF','IPR','IEA','APF','APR','AEA'};
-% Xlabels = cell(length(credDefAbv)*length(selectorsAbv),1);
-% Ylabels = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-
-selectorsAbv = {'R'};
-credDefAbv = {'P'};
-Xlabels = cell(length(credDefAbv)*length(selectorsAbv),1);
-Ylabels = {'UF2'};
-
-bestVals = zeros(length(creditDef)*length(selectors),length(problemName),3);
-worstVals = zeros(length(creditDef)*length(selectors),length(problemName),3);
-avgVals = zeros(length(creditDef)*length(selectors),length(problemName),3);
-HVattainmentPer = zeros(length(creditDef)*length(selectors),length(problemName));
-AllHVvals = zeros(length(creditDef)*length(selectors),length(problemName),30);
-AllIGDvals = zeros(length(creditDef)*length(selectors),length(problemName),30);
-
-path ='/Users/nozomihitomi/Dropbox/MOHEA/results';
+path ='/Users/nozomihitomi/Dropbox/MOHEA/mRes';
 
 ind = 1;
 for j=1:length(selectors)
     for i=1:length(creditDef)
         for k=1:length(problemName)
-%             fprintf('%s %s\n',selectors{j},creditDef{i});
-            [EI,IGD,HV] = getAllResults(path,selectors{j},creditDef{i},problemName{k},numObj{k});
-            bestVals(ind,k,1) = min(EI(:,end));
-            bestVals(ind,k,2) = min(IGD(:,end));
-            bestVals(ind,k,3) = max(HV(:,end));
-            worstVals(ind,k,1) = max(EI(:,end));
-            worstVals(ind,k,2) = max(IGD(:,end));
-            worstVals(ind,k,3) = min(HV(:,end));
-            avgVals(ind,k,1) = mean(EI(:,end));
-            avgVals(ind,k,2) = mean(IGD(:,end));
-            avgVals(ind,k,3) = mean(HV(:,end));
-            AllHVvals(ind,k,:) = HV(:,end);
-            AllIGDvals(ind,k,:) = IGD(:,end);
+%             [AEI,GD,HV,IGD] = getAllResults(path,selectors{j},creditDef{i},problemName{k});
+%             res.GD = squeeze(GD(:,end));
+%             res.AEI = squeeze(AEI(:,end));
+%             res.HV = squeeze(HV(:,end));
+%             res.IGD = squeeze(IGD(:,end));
+%             save(strcat(problemName{k},'_',selectors{j},'_',creditDef{i},'.mat'),'res');
+
+            [out,p,avg1,avg2] = runKWsignificance(path,selectors{j},creditDef{i},'Random','Parent',problemName{k});
+            if p<0.05 && avg1<avg2
+                fprintf(['LOSE:',strcat(problemName{k},'_',selectors{j},'_',creditDef{i}),'avg1: %d , avg2: %d\n'],avg1,avg2);
+            end
+            if p<0.05 && avg1>avg2
+                fprintf(['WIN:',strcat(problemName{k},'_',selectors{j},'_',creditDef{i}),'avg1: %d , avg2: %d\n'],avg1,avg2);
+            end
         end
-        Xlabels{ind} = strcat(selectorsAbv{j},'-',credDefAbv{i});
+%         Xlabels{ind} = strcat(selectorsAbv{j},'-',credDefAbv{i});
         ind = ind + 1;
     end
 end
-% plotMetrics(bestVals(:,:,3),Xlabels,Ylabels);
+
