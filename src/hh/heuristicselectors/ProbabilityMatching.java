@@ -34,23 +34,16 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * The minimum probability for a heuristic to be selected
      */
     protected final double pmin;
-    
-    /**
-     * Adaptation rate
-     */
-    protected final double alpha;
 
     /**
      * Constructor to initialize probability map for selection
      * @param heuristics from which to select from 
      * @param pmin The minimum probability for a heuristic to be selected
-     * @param alpha The adaptation rate
      */
-    public ProbabilityMatching(Collection<Variation> heuristics, double pmin,double alpha) {
+    public ProbabilityMatching(Collection<Variation> heuristics, double pmin) {
         super(heuristics);
         this.pmin = pmin;
         this.probabilities = new HashMap();
-        this.alpha = alpha;
         reset();
     }
 
@@ -84,15 +77,14 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * heuristic's credit history. If the quality becomes negative, it is reset
      * to 0.0. Only updates those heuristics that were just rewarded.
      * @param creditRepo the credit repository that store the past earned credits
-     * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
+     * @param qualEst method to aggregate the past credits to compute the heuristic's reward
      */
-    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation creditAgg){
+    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
         Collection<Variation> heuristicsRewarded = creditRepo.getLastRewardedHeuristic();
         Iterator<Variation> rewardIter = heuristicsRewarded.iterator();
         while (rewardIter.hasNext()) {
             Variation heuristic = rewardIter.next();
-            double reward = creditRepo.getAggregateCredit(creditAgg, getNumberOfIterations(), heuristic).getValue();
-            qualities.put(heuristic, (1.0 - alpha) * qualities.get(heuristic) + alpha * reward);
+            qualities.put(heuristic, creditRepo.estimateQuality(qualEst, getNumberOfIterations(), heuristic));
 
             //if current quality becomes negative, adjust to 0
             if (qualities.get(heuristic) < 0.0) {

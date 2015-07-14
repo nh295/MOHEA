@@ -40,11 +40,10 @@ public class AdaptivePursuit extends ProbabilityMatching {
      *
      * @param heuristics from which to select from 
      * @param pmin the minimum selection probability
-     * @param alpha the adaptation rate
      * @param beta the learning rate
      */
-    public AdaptivePursuit(Collection<Variation> heuristics, double pmin, double alpha, double beta) {
-        super(heuristics, pmin, alpha);
+    public AdaptivePursuit(Collection<Variation> heuristics, double pmin, double beta) {
+        super(heuristics, pmin);
         this.pmax = 1 - (probabilities.size() - 1) * pmin;
         this.beta = beta;
         if (pmax < pmin) {

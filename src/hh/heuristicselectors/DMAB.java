@@ -139,7 +139,7 @@ public class DMAB extends AbstractHeuristicSelector {
         while (rewardIter.hasNext()) {
             Variation heuristic = rewardIter.next();
             //update the arm and execute PH test
-            boolean PHtest = arms.get(heuristic).updateArm(creditRepo.getLatestCredit(heuristic),
+            boolean PHtest = arms.get(heuristic).updateArm(creditRepo.getLatestReward(heuristic),
                     crediAggregator.mean(getNumberOfIterations(), ((CreditHistoryRepository) creditRepo).getHistory(heuristic)));
             if (PHtest) {
                 //if PH test is true, reset all counters, credits, and arms
@@ -208,8 +208,8 @@ public class DMAB extends AbstractHeuristicSelector {
          * received this iteration
          * @return true if PH test detects change
          */
-        public boolean updateArm(Reward receivedCredit, Reward averageCredit) {
-            avg = averageCredit.getValue();
+        public boolean updateArm(Reward receivedCredit, double averageCredit) {
+            avg = averageCredit;
             avgDev = avgDev + (avg - receivedCredit.getValue() + delta);
             maxDev = Math.max(maxDev, avgDev);
             boolean PHtest = ((maxDev - avgDev) > lambda);

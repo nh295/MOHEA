@@ -9,7 +9,7 @@ import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.DecayingReward;
 import hh.rewarddefinition.IRewardDefinition;
-import hh.credithistory.CreditHistory;
+import hh.credithistory.RewardHistory;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.INextHeuristic;
@@ -154,7 +154,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         this.creditAgg = creditAgg;
         this.alpha = alpha;
         this.heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
-        this.creditHistory = new CreditHistoryRepository(heuristics, new CreditHistory());
+        this.creditHistory = new CreditHistoryRepository(heuristics, new RewardHistory());
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         
@@ -298,7 +298,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      */
     private void updateCreditHistory() {
         for (Variation heuristic : heuristics) {
-            creditHistory.update(heuristic, creditRepo.getLatestCredit(heuristic));
+            creditHistory.update(heuristic, creditRepo.getLatestReward(heuristic));
         }
     }
 
@@ -377,7 +377,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
         while (iter.hasNext()) {
             Variation heuristic = iter.next();
-            out.put(heuristic, creditRepo.getLatestCredit(heuristic));
+            out.put(heuristic, creditRepo.getLatestReward(heuristic));
         }
         return out;
     }

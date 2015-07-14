@@ -6,6 +6,7 @@
 
 package hh.creditrepository;
 
+import hh.credithistory.RewardHistory;
 import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
 import java.io.Serializable;
@@ -16,9 +17,9 @@ import java.util.Iterator;
 import org.moeaframework.core.Variation;
 
 /**
- * This class of credit repository stores credit for each heuristic. One Credit 
+ * This class of credit repository stores reward for each heuristic. One Reward 
  * object is assigned for each heuristic. This does not store the history of 
- * credits received over time
+ * rewards received over time
  * @author nozomihitomi
  */
 public class CreditRepository implements ICreditRepository,Serializable{
@@ -27,12 +28,12 @@ public class CreditRepository implements ICreditRepository,Serializable{
     protected HashMap<Variation,Reward> creditRepository;
     
     /**
-     * The most recently rewarded heuristic. There maybe multiple if using aggregated type credit definition
+     * The most recently rewarded heuristic. There maybe multiple if using aggregated type reward definition
      */
     private ArrayList<Variation> lastRewardedHeuristic = new ArrayList();
     
     /**
-     * This constructor creates the credit repository that initialize 0 credit for each heuristic
+     * This constructor creates the credit repository that initialize 0 reward for each heuristic
      * @param heuristics An iterable set of the candidate heuristics to be used
      */
     public CreditRepository(Collection<Variation> heuristics) {
@@ -44,36 +45,38 @@ public class CreditRepository implements ICreditRepository,Serializable{
     }
 
     /**
-     * Method returns the current aggregated credit stored for the specified heuristic
-     * @param creditAgg The method to aggregate the history of credits. In this implementation, a credit aggregation strategy is not needed
+     * Method returns the current quality estimate for the specified heuristic based on its current reward
+     * @param qualEst The method to aggregate the history of rewards. In this implementation, a quality estimator is not needed
      * @param iteration the iteration to aggregate up to. In this implementation, an iteration is not needed
-     * @param heuristic
-     * @return the current credit stored for the specified heuristic
+     * @param heuristic to estimate quality for
+     * @return the current quality estimate for the specified heuristic
      */
     @Override
-    public Reward getAggregateCredit(IQualityEstimation creditAgg, int iteration,Variation heuristic){
-        return creditRepository.get(heuristic);
+    public double estimateQuality(IQualityEstimation qualEst, int iteration,Variation heuristic){
+        RewardHistory rh = new RewardHistory();
+        rh.add(creditRepository.get(heuristic));
+        return qualEst.estimate(iteration,rh);
     }
 
     /**
-     * Replaces the credit assigned to the specified heuristic with the given credit
+     * Replaces the reward assigned to the specified heuristic with the given credit
      * @param heuristic the heuristic to query
-     * @param credit that will replace old credit
+     * @param reward that will replace old reward
      */
     @Override
-    public void update(Variation heuristic, Reward credit) {
-        creditRepository.put(heuristic, credit);
+    public void update(Variation heuristic, Reward reward) {
+        creditRepository.put(heuristic, reward);
         lastRewardedHeuristic.clear();
         lastRewardedHeuristic.add(heuristic);
     }
     
     @Override
-    public void update(HashMap<Variation,Reward> credits) {
+    public void update(HashMap<Variation,Reward> rewards) {
         lastRewardedHeuristic.clear();
-        Iterator<Variation> iter = credits.keySet().iterator();
+        Iterator<Variation> iter = rewards.keySet().iterator();
         while(iter.hasNext()){
             Variation heuristic = iter.next();
-            creditRepository.put(heuristic, credits.get(heuristic));
+            creditRepository.put(heuristic, rewards.get(heuristic));
             lastRewardedHeuristic.add(heuristic);
         }
     }
@@ -88,7 +91,7 @@ public class CreditRepository implements ICreditRepository,Serializable{
     }    
     
     /**
-     * Clears the credit stored in the repository. Resets credits to 0
+     * Clears the reward stored in the repository. Resets credits to 0
      */
     @Override
     public void clear() {
@@ -99,7 +102,7 @@ public class CreditRepository implements ICreditRepository,Serializable{
     }
 
     @Override
-    public Reward getLatestCredit(Variation heuristic) {
+    public Reward getLatestReward(Variation heuristic) {
         return creditRepository.get(heuristic);
     }
 

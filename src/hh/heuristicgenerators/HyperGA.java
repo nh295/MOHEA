@@ -8,7 +8,7 @@ package hh.heuristicgenerators;
 
 import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
-import hh.credithistory.AbstractCreditHistory;
+import hh.credithistory.AbstractRewardHistory;
 import hh.creditrepository.CreditRepository;
 import hh.heuristicPopulation.HeuristicIndividual;
 import hh.nextheuristic.AbstractHeuristicGenerator;
@@ -59,7 +59,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
     /**
      * The credit history to be used for an individual. Keeps track of credits earned over time
      */
-    private AbstractCreditHistory creditHistory;
+    private AbstractRewardHistory creditHistory;
     
     /**
      * The method to weight credits earned over time.
@@ -80,7 +80,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
      */
     public HyperGA(Collection<Variation> heuristics,int chromosomeLength,
             int thresholdGen, int keepN, int populationSize,  double mutationRate,
-            double crossoverRate,AbstractCreditHistory creditHistory, IQualityEstimation creditAgg) {
+            double crossoverRate,AbstractRewardHistory creditHistory, IQualityEstimation creditAgg) {
         super(new CreditRepository(heuristics),heuristics);
         this.keepN = keepN;
         this.populationSize = populationSize;
@@ -151,7 +151,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             double sumChromoFitness = 0;
             HeuristicIndividual chromo = (HeuristicIndividual)iter.next();
             for(Variation buildingBlock: chromo.getSequence().getSequence()){
-                sumChromoFitness+=creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),buildingBlock).getValue();
+                sumChromoFitness+=creditRepo.estimateQuality(creditAgg,getNumberOfIterations(),buildingBlock);
             }
             chromo.setObjective(0,sumChromoFitness);
             sumPopulationFitness+=sumChromoFitness;
@@ -414,7 +414,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             HeuristicSequence challengerGene = new HeuristicSequence();
             for(int i=0;i<chromosome.getLength();i++){
                 Variation heuristic = chromosome.get(i);
-                if (creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),heuristic).getValue()>0){ //yes improvement
+                if (creditRepo.estimateQuality(creditAgg,getNumberOfIterations(),heuristic)>0){ //yes improvement
                     challengerGene.appendOperator(heuristic);
                 }else{
                     //check to see which gene is the longest one
@@ -441,7 +441,7 @@ public class HyperGA extends AbstractHeuristicGenerator {
             HeuristicSequence challengerGene = new HeuristicSequence();
             for(int i=0;i<chromosome.getLength();i++){
                 Variation heuristic = chromosome.get(i);
-                if (creditRepo.getAggregateCredit(creditAgg,getNumberOfIterations(),heuristic).getValue()<=0){ //yes improvement
+                if (creditRepo.estimateQuality(creditAgg,getNumberOfIterations(),heuristic)<=0){ //yes improvement
                     challengerGene.appendOperator(heuristic);
                 }else{
                     //check to see which gene is the longest one

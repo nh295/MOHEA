@@ -6,8 +6,7 @@
 
 package hh.qualityestimation;
 
-import hh.rewarddefinition.Reward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 
 /**
  * Aggregates the credits by taking the mean of all credits in history.
@@ -25,9 +24,9 @@ public class MeanRewards extends SumRewards{
      * @return 
      */
     @Override
-    public Reward aggregateCredit(int iteration, ICreditHistory creditHistory) {
-        double creditSum = super.aggregateCredit(iteration, creditHistory).getValue();
-        return new Reward(iteration,creditSum/(double)creditHistory.size());
+    public double estimate(int iteration, IRewardHistory creditHistory) {
+        double creditSum = super.estimate(iteration, creditHistory);
+        return creditSum/(double)creditHistory.size();
     }
     
 }

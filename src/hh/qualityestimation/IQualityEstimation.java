@@ -6,8 +6,7 @@
 
 package hh.qualityestimation;
 
-import hh.rewarddefinition.Reward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 import java.io.Serializable;
 
 /**
@@ -17,11 +16,10 @@ import java.io.Serializable;
 public interface IQualityEstimation extends Serializable{
     
     /**
-     * Aggregates the history using an aggregation function to produce one 
-     * Credit value
+     * estimates the quality of a heuristic based on its rewards history
      * @param iteration the iteration of the search
-     * @param creditHistory the history to aggregate
-     * @return The aggregated credit
+     * @param rewardHistory the history to aggregate
+     * @return The estimated quality
      */
-    public Reward aggregateCredit(int iteration, ICreditHistory creditHistory);
+    public double estimate(int iteration, IRewardHistory rewardHistory);
 }

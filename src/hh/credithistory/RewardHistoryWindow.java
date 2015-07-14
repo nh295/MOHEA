@@ -9,32 +9,32 @@ package hh.credithistory;
 import hh.rewarddefinition.Reward;
 
 /**
- * Credit history with a sliding window that keeps the last W earned Credits. Window of credits is first-in-first-out
+ * Credit history with a sliding window that keeps the last W earned Rewards. Window of rewards is first-in-first-out
  * @author nozomihitomi
  */
-public class CreditHistoryWindow extends AbstractCreditHistory{
+public class RewardHistoryWindow extends AbstractRewardHistory{
     private static final long serialVersionUID = 165645971050230636L;
 
     private int windowSize;
     
-    public CreditHistoryWindow(int windowSize){
+    public RewardHistoryWindow(int windowSize){
         super();
         this.windowSize = windowSize;
     }
     
     @Override
-    public ICreditHistory getInstance() {
-        return new CreditHistoryWindow(windowSize);
+    public IRewardHistory getInstance() {
+        return new RewardHistoryWindow(windowSize);
     }
     
     /**
-     * Adds the credit to the head of the list and removes credits outside of the sliding window.
-     * @param credit to add
+     * Adds the credit to the head of the list and removes rewards outside of the sliding window.
+     * @param reward to add
      */
     @Override
-    public void addCredit(Reward credit) {
-        creditHistory.addFirst(credit);
-        if(creditHistory.size()>windowSize)
-            creditHistory.removeLast();
+    public void add(Reward reward) {
+        rewardHistory.addFirst(reward);
+        if(rewardHistory.size()>windowSize)
+            rewardHistory.removeLast();
     }
 }

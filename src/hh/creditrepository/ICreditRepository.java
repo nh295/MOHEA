@@ -13,34 +13,34 @@ import java.util.HashMap;
 import org.moeaframework.core.Variation;
 
 /**
- * Intergace to store the credit histories of multiple heuristics
+ * Interface to store the credit histories of multiple heuristics
  * @author nozomihitomi
  */
 public interface ICreditRepository {
     
 
     /**
-     * Method returns the current aggregated credit stored for the specified heuristic
-     * @param creditAgg The method to aggregate the history of credits
+     * Method returns the current quality of the specified heuristic
+     * @param qualEst The method to estimate the quality of a heuristic based on the history of credits
      * @param iteration the iteration to aggregate up to
      * @param heuristic
-     * @return the current credit stored for the specified heuristic
+     * @return the current quality of the specified heuristic
      */
-    public Reward getAggregateCredit(IQualityEstimation creditAgg, int iteration,Variation heuristic);
+    public double estimateQuality(IQualityEstimation qualEst, int iteration,Variation heuristic);
     
     /**
      * Updates the credit history for the specified credit
      * @param heuristic
-     * @param credit 
+     * @param reward 
      */
-    public void update(Variation heuristic, Reward credit);
+    public void update(Variation heuristic, Reward reward);
     
     /**
      * Used when updating the credit repository with more than one heuristic at 
      * a time (e.g when using aggregated credit definitions)
-     * @param credits
+     * @param rewards
      */
-    public void update(HashMap<Variation,Reward> credits);
+    public void update(HashMap<Variation,Reward> rewards);
     
     /**
      * Gets the collection of heuristics stored in the credit repository
@@ -64,5 +64,5 @@ public interface ICreditRepository {
      * @param heuristic of interest
      * @return the most recent credit in the repository for the specified heuristic
      */
-    public Reward getLatestCredit(Variation heuristic);
+    public Reward getLatestReward(Variation heuristic);
 }

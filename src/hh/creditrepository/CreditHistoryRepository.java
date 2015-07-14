@@ -7,7 +7,7 @@ package hh.creditrepository;
 
 import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Iterator;
 import org.moeaframework.core.Variation;
 
 /**
- * This class of credit repository stores the credit history over time for each
+ * This class of credit repository stores the reward history over time for each
  * heuristic.
  *
  * @author nozomihitomi
@@ -24,16 +24,16 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
 
     private static final long serialVersionUID = -151125984931862164L;
 
-    protected HashMap<Variation, ICreditHistory> creditHistory;
+    protected HashMap<Variation, IRewardHistory> creditHistory;
 
     /**
-     * This constructor creates the credit repository that initialize 0 credit
+     * This constructor creates the credit repository that initialize 0 reward
      * for each heuristic
      *
      * @param heuristics An iterable set of the candidate heuristics to be used
      * @param history the type of history desired
      */
-    public CreditHistoryRepository(Collection<Variation> heuristics, ICreditHistory history) {
+    public CreditHistoryRepository(Collection<Variation> heuristics, IRewardHistory history) {
         super(heuristics);
         creditHistory = new HashMap<>(heuristics.size());
         Iterator<Variation> iter = heuristics.iterator();
@@ -48,31 +48,31 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
      * @param heuristic
      * @return
      */
-    public ICreditHistory getHistory(Variation heuristic) {
+    public IRewardHistory getHistory(Variation heuristic) {
         return creditHistory.get(heuristic);
     }
 
     /**
-     * Updates the superclass CreditRepository which stores the latest credits
+     * Updates the superclass CreditRepository which stores the latest rewards
      * earned by each heuristic
      *
      * @param heuristic
-     * @param credit
+     * @param reward
      */
-    protected void updateSuper(Variation heuristic, Reward credit) {
-        super.update(heuristic, credit);
+    protected void updateSuper(Variation heuristic, Reward reward) {
+        super.update(heuristic, reward);
     }
 
     /**
-     * Adds the new credit to the history of the credits
+     * Adds the new reward to the history of the credits
      *
      * @param heuristic the heuristic to query
-     * @param credit that will be added to the history
+     * @param reward that will be added to the history
      */
     @Override
-    public void update(Variation heuristic, Reward credit) {
-        updateSuper(heuristic, credit);
-        creditHistory.get(heuristic).addCredit(credit);
+    public void update(Variation heuristic, Reward reward) {
+        updateSuper(heuristic, reward);
+        creditHistory.get(heuristic).add(reward);
     }
 
     /**
@@ -96,8 +96,8 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
      * over the history
      */
     @Override
-    public Reward getAggregateCredit(IQualityEstimation creditAgg, int iteration, Variation heuristic) {
-        return creditAgg.aggregateCredit(iteration, creditHistory.get(heuristic));
+    public double estimateQuality(IQualityEstimation qualEst, int iteration, Variation heuristic) {
+        return qualEst.estimate(iteration, creditHistory.get(heuristic));
     }
 
 }

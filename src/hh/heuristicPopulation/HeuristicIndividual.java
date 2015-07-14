@@ -8,8 +8,7 @@ package hh.heuristicPopulation;
 
 import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
-import hh.credithistory.AbstractCreditHistory;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.AbstractRewardHistory;
 import hh.heuristicgenerators.HeuristicSequence;
 import org.moeaframework.core.Solution;
 
@@ -25,7 +24,7 @@ public class HeuristicIndividual extends Solution{
     /**
      * The credit history to be used for this individual. Keeps track of credits earned over time
      */
-    private AbstractCreditHistory creditHistory;
+    private AbstractRewardHistory creditHistory;
     
     /**
      * The method to weight credits earned over time.
@@ -38,11 +37,11 @@ public class HeuristicIndividual extends Solution{
     private final HeuristicSequence heuristicSequence;
     
     public HeuristicIndividual(int numberOfVariables, int numberOfObjectives,
-            HeuristicSequence heuristicSequence,AbstractCreditHistory creditHistory,
+            HeuristicSequence heuristicSequence,AbstractRewardHistory creditHistory,
             IQualityEstimation aggregateStrategy) {
         super(numberOfVariables, numberOfObjectives);
         this.heuristicSequence = heuristicSequence;
-        this.creditHistory = (AbstractCreditHistory)creditHistory.getInstance();
+        this.creditHistory = (AbstractRewardHistory)creditHistory.getInstance();
         this.aggregateStrategy = aggregateStrategy;
     }
     
@@ -50,11 +49,11 @@ public class HeuristicIndividual extends Solution{
         return heuristicSequence;
     }
     
-    public void updateCredit(Reward credit){
-        creditHistory.addCredit(credit);
-        Reward currentCredit = 
-                aggregateStrategy.aggregateCredit(credit.getIteration(), creditHistory);
-        setObjective(0, currentCredit.getValue());
+    public void updateReward(Reward reward){
+        creditHistory.add(reward);
+        double qual = 
+                aggregateStrategy.estimate(reward.getIteration(), creditHistory);
+        setObjective(0, qual);
     }
     
     

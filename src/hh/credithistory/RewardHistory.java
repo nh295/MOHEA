@@ -9,14 +9,14 @@ package hh.credithistory;
 import java.io.Serializable;
 
 /**
- * This class stores the history of credits earned by a particular heuristic or operator.
+ * This class stores the history of rewards earned by a particular heuristic or operator.
  * @author nozomihitomi
  */
-public class CreditHistory extends AbstractCreditHistory implements Serializable{
+public class RewardHistory extends AbstractRewardHistory implements Serializable{
     private static final long serialVersionUID = 6804265407688982872L;
 
     @Override
-    public ICreditHistory getInstance() {
-        return new CreditHistory();
+    public IRewardHistory getInstance() {
+        return new RewardHistory();
     }
 }

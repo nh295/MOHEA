@@ -19,8 +19,8 @@ import hh.rewarddefinition.populationcontribution.ParetoRankContribution;
 import hh.rewarddefinition.offspringparent.ParentDomination;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
-import hh.credithistory.CreditHistory;
-import hh.credithistory.CreditHistoryWindow;
+import hh.credithistory.RewardHistory;
+import hh.credithistory.RewardHistoryWindow;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
@@ -115,7 +115,6 @@ public class HHCreditTest {
                         //Setup algorithm parameters
                         Properties prop = new Properties();
                         prop.put("populationSize", "600");
-//                      prop.put("alpha", args[2]);
                         prop.put("crediMemory", "1.0");
                         prop.put("HH", selector);
                         prop.put("CredDef", credDefStr);
@@ -134,7 +133,7 @@ public class HHCreditTest {
                         //Choose credit aggregation method
                         IQualityEstimation creditAgg = new MeanRewards();
 
-                        ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new CreditHistoryWindow(windowSize), windowSize);
+                        ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new RewardHistoryWindow(windowSize), windowSize);
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);

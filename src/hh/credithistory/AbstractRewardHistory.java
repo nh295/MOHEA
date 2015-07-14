@@ -13,44 +13,44 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * This class stores the history of credits earned by a particular heuristic or operator.
+ * This class stores the history of rewards earned by a particular heuristic or operator.
  * @author nozomihitomi
  */
-public abstract class AbstractCreditHistory implements ICreditHistory, Serializable{
+public abstract class AbstractRewardHistory implements IRewardHistory, Serializable{
     private static final long serialVersionUID = -41148639682799251L;
 
-    protected LinkedList<Reward> creditHistory;
-    protected QualityEstimator creditAdder;
+    protected LinkedList<Reward> rewardHistory;
+    protected QualityEstimator qualEst;
     
-    public AbstractCreditHistory(){
-        creditHistory = new LinkedList<>();
-        creditAdder = new QualityEstimator();
+    public AbstractRewardHistory(){
+        rewardHistory = new LinkedList<>();
+        qualEst = new QualityEstimator();
     }
     
     /**
-     * Gets the most recent credit in the credit history
+     * Gets the most recent reward in the credit history
      * @return the most recent credit in the credit history
      */
-    public Reward getMostRecentCredit(){
-        return creditHistory.getFirst();
+    public Reward getMostRecentReward(){
+        return rewardHistory.getFirst();
     }
     
     /**
-     * Gets the ith most recent credit.
-     * @param i the index of the credit desired. i=0 is the most recent credit
-     * @return the ith most recent credit.
+     * Gets the ith most recent reward.
+     * @param i the index of the reward desired. i=0 is the most recent reward
+     * @return the ith most recent reward.
      */
     public Reward get(int i){
-        return creditHistory.get(i);
+        return rewardHistory.get(i);
     }
     
     /**
-     * Adds the credit to the head of the list
-     * @param credit to add
+     * Adds the reward to the head of the list
+     * @param reward to add
      */
     @Override
-    public void addCredit(Reward credit) {
-        creditHistory.addFirst(credit);
+    public void add(Reward reward) {
+        rewardHistory.addFirst(reward);
     }
 
     /**
@@ -60,18 +60,18 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      */
     @Override
     public LinkedList<Reward> getHistory() {
-        return creditHistory;
+        return rewardHistory;
     }
     
     /**
-     * Returns the iterator that iterates over the credits in the history. 
-     * Iterator should start from the most recent credits and iterate back in 
+     * Returns the iterator that iterates over the rewards in the history. 
+     * Iterator should start from the most recent rewards and iterate back in 
      * time
-     * @return iterator that iterates over the credits in the history
+     * @return iterator that iterates over the rewards in the history
      */
     @Override
     public Iterator<Reward> iterator() {
-        return creditHistory.iterator();
+        return rewardHistory.iterator();
     }
     
     /**
@@ -79,27 +79,27 @@ public abstract class AbstractCreditHistory implements ICreditHistory, Serializa
      */
     @Override
     public void clear(){
-        creditHistory.clear();
+        rewardHistory.clear();
     }
     
     /**
-     * Returns the number of credits stored in the history
-     * @return the number of credits stored in the history
+     * Returns the number of rewards stored in the history
+     * @return the number of rewards stored in the history
      */
     @Override
     public int size(){
-        return creditHistory.size();
+        return rewardHistory.size();
     }
     
     /**
-     * Returns the latest credit in the history. If the history is empty, returns a Credit with 0.0 value
+     * Returns the latest reward in the history. If the history is empty, returns a Reward with 0.0 value
      * @return 
      */
     @Override
     public Reward getLatest(){
-        if(creditHistory.isEmpty())
+        if(rewardHistory.isEmpty())
             return new Reward(-1,0.0);
         else
-            return creditHistory.getFirst();
+            return rewardHistory.getFirst();
     }
 }

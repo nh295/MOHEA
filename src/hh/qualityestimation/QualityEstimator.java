@@ -6,8 +6,7 @@
 
 package hh.qualityestimation;
 
-import hh.rewarddefinition.Reward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 import java.io.Serializable;
 
 /**
@@ -26,11 +25,11 @@ public class QualityEstimator implements Serializable{
         averager = new MeanRewards();
     }
 
-    public Reward sum(int iteration, ICreditHistory history){
-        return summer.aggregateCredit(iteration, history);
+    public double sum(int iteration, IRewardHistory history){
+        return summer.estimate(iteration, history);
     }
     
-    public Reward mean(int iteration, ICreditHistory history){
-        return averager.aggregateCredit(iteration, history);
+    public double mean(int iteration, IRewardHistory history){
+        return averager.estimate(iteration, history);
     }
 }

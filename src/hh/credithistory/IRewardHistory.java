@@ -13,40 +13,40 @@ import java.util.LinkedList;
  *
  * @author Nozomi
  */
-public interface ICreditHistory extends Iterable<Reward>{
+public interface IRewardHistory extends Iterable<Reward>{
     
     /**
-     * Adds credit to the history
-     * @param credit to add to the history
+     * Adds reward to the history
+     * @param reward to add to the history
      */
-    public void addCredit(Reward credit);
+    public void add(Reward reward);
     
     /**
-     * Returns the credit history
-     * @return the credit history
+     * Returns the reward history
+     * @return the reward history
      */
     public LinkedList<Reward> getHistory();
     
     /**
-     * Returns the latest credit in the history
+     * Returns the latest reward in the history
      * @return 
      */
     public Reward getLatest();
     
     /**
-     * Returns an instance of credit history.
-     * @return an instance of credit history
+     * Returns an instance of reward history.
+     * @return an instance of reward history
      */
-    public ICreditHistory getInstance();
+    public IRewardHistory getInstance();
     
     /**
-     * Clears the stored credit history.
+     * Clears the stored reward history.
      */
     public void clear();
     
     /**
-     * Returns the number of credits stored in the history
-     * @return the number of credits stored in the history
+     * Returns the number of rewards stored in the history
+     * @return the number of rewards stored in the history
      */
     public int size();
 }

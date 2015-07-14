@@ -6,7 +6,7 @@
 package hh.creditrepository;
 
 import hh.rewarddefinition.Reward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 import java.util.Collection;
 import java.util.LinkedList;
 import org.moeaframework.core.Variation;
@@ -25,7 +25,7 @@ public class SlidingWindowRepository extends CreditHistoryRepository{
      */
     private int windowSize;
 
-    public SlidingWindowRepository(Collection<Variation> heuristics, ICreditHistory history, int windowSize) {
+    public SlidingWindowRepository(Collection<Variation> heuristics, IRewardHistory history, int windowSize) {
         super(heuristics, history);
         this.windowSize = windowSize;
     }
@@ -38,7 +38,7 @@ public class SlidingWindowRepository extends CreditHistoryRepository{
     @Override
     public void update(Variation heuristic, Reward credit) {
         updateSuper(heuristic, credit);
-        creditHistory.get(heuristic).addCredit(credit);
+        creditHistory.get(heuristic).add(credit);
         
         for(Variation heur:getHeuristics())
             truncateHistroy(credit, creditHistory.get(heuristic));
@@ -47,7 +47,7 @@ public class SlidingWindowRepository extends CreditHistoryRepository{
     /**
      * Truncates the credits from the history that is past specified window size. Assumes the input credit has the current iteration count
      */
-    private void truncateHistroy(Reward currentCredit,ICreditHistory history){
+    private void truncateHistroy(Reward currentCredit,IRewardHistory history){
         int currentIter = currentCredit.getIteration();
         LinkedList<Reward> hist = history.getHistory();
         while(currentIter - hist.getLast().getIteration()>windowSize){

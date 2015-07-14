@@ -8,7 +8,7 @@ package hh.qualityestimation;
 
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.DecayingReward;
-import hh.credithistory.ICreditHistory;
+import hh.credithistory.IRewardHistory;
 import java.util.Iterator;
 
 /**
@@ -27,7 +27,7 @@ public class SumRewards implements IQualityEstimation{
      * @return 
      */
     @Override
-    public Reward aggregateCredit(int iteration, ICreditHistory creditHistory) {
+    public double estimate(int iteration, IRewardHistory creditHistory) {
         Iterator<Reward> iter =  creditHistory.iterator();
         double aggregate = 0;
         while(iter.hasNext()){
@@ -42,7 +42,6 @@ public class SumRewards implements IQualityEstimation{
             }else
                 aggregate+=credit.getValue();
         }
-        return new Reward(iteration, aggregate);
+        return aggregate;
     }
-    
 }
