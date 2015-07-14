@@ -71,9 +71,9 @@ public class HHCreditTest {
 //        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
-        pool = Executors.newFixedThreadPool(15);
-        for (int j = 0; j < problems.length; j++) {
-
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
+//        pool = Executors.newFixedThreadPool(1);
+        for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
@@ -81,30 +81,17 @@ public class HHCreditTest {
             } else {
                 path = args[0];
             }
-
-//            String probName = "UF"+args[1];
-//             String probName = "UF3";
-            String probName = problems[j];
+            String probName = problem;
             System.out.println(probName);
-            Problem prob = ProblemFactory.getInstance().getProblem(probName);
-
-            double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
-            for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
-                epsilonDouble[i] = EpsilonHelper.getEpsilon(prob);
-            }
-
-            int numberOfSeeds = 1;
+            int numberOfSeeds = 30;
             int maxEvaluations = 300000;
             int windowSize = 300;
-
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"Random"};
-
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP", "IPF", "IEA", "CPF", "CEA"};
-            String[] creditDefs = new String[]{"CPF"};
-
+            String[] creditDefs = new String[]{"ODP","IPF","IEA","CPF","CEA"};
+//            String[] creditDefs = new String[]{"IPF"};
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
             for (String selector : selectors) {
@@ -112,6 +99,13 @@ public class HHCreditTest {
                     //parallel process all runs
                     futures.clear();
                     for (int k = 0; k < numberOfSeeds; k++) {
+
+                        Problem prob = ProblemFactory.getInstance().getProblem(probName);
+                        double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
+                        for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
+                            epsilonDouble[i] = EpsilonHelper.getEpsilon(prob);
+                        }
+                        
                         //Setup algorithm parameters
                         Properties prop = new Properties();
                         prop.put("populationSize", "600");
@@ -149,7 +143,7 @@ public class HHCreditTest {
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
-
+                            
                             //save the approximation set
 //                            NondominatedPopulation ndPop = instAlgorithm.getResult();
 //                            try {
@@ -170,11 +164,13 @@ public class HHCreditTest {
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
 //                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".qual");
+                            hh.reset();
+                            hh=null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    System.out.println("Finished " + prob.getName() + "_" + selector + "_" + credDefStr + "\n\n");
+                    System.out.println("Finished " + probName + "_" + selector + "_" + credDefStr + "\n\n");
                 }
             }
         }

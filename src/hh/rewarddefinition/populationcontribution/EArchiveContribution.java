@@ -75,7 +75,7 @@ public class EArchiveContribution extends AbstractPopulationContribution{
     public HashMap<Variation, Reward> compute(Iterable<Solution> population, Collection<Variation> heuristics, int iteration) {
         HashMap<Variation,Reward> credits = new HashMap();
         for(Variation heuristic:heuristics){
-            credits.put(heuristic, new Reward(-1,compute(population,heuristic, iteration)));
+            credits.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));
         }
         return credits;
     }
