@@ -76,7 +76,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * Updates the quality of the heuristic based on the aggregation applied the
      * heuristic's credit history. If the quality becomes negative, it is reset
      * to 0.0. Only updates those heuristics that were just rewarded.
-     * @param creditRepo the credit repository that store the past earned credits
+     * @param creditRepo the credit repository that store the past earned rewards
      * @param qualEst method to aggregate the past credits to compute the heuristic's reward
      */
     protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){

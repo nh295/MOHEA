@@ -32,13 +32,13 @@ public class SumRewards implements IQualityEstimation{
         double aggregate = 0;
         while(iter.hasNext()){
             Reward credit = iter.next();
-            DecayingReward decayCredit;
+            DecayingReward decayingReward;
             if(credit.getClass().equals(DecayingReward.class)){
-                decayCredit = (DecayingReward)credit;
-                if(decayCredit.fractionOriginalVal(iteration)<Math.pow(10, -6))
+                decayingReward = (DecayingReward)credit;
+                if(decayingReward.fractionOriginalVal(iteration)<Math.pow(10, -6))
                     break;
                 else
-                    aggregate+=decayCredit.getValue()*decayCredit.fractionOriginalVal(iteration);
+                    aggregate+=decayingReward.getValue()*decayingReward.fractionOriginalVal(iteration);
             }else
                 aggregate+=credit.getValue();
         }
