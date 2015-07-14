@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import jdk.nashorn.internal.runtime.RewriteException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.moeaframework.algorithm.EpsilonMOEA;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
@@ -120,6 +121,11 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     private NondominatedPopulation paretoFront;
 
     /**
+     * The population contribution rewards from the previous iteration
+     */
+    private HashMap<Variation, Reward> prevPopContRewards;
+
+    /**
      * Creates an instance of a hyper heuristic e-MOEA
      *
      * @param problem the problem to solve
@@ -157,10 +163,16 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         this.creditHistory = new CreditHistoryRepository(heuristics, new RewardHistory());
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
-        
+
         //Initialize the stored pareto front
         super.initialize();
         this.paretoFront = new NondominatedPopulation(getPopulation());
+
+        //initialize the previous population contribution rewards to all zero for each heuristic
+        prevPopContRewards = new HashMap<>();
+        for (Variation heur : heuristics) {
+            prevPopContRewards.put(heur, new Reward(0, 0.0));
+        }
     }
 
     /**
@@ -198,7 +210,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * random offspring will be selected with uniform probability
      */
     @Override
-    public void iterate() {        
+    public void iterate() {
         iteration++;
 
         //select next heuristic
@@ -234,7 +246,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         break;
                     case POPULATION:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
-                        paretoFront.add(child);
                         archive.add(child);
                         break;
                     case PARETOFRONT:
@@ -245,7 +256,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     case ARCHIVE:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive, heuristic);
                         population.add(child);
-                        paretoFront.add(child);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "
@@ -262,29 +272,37 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
             for (Solution child : children) {
                 evaluate(child);
-                population.add(child);
-                paretoFront.add(child);
-                archive.add(child);
                 child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
-                child.setAttribute("heuristic", new SerializableVal(heuristic.getClass().getSimpleName()));
+                child.setAttribute("heuristic", new SerializableVal(heuristic.toString()));
                 child.setAttribute("alpha", new SerializableVal(alpha));
             }
-            HashMap<Variation, Reward> aggCredits;
+            population.addAll(children);
+            boolean archiveChanged = archive.addAll(children);
+            HashMap<Variation, Reward> popContRewards;
             switch (creditDef.getOperatesOn()) {
                 case POPULATION:
-                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(population, heuristics, this.getNumberOfEvaluations());
+                    popContRewards = ((AbstractPopulationContribution) creditDef).compute(population, heuristics, this.getNumberOfEvaluations());
                     break;
                 case PARETOFRONT:
-                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(paretoFront, heuristics, this.getNumberOfEvaluations());
+                    boolean PFchanged = paretoFront.addAll(children); //updated only if reward def uses the PF
+                    if (!PFchanged) {
+                        popContRewards = reusePrevPopContRewards();
+                    } else {
+                        popContRewards = ((AbstractPopulationContribution) creditDef).compute(paretoFront, heuristics, this.getNumberOfEvaluations());
+                    }
                     break;
                 case ARCHIVE:
-                    aggCredits = ((AbstractPopulationContribution) creditDef).compute(archive, heuristics, this.getNumberOfEvaluations());
+                    if (!archiveChanged) {
+                        popContRewards = reusePrevPopContRewards();
+                    } else {
+                        popContRewards = ((AbstractPopulationContribution) creditDef).compute(archive, heuristics, this.getNumberOfEvaluations());
+                    }
                     break;
                 default:
                     throw new NullPointerException("Credit definition not "
                             + "recognized. Used " + creditDef.getType() + ".");
             }
-            creditRepo.update(aggCredits);
+            creditRepo.update(popContRewards);
             heuristicSelector.update(creditRepo, creditAgg);
             heuristicSelectionHistory.add(heuristic);
             updateCreditHistory();
@@ -300,6 +318,19 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         for (Variation heuristic : heuristics) {
             creditHistory.update(heuristic, creditRepo.getLatestReward(heuristic));
         }
+    }
+
+    /**
+     * reuses the previous population contribution rewards. This method updates
+     * the iteration coutner in the rewards from the previous iteration
+     * @return the rewards for each heuristic with the up to date iteration count
+     */
+    private HashMap<Variation, Reward> reusePrevPopContRewards() {
+        for (Variation heur : heuristics) {
+            Reward r = new Reward(iteration, prevPopContRewards.get(heur).getValue());
+            prevPopContRewards.put(heur, r);
+        }
+        return prevPopContRewards;
     }
 
     /**

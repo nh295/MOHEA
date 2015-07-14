@@ -67,8 +67,8 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
         pool = Executors.newFixedThreadPool(15);
@@ -98,12 +98,12 @@ public class HHCreditTest {
             int windowSize = 300;
 
             //Setup heuristic selectors
-//            String[] selectors = new String[]{"PM", "AP"};
-            String[] selectors = new String[]{"Random"};
+            String[] selectors = new String[]{"PM", "AP"};
+//            String[] selectors = new String[]{"Random"};
 
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP", "IPF", "IEA", "CPF", "CEA"};
-            String[] creditDefs = new String[]{"IPF"};
+            String[] creditDefs = new String[]{"CPF"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
