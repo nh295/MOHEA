@@ -21,28 +21,38 @@
 % gets all the best, worst and mean values for each indicator
 % also finds the % past 90% attainment on hypervolume
 
-% selectors = {'Random','Probability','Adaptive','DMAB'};
-% creditDef = {'Parent','ImmediateParetoFront','ImmediateParetoRank','ImmediateEArchive'...
-%     'AggregateParetoFront','AggregateParetoRank','AggregateEArchive'};
 problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 selectors = {'Probability','Adaptive'};
-creditDef = { 'Parent','ImmediateParetoFront','ImmediateEArchive' };
-% problemName = {'UF2'};
+% creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
+% selectors = {''};
+creditDef = {'EArchiveContribution'};
+% problemName = {'UF10'};
 
-path ='/Users/nozomihitomi/Dropbox/MOHEA/mRes';
+% path ='/Users/nozomihitomi/Dropbox/MOHEA/mRes';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA';
 
 ind = 1;
 for j=1:length(selectors)
     for i=1:length(creditDef)
         for k=1:length(problemName)
-%             [AEI,GD,HV,IGD] = getAllResults(path,selectors{j},creditDef{i},problemName{k});
+%             [AEI,GD,HV,IGD] = getAllResults(strcat(path,filesep,'results'),selectors{j},creditDef{i},problemName{k});
 %             res.GD = squeeze(GD(:,end));
 %             res.AEI = squeeze(AEI(:,end));
 %             res.HV = squeeze(HV(:,end));
 %             res.IGD = squeeze(IGD(:,end));
 %             save(strcat(problemName{k},'_',selectors{j},'_',creditDef{i},'.mat'),'res');
 
-            [out,p,avg1,avg2] = runKWsignificance(path,selectors{j},creditDef{i},'Random','Parent',problemName{k});
+            %it seems that AP or PM with ODP on UF5,6,8,9,10 fail so skip
+            %those
+            b = strcmp(creditDef{i},'Parent');
+            c = strcmp(problemName{k},'UF5') || strcmp(problemName{k},'UF6')...
+            || strcmp(problemName{k},'UF8')||strcmp(problemName{k},'UF9')...
+            ||strcmp(problemName{k},'UF10');
+            if(b&&c)
+                continue
+            end
+
+            [out,p,avg1,avg2] = runKWsignificance(path,selectors{j},creditDef{i},'Random',problemName{k});
             if p<0.05 && avg1<avg2
                 fprintf(['LOSE:',strcat(problemName{k},'_',selectors{j},'_',creditDef{i}),'avg1: %d , avg2: %d\n'],avg1,avg2);
             end
