@@ -29,7 +29,7 @@ import org.moeaframework.core.comparator.ParetoDominanceComparator;
  * solution are removed. If the new solution is dominated by any member of the
  * population, the new solution is not added.
  */
-public class NondominatedPopulation extends Population {
+public class NondominatedPopulation extends Population implements Cloneable{
 
 	/**
 	 * The dominance comparator used by this non-dominated population.
@@ -149,5 +149,20 @@ public class NondominatedPopulation extends Population {
 	public DominanceComparator getComparator() {
 		return comparator;
 	}
+        
+        /**
+         * Shallow clone that only copies the Solution instances to a new instance of a NondominatedPopulation
+         * @return
+         * @throws CloneNotSupportedException 
+         */
+        @Override
+        public NondominatedPopulation clone() throws CloneNotSupportedException{
+            NondominatedPopulation ndPopClone = new NondominatedPopulation();
+            Iterator<Solution> iterator = iterator();
+		while (iterator.hasNext()) {
+			ndPopClone.forceAddWithoutCheck(iterator.next());
+		}
+		return ndPopClone;
+        }
 
 }

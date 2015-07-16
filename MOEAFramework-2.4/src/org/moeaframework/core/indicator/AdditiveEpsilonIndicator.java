@@ -85,4 +85,4 @@ public class AdditiveEpsilonIndicator extends NormalizedIndicator {
 		return eps_i;
 	}
 
-}
+    }

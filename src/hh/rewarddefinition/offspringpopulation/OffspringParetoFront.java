@@ -7,11 +7,6 @@
 package hh.rewarddefinition.offspringpopulation;
 
 import hh.rewarddefinition.RewardDefinedOn;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;

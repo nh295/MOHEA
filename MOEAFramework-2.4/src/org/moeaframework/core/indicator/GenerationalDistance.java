@@ -72,4 +72,4 @@ public class GenerationalDistance extends NormalizedIndicator {
 
 		return Math.sqrt(sum) / approximationSet.size();
 	}
-}
+    }

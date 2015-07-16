@@ -73,4 +73,4 @@ public class MaximumParetoFrontError extends NormalizedIndicator {
 
 		return max;
 	}
-}
+    }

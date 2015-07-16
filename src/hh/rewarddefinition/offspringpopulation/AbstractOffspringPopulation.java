@@ -7,9 +7,7 @@
 package hh.rewarddefinition.offspringpopulation;
 
 import hh.rewarddefinition.AbstractRewardDefintion;
-import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.RewardDefinitionType;
-import java.util.List;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -26,9 +24,9 @@ public abstract class AbstractOffspringPopulation extends AbstractRewardDefintio
     /**
      * Computes the credit of an offspring solution with respect to some archive
      * @param offspring solution that will receive credits
-     * @param archive the archive to compare the offspring solutions with
+     * @param population the population to compare the offspring solutions with
      * @param heuristic that created offspring solution
      * @return the value of credit to resulting from the solution
      */
-    public abstract double compute(Solution offspring, Iterable<Solution> archive,Variation heuristic);
+    public abstract double compute(Solution offspring, Iterable<Solution> population,Variation heuristic);
 }

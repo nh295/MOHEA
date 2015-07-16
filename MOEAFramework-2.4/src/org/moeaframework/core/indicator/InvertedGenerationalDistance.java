@@ -69,4 +69,4 @@ public class InvertedGenerationalDistance extends NormalizedIndicator {
 
 		return Math.sqrt(sum) / referenceSet.size();
 	}
-}
+    }
