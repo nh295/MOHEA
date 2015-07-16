@@ -60,7 +60,8 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
             }
             
             if (afterOffspring.add(offspring)) {
-                return indicator.computeWRef(afterOffspring, beforeOffspring);
+                //improvements over old population will result in a negative 
+                return -indicator.computeWRef(afterOffspring, beforeOffspring);
             } else {
                 return 0.0;
             }
