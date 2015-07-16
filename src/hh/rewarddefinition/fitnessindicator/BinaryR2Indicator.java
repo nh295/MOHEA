@@ -20,11 +20,16 @@ public class BinaryR2Indicator implements IBinaryIndicator {
 
     /**
      * Constructor to initialize the weight vectors
-     * @param numbObjs number of objectives
+     * @param numObjs number of objectives
      * @param numVecs number of vectors
      */
-    public BinaryR2Indicator(int numbObjs,int numVecs) {
-        initializeWts(numbObjs,numVecs);
+    public BinaryR2Indicator(int numObjs,int numVecs) {
+        
+        wtVecs = new ArrayList<>();
+        if(numObjs==2)
+            initializeWts2D(numVecs);
+        else
+            initializeWts(numObjs,numVecs);
     }
 
     /**
@@ -56,7 +61,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
         NondominatedPopulation singlePop = new NondominatedPopulation();
         singlePop.add(solnA);
         NondominatedPopulation doublePop = new NondominatedPopulation();
-        doublePop.add(solnA);
+        doublePop.add(solnB);
         double valA = 0.0;
         double valB = 0.0;
         for (WtVector vec : wtVecs) {
@@ -106,7 +111,22 @@ public class BinaryR2Indicator implements IBinaryIndicator {
     public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop, Solution refPt) {
         return compute(refPop, popA, refPt);
     }
-
+    
+    /**
+     * use to create weight vectors in 2 dimensional space
+     */
+    private void initializeWts2D(int numVecs){
+        for(int i=0;i<numVecs;i++){
+            double[] wts = new double[]{1-(double)i/(double)(numVecs-1),(double)i/(double)(numVecs-1)};
+            wtVecs.add(new WtVector(wts));
+        }
+    }
+   
+    /**
+     * Used when want weights for more than 2 dimensions
+     * @param numObj
+     * @param numVecs 
+     */
     private void initializeWts(int numObj,int numVecs) {
         // creates full factorial matrix. Code is based on 2013a Matlab 
         //fullfact(levels). Eliminate rows with sum != the number of vectors.
@@ -136,7 +156,6 @@ public class BinaryR2Indicator implements IBinaryIndicator {
             }
         }
 
-        wtVecs = new ArrayList<>();
         //Find valid row vectors (ones that add up to numVecs) 
         for (int i = 0; i < numExp; i++) {
             double sum = 0.0;

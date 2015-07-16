@@ -34,7 +34,6 @@ public class BinaryR3Indicator extends BinaryR2Indicator{
             double utilB = popUtility(vec,popB,refPt);
            val+= (utilB-popUtility(vec,popA,refPt))/utilB;
         }
-        
         return val/wtVecs.size();
     }
 

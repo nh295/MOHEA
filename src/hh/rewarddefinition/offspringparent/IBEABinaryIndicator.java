@@ -41,7 +41,7 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
     /**
      * Some indicators need a reference point like hypervolume and the R family indicators
      */
-    private Solution refPoint;
+    private final Solution refPoint;
 
     /**
      * 

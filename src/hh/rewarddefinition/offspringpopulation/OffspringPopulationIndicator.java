@@ -48,27 +48,22 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
      * with the offspring solution added
      *
      * @param offspring
-     * @param paretofront
+     * @param ndpop nondominated population: pareto front or archive
      * @param heuristic
      * @return the improvement in the indicator value. 0.0 if no improvement
      */
     @Override
-    public double compute(Solution offspring, Iterable<Solution> paretofront, Variation heuristic) {
+    public double compute(Solution offspring, Iterable<Solution> ndpop, Variation heuristic) {
         try {
-            if (!paretofront.getClass().equals(NondominatedPopulation.class)) {
-                throw new IllegalArgumentException("Invalid solution collection: " + paretofront.getClass() + ". Needs to by NondominatedPopulation.");
+            if (!ndpop.getClass().equals(NondominatedPopulation.class)) {
+                throw new IllegalArgumentException("Invalid solution collection: " + ndpop.getClass() + ". Needs to by NondominatedPopulation.");
             }
-            NondominatedPopulation beforeOffspring = ((NondominatedPopulation) paretofront).clone(); 
-            NondominatedPopulation afterOffspring;
-            if(operatesOn == RewardDefinedOn.ARCHIVE){
-                afterOffspring = (EpsilonBoxDominanceArchive) paretofront;
-            }else{
-                afterOffspring = (EpsilonBoxDominanceArchive) paretofront;
-            }
+            NondominatedPopulation beforeOffspring = ((NondominatedPopulation) ndpop).clone(); 
+            NondominatedPopulation afterOffspring = (NondominatedPopulation) ndpop;
             
             if (afterOffspring.add(offspring)) {
                 //improvements over old population will result in a negative 
-                return -indicator.computeWRef(afterOffspring, beforeOffspring,refPt);
+                return -indicator.computeWRef(afterOffspring,beforeOffspring,refPt);
             } else {
                 return 0.0;
             }
