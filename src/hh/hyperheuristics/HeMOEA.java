@@ -5,26 +5,25 @@
  */
 package hh.hyperheuristics;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.rewarddefinition.Reward;
-import hh.rewarddefinition.DecayingReward;
-import hh.rewarddefinition.IRewardDefinition;
 import hh.credithistory.RewardHistory;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.INextHeuristic;
+import hh.qualityestimation.IQualityEstimation;
 import hh.qualityhistory.HeuristicQualityHistory;
+import hh.rewarddefinition.DecayingReward;
+import hh.rewarddefinition.IRewardDefinition;
+import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinitionType;
 import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
+import hh.rewarddefinition.offspringparent.IBEABinaryIndicator;
 import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
 import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
 import hh.selectionhistory.HeuristicSelectionHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import jdk.nashorn.internal.runtime.RewriteException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.moeaframework.algorithm.EpsilonMOEA;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
@@ -218,12 +217,14 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
         Solution[] parents;
 
+        Solution refParent; //used in OffspringParent Rewads
         if (archive.size() <= 1) {
             parents = selection.select(heuristic.getArity(), population);
+            refParent = parents[pprng.nextInt(parents.length)];
         } else {
+            refParent = archive.get(pprng.nextInt(archive.size()));
             parents = ArrayUtils.add(
-                    selection.select(heuristic.getArity() - 1, population),
-                    archive.get(pprng.nextInt(archive.size())));
+                    selection.select(heuristic.getArity() - 1, population), refParent);
         }
         pprng.shuffle(parents);
 
@@ -233,21 +234,41 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         Solution randChild = children[pprng.nextInt(children.length)];
         children = new Solution[]{randChild};
 
-        if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT || creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
+        if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT) {
             for (Solution child : children) {
                 evaluate(child);
 
                 double creditValue;
-
                 //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, Arrays.asList(parents), heuristic);
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent,null);
+                        archive.add(child);
                         break;
-//                    case POPULATION:
-//                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
-//                        archive.add(child);
-//                        break;
+                    case PARETOFRONT:
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent,paretoFront);
+                        archive.add(child);
+                        break;
+                    case ARCHIVE:
+                        creditValue = ((IBEABinaryIndicator)creditDef).compute(child, refParent,archive);
+                        break;
+                    default:
+                        throw new NullPointerException("Credit definition not "
+                                + "recognized. Used " + creditDef.getType() + ".");
+                }
+                population.add(child);
+                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
+            }
+        } else if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
+            for (Solution child : children) {
+                evaluate(child);
+                double creditValue;
+                //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
+                switch (creditDef.getOperatesOn()) {
+                    case POPULATION:
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
+                        archive.add(child);
+                        break;
                     case PARETOFRONT:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront, heuristic);
                         addToPopulation(child);
@@ -262,14 +283,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
                 creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
-                heuristicSelector.update(creditRepo, creditAgg);
-//                heuristicSelectionHistory.add(heuristic);
-//                updateCreditHistory();
-//                updateQualityHistory();
 //                System.out.println(heuristic+": "+creditValue);
             }
         } else {
-
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
@@ -303,11 +319,12 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                             + "recognized. Used " + creditDef.getType() + ".");
             }
             creditRepo.update(popContRewards);
-            heuristicSelector.update(creditRepo, creditAgg);
-//            heuristicSelectionHistory.add(heuristic);
-//            updateCreditHistory();
-//            updateQualityHistory();
         }
+
+        heuristicSelector.update(creditRepo, creditAgg);
+        heuristicSelectionHistory.add(heuristic);
+        updateCreditHistory();
+        updateQualityHistory();
     }
 
     /**
@@ -323,7 +340,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     /**
      * reuses the previous population contribution rewards. This method updates
      * the iteration coutner in the rewards from the previous iteration
-     * @return the rewards for each heuristic with the up to date iteration count
+     *
+     * @return the rewards for each heuristic with the up to date iteration
+     * count
      */
     private HashMap<Variation, Reward> reusePrevPopContRewards() {
         for (Variation heur : heuristics) {

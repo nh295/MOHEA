@@ -5,8 +5,6 @@
  */
 package hh.credittest;
 
-import hh.IO.IOQualityHistory;
-import hh.IO.IOSelectionHistory;
 import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.RewardDefFactory;
 import hh.rewarddefinition.IRewardDefinition;
@@ -18,9 +16,7 @@ import hh.nextheuristic.INextHeuristic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -35,7 +31,6 @@ import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
-import org.moeaframework.core.Selection;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
@@ -55,7 +50,7 @@ public class TestRun implements Callable {
     protected Problem problem;
     protected String probName;
     protected String path;
-    private IRewardDefinition creditDef;
+    private IRewardDefinition rewardDef;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
     private final IQualityEstimation creditAgg;
@@ -107,10 +102,10 @@ public class TestRun implements Callable {
         
         //Use default values for selectors
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
-        creditDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties);
+        rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-            initialization, selector, creditDef, creditRepo,
+            initialization, selector, rewardDef, creditRepo,
             creditAgg, crediMemory);
 
         return hemoea;
@@ -138,7 +133,7 @@ public class TestRun implements Callable {
         Algorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + creditDef +" on " + problem.getName());
+        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName());
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {

@@ -102,4 +102,4 @@ public class Spacing implements Indicator {
 
 		return Math.sqrt(sum / (approximationSet.size() - 1));
 	}
-}
+    }

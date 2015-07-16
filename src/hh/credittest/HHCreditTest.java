@@ -5,33 +5,12 @@
  */
 package hh.credittest;
 
-import com.sun.org.apache.bcel.internal.generic.AALOAD;
-import hh.IO.IOQualityHistory;
-import hh.IO.IOSelectionHistory;
 import hh.qualityestimation.IQualityEstimation;
 import hh.qualityestimation.MeanRewards;
-import hh.rewarddefinition.RewardDefFactory;
-import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
-import hh.rewarddefinition.IRewardDefinition;
-import hh.rewarddefinition.populationcontribution.EArchiveContribution;
-import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
-import hh.rewarddefinition.populationcontribution.ParetoRankContribution;
-import hh.rewarddefinition.offspringparent.ParentDomination;
-import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
-import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
-import hh.credithistory.RewardHistory;
 import hh.credithistory.RewardHistoryWindow;
-import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
-import hh.heuristicselectors.AdaptivePursuit;
-import hh.heuristicselectors.DMAB;
-import hh.heuristicselectors.ProbabilityMatching;
-import hh.heuristicselectors.RandomSelect;
-import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.IHyperHeuristic;
-import hh.nextheuristic.INextHeuristic;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -90,8 +69,11 @@ public class HHCreditTest {
 //            String[] selectors = new String[]{"PM", "AP"};
             String[] selectors = new String[]{"PM"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP","IPF","IEA","CPF","CEA"};
-            String[] creditDefs = new String[]{"CEA"};
+//            String[] creditDefs = new String[]{"ODP","OPIPFAE","OPIPFHV","OPIPFR2","OPIPFR3","OPIEAAE","OPIEAHV","OPIEAR2","OPIEAR3",
+//                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
+//                "CPF", "CEA"};
+            String[] creditDefs = new String[]{"OPIPFAE"};
+
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
             for (String selector : selectors) {

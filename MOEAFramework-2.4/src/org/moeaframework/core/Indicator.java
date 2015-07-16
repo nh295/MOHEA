@@ -22,14 +22,14 @@ package org.moeaframework.core;
  */
 public interface Indicator {
 
-	/**
-	 * Returns the value of this unary quality indicator given the specified
-	 * non-dominated population.
-	 * 
-	 * @param approximationSet the non-dominated population to be evaluated
-	 * @return the value of this quality indicator given the specified
+    /**
+     * Returns the value of this unary quality indicator given the specified
+     * non-dominated population.
+     *
+     * @param approximationSet the non-dominated population to be evaluated
+     * @return the value of this quality indicator given the specified
 	 *         non-dominated population
-	 */
-	public double evaluate(NondominatedPopulation approximationSet);
+     */
+    public double evaluate(NondominatedPopulation approximationSet);
 
 }

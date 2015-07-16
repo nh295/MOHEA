@@ -48,7 +48,7 @@ public class OffspringEArchive extends AbstractOffspringPopulation{
      */
     @Override
     public double compute(Solution offspring, Iterable<Solution> archive,Variation heuristic) {
-        if(archive.getClass()!=EpsilonBoxDominanceArchive.class)
+        if(!archive.getClass().equals(EpsilonBoxDominanceArchive.class))
             throw new ClassCastException("Need to be NondominatedPopulation: " + archive.getClass());
         EpsilonBoxDominanceArchive ndpop = (EpsilonBoxDominanceArchive)archive;
         if(ndpop.add(offspring))

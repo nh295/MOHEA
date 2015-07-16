@@ -144,4 +144,4 @@ public class Contribution implements Indicator {
 		return count / (double)referenceSet.size();
 	}
 
-}
+    }

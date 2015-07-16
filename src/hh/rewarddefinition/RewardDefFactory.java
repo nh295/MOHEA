@@ -5,17 +5,27 @@
  */
 package hh.rewarddefinition;
 
+import hh.rewarddefinition.fitnessindicator.BinaryAdditiveEpsilonIndicator;
+import hh.rewarddefinition.fitnessindicator.BinaryHypervolumeIndicator;
+import hh.rewarddefinition.fitnessindicator.BinaryR2Indicator;
+import hh.rewarddefinition.fitnessindicator.BinaryR3Indicator;
+import hh.rewarddefinition.offspringparent.IBEABinaryIndicator;
+import hh.rewarddefinition.offspringparent.ParentDomination;
+import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
+import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
+import hh.rewarddefinition.offspringpopulation.OffspringPopulationIndicator;
+import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
 import hh.rewarddefinition.populationcontribution.ParetoRankContribution;
-import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
-import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
-import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
-import hh.rewarddefinition.offspringparent.ParentDomination;
+import java.util.Arrays;
+import org.moeaframework.core.Problem;
+import org.moeaframework.core.Solution;
 import org.moeaframework.util.TypedProperties;
 
 /**
  * Factory methods for creating instances of ICreditDefinition
+ *
  * @author SEAK2
  */
 public class RewardDefFactory {
@@ -28,53 +38,109 @@ public class RewardDefFactory {
     /**
      * private constructor to enforce singleton
      */
-    private RewardDefFactory(){
+    private RewardDefFactory() {
         super();
     }
-    
+
     /**
      * Returns an instance of the hyper-heuristic factory
-     * @return 
+     *
+     * @return
      */
-    public static RewardDefFactory getInstance(){
-        if(instance==null)
+    public static RewardDefFactory getInstance() {
+        if (instance == null) {
             return new RewardDefFactory();
-        else 
+        } else {
             return instance;
+        }
     }
-    
-    public IRewardDefinition getCreditDef(String name, TypedProperties prop){
+
+    public IRewardDefinition getCreditDef(String name, TypedProperties prop, Problem problem) {
         IRewardDefinition credDef = null;
         //Get values from properties or use default values
         double satisfy = prop.getDouble("satisfy", 1.0);
         double disatisfy = prop.getDouble("disatisfy", 0.0);
         double neither = prop.getDouble("neither", 0.0);
         int rank = prop.getInt("rankThresh", 5);
-        switch(name){
+        //reference point used to compute hypervolume
+        double[] defRef = new double[problem.getNumberOfObjectives()];
+        Arrays.fill(defRef, 2.0);
+        double[] refPoint = prop.getDoubleArray("ref point", defRef);
+        //ideal point used in R family indicators
+        double[] defIdeal = new double[problem.getNumberOfObjectives()];
+        Arrays.fill(defIdeal, 0.0);
+        double[] idealPoint = prop.getDoubleArray("ref point", defRef);
+        int numVec = prop.getInt("numVec", 100);
+        //kappa parameter used in IBEA
+        double kappa = prop.getDouble("kappa", 0.05);
+        switch (name) {
             case "ODP": //offspring dominates parent
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
-            case "IPF": //in pareto front
+            case "OPIPFAE": //offspring parent additive epsilon indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa, RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPIPFHV": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(new Solution(refPoint)), kappa, RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPIPFR2": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPIPFR3": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPIEAAE": //offspring parent additive epsilon indicator using archive
+                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa, RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPIEAHV": //offspring parent hypervolume indicator using archive
+                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(new Solution(refPoint)), kappa, RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPIEAR2": //offspring parent hypervolume indicator using archive
+                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPIEAR3": //offspring parent hypervolume indicator using archive
+                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);
                 break;
-            case "IPR": //within pareto rank
-                credDef = new OffspringParetoRank(satisfy, disatisfy,rank);
+            case "OPopPR": //within pareto rank
+                credDef = new OffspringParetoRank(satisfy, disatisfy, rank);
                 break;
-            case "IEA": //in epsilon archive
+            case "OPopEA": //in epsilon archive
                 credDef = new OffspringEArchive(satisfy, disatisfy);
                 break;
+            case "OPopIPFAE": //offpsring improvement to additive epsilon indicator value for pareto front
+                credDef = new OffspringPopulationIndicator(new BinaryAdditiveEpsilonIndicator(),RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPopIPFR2": //offpsring improvement to R2 indicator value for pareto front
+                credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec),RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
+                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec),RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPopIEAAE": //offpsring improvement to additive epsilon indicator value for epsilon archive
+                credDef = new OffspringPopulationIndicator(new BinaryAdditiveEpsilonIndicator(),RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPopIEAR2": //offpsring improvement to R2 indicator value for epsilon archive
+                credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec),RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
+                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec),RewardDefinedOn.ARCHIVE);
+                break;
             case "CPF": //contribution to pareto front
-                credDef = new ParetoFrontContribution(satisfy,disatisfy);
+                credDef = new ParetoFrontContribution(satisfy, disatisfy);
                 break;
             case "CPR": //contribution to pareto rank
-                credDef = new ParetoRankContribution(satisfy, disatisfy,rank);
+                credDef = new ParetoRankContribution(satisfy, disatisfy, rank);
                 break;
             case "CEA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
-            default: throw new IllegalArgumentException("No such credit defintion: " + name);
+            default:
+                throw new IllegalArgumentException("No such credit defintion: " + name);
         }
-            
+
         return credDef;
     }
 }
