@@ -8,7 +8,6 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.AbstractRewardDefintion;
 import hh.rewarddefinition.RewardDefinitionType;
-import java.util.List;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 

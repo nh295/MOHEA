@@ -26,10 +26,11 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
      *
      * @param popA solution set 1
      * @param popB solution set 2 (can be reference population)
+     * @param refPt additive epsilon indicator does not need a reference point
      * @return the additive &epsilon;-indicator value
      */
     @Override
-    public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
+    public double compute(NondominatedPopulation popA, NondominatedPopulation popB, Solution refPt) {
         double eps_i = 0.0;
         for (int i = 0; i < popB.size(); i++) {
             Solution solution1 = popB.get(i);
@@ -37,15 +38,22 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
 
             for (int j = 0; j < popA.size(); j++) {
                 Solution solution2 = popA.get(j);
-                eps_j = Math.min(eps_j, compute(solution1, solution2));
+                eps_j = Math.min(eps_j, compute(solution1, solution2,refPt));
             }
             eps_i = Math.max(eps_i, eps_j);
         }
         return eps_i;
     }
 
+    /**
+     * 
+     * @param solnA
+     * @param solnB
+     * @param refPt additive epsilon indicator does not need a reference point
+     * @return 
+     */
     @Override
-    public double compute(Solution solnA, Solution solnB) {
+    public double compute(Solution solnA, Solution solnB, Solution refPt) {
         int numObjs = solnA.getNumberOfObjectives();
         double eps_k = 0.0;
         for (int k = 0; k < numObjs; k++) {
@@ -55,9 +63,16 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
         return eps_k;
     }
 
+    /**
+     * Use if population A is to be compared with a reference population.
+     * @param popA
+     * @param popRef
+     * @param refPt additive epsilon indicator does not need a reference point
+     * @return 
+     */
     @Override
-    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef) {
-        return compute(popA, popRef);
+    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef, Solution refPt) {
+        return compute(popA, popRef,refPt);
     }
 
     @Override

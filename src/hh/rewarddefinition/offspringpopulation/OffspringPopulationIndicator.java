@@ -26,13 +26,20 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     private final IBinaryIndicator indicator;
 
     /**
+     * Reference point. Some indicators require a reference point
+     */
+    private final Solution refPt;
+    
+    /**
      *
      * @param indicator Indicator to use to reward heuristics
      * @param operatesOn Enum to specify whether to compare the improvement on the population or the archive
+     * @param refPt some of the indicators require a reference point
      */
-    public OffspringPopulationIndicator(IBinaryIndicator indicator,RewardDefinedOn operatesOn) {
+    public OffspringPopulationIndicator(IBinaryIndicator indicator,RewardDefinedOn operatesOn, Solution refPt) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
+        this.refPt = refPt;
     }
 
     /**
@@ -61,7 +68,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
             
             if (afterOffspring.add(offspring)) {
                 //improvements over old population will result in a negative 
-                return -indicator.computeWRef(afterOffspring, beforeOffspring);
+                return -indicator.computeWRef(afterOffspring, beforeOffspring,refPt);
             } else {
                 return 0.0;
             }

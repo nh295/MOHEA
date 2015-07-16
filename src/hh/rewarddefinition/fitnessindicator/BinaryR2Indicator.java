@@ -17,11 +17,14 @@ public class BinaryR2Indicator implements IBinaryIndicator {
 
     protected ArrayList<WtVector> wtVecs;
 
-    protected final Solution referencePt;
 
-    public BinaryR2Indicator(Solution referencePt, int numVecs) {
-        this.referencePt = referencePt;
-        initializeWts(numVecs);
+    /**
+     * Constructor to initialize the weight vectors
+     * @param numbObjs number of objectives
+     * @param numVecs number of vectors
+     */
+    public BinaryR2Indicator(int numbObjs,int numVecs) {
+        initializeWts(numbObjs,numVecs);
     }
 
     /**
@@ -31,10 +34,10 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      * @return
      */
     @Override
-    public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
+    public double compute(NondominatedPopulation popA, NondominatedPopulation popB, Solution refPt) {
         double val = 0.0;
         for (WtVector vec : wtVecs) {
-            val += popUtility(vec, popA) - popUtility(vec, popB);
+            val += popUtility(vec, popA,refPt) - popUtility(vec, popB,refPt);
         }
         return val / wtVecs.size();
     }
@@ -49,7 +52,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      * @return
      */
     @Override
-    public double compute(Solution solnA, Solution solnB) {
+    public double compute(Solution solnA, Solution solnB, Solution refPt) {
         NondominatedPopulation singlePop = new NondominatedPopulation();
         singlePop.add(solnA);
         NondominatedPopulation doublePop = new NondominatedPopulation();
@@ -57,8 +60,8 @@ public class BinaryR2Indicator implements IBinaryIndicator {
         double valA = 0.0;
         double valB = 0.0;
         for (WtVector vec : wtVecs) {
-            valA += popUtility(vec, singlePop);
-            valB += popUtility(vec, doublePop);
+            valA += popUtility(vec, singlePop, refPt);
+            valB += popUtility(vec, doublePop, refPt);
         }
         return valA-valB;
     }
@@ -69,12 +72,13 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      *
      * @param vec weight vector
      * @param pop
+     * @param refPt reference point
      * @return the utility of the nondominated population
      */
-    protected double popUtility(WtVector vec, NondominatedPopulation pop) {
+    protected double popUtility(WtVector vec, NondominatedPopulation pop,Solution refPt) {
         double popUtil = Double.NEGATIVE_INFINITY;
         for (Solution solution : pop) {
-            popUtil = Math.max(popUtil, solnUtility(vec, solution));
+            popUtil = Math.max(popUtil, solnUtility(vec, solution, refPt));
         }
         return popUtil;
     }
@@ -87,25 +91,25 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      *
      * @param vec weight vector
      * @param solution
+     * @param refPt reference point
      * @return utility of a solution wrt to a weight vector
      */
-    private double solnUtility(WtVector vec, Solution solution) {
+    private double solnUtility(WtVector vec, Solution solution, Solution refPt) {
         double solnUtil = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
-            solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(referencePt.getObjective(i) - solution.getObjective(i)));
+            solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(refPt.getObjective(i) - solution.getObjective(i)));
         }
         return -solnUtil;
     }
 
     @Override
-    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop) {
-        return compute(refPop, popA);
+    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop, Solution refPt) {
+        return compute(refPop, popA, refPt);
     }
 
-    private void initializeWts(int numVecs) {
+    private void initializeWts(int numObj,int numVecs) {
         // creates full factorial matrix. Code is based on 2013a Matlab 
         //fullfact(levels). Eliminate rows with sum != the number of vectors.
-        int numObj = referencePt.getNumberOfObjectives();
         int numExp = (int) Math.pow(numVecs, numObj);
         int[][] experiments = new int[numExp][numObj];
 

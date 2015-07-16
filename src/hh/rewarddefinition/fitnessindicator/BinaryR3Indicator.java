@@ -16,30 +16,31 @@ import org.moeaframework.core.Solution;
  */
 public class BinaryR3Indicator extends BinaryR2Indicator{
 
-    public BinaryR3Indicator(Solution referencePt,int numVecs) {
-        super(referencePt,numVecs);
+    public BinaryR3Indicator(int numObj,int numVecs) {
+        super(numObj,numVecs);
     }
 
     /**
      * 
      * @param popA
      * @param popB can be the reference population
+     * @param refPt reference point
      * @return 
      */
     @Override
-    public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
+    public double compute(NondominatedPopulation popA, NondominatedPopulation popB,Solution refPt) {
         double val = 0.0;
         for(WtVector vec: wtVecs){
-            double utilB = popUtility(vec,popB);
-           val+= (utilB-popUtility(vec,popA))/utilB;
+            double utilB = popUtility(vec,popB,refPt);
+           val+= (utilB-popUtility(vec,popA,refPt))/utilB;
         }
         
         return val/wtVecs.size();
     }
 
     @Override
-    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop) {
-        return compute(popA,refPop);
+    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop,Solution refPt) {
+        return compute(popA,refPop,refPt);
     }
     
      @Override

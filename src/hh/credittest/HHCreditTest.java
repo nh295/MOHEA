@@ -69,10 +69,10 @@ public class HHCreditTest {
 //            String[] selectors = new String[]{"PM", "AP"};
             String[] selectors = new String[]{"PM"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIHV","OPIR2","OPIR3",
+//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPIAE"};
+            String[] creditDefs = new String[]{"OPIR2"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with

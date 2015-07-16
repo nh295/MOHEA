@@ -230,10 +230,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
         Solution[] children = heuristic.evolve(parents);
 
-        //RECONSIDER some other policy other than using binary tournament
-        Solution randChild = children[pprng.nextInt(children.length)];
-        children = new Solution[]{randChild};
-
         if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT) {
             for (Solution child : children) {
                 evaluate(child);
@@ -247,6 +243,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         break;
                     case POPULATION:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population);
+                        break;
                     default:
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");

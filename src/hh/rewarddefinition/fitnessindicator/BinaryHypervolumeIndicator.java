@@ -6,9 +6,11 @@
 package hh.rewarddefinition.fitnessindicator;
 
 import java.util.Arrays;
-import jmetal.util.comparators.DominanceComparator;
+import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.indicator.Hypervolume;
 
 /**
@@ -25,43 +27,41 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
 
     private final Hypervolume HV;
 
-    private final Solution referencePt;
-
     /**
      *
-     * @param referencePt Reference point from which to compute the hypervolume
+     * @param problem being solved
      */
-    public BinaryHypervolumeIndicator(Solution referencePt) {
+    public BinaryHypervolumeIndicator(Problem problem) {
         NondominatedPopulation refPop = new NondominatedPopulation();
-        refPop.add(referencePt);
-        this.HV = new Hypervolume(null, refPop);
-        this.referencePt = referencePt;
+        this.HV = new Hypervolume(problem, refPop);
+        this.domComparator = new ParetoDominanceComparator();
     }
 
     /**
-     *
+     * The population input order matters.
      * @param popA
      * @param popB (can be reference population)
+     * @param refPt hypervolume requires a reference point
      * @return
      */
     @Override
-    public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
+    public double compute(NondominatedPopulation popA, NondominatedPopulation popB, Solution refPt) {
         //intended use of binary HV indicator in IBEA: compares two vectors only
         if (popA.size() == 1 && popB.size() == 1) {
             Solution soln1 = popA.get(0);
             Solution soln2 = popB.get(0);
-            return compute(soln1, soln2);
+            return compute(soln1, soln2,refPt);
         } else {
             throw new UnsupportedOperationException("No such method for computing binary HV value for populations of more than one");
         }
     }
 
     @Override
-    public double compute(Solution solnA, Solution solnB) {
+    public double compute(Solution solnA, Solution solnB, Solution refPt) {
         if (domComparator.compare(solnA, solnB) == -1) {
-            return volume(solnB) - volume(solnA);
+            return volume(solnB,refPt) - volume(solnA,refPt);
         } else {
-            return volume(new Solution[]{solnA, solnB}) - volume(solnA);
+            return volume(new Solution[]{solnA, solnB},refPt) - volume(solnA,refPt);
         }
     }
 
@@ -71,10 +71,10 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
      * @param soln
      * @return
      */
-    private double volume(Solution soln) {
+    private double volume(Solution soln,Solution refPt) {
         double vol = 0.0;
         for (int i = 0; i < soln.getNumberOfObjectives(); i++) {
-            vol *= referencePt.getObjective(i) - soln.getObjective(i);
+            vol *= refPt.getObjective(i) - soln.getObjective(i);
         }
         if (vol < 0) //if point is dominated by reference point
         {
@@ -89,13 +89,20 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
      * @param solutions
      * @return
      */
-    private double volume(Solution[] solutions) {
+    private double volume(Solution[] solutions,Solution refPt) {
         return HV.evaluate(new NondominatedPopulation(Arrays.asList(solutions)));
     }
 
+    /**
+     * In IBEA format binary indicator the order of the population inputs matter. Use this method if you have a reference population.
+     * @param popA
+     * @param popRef
+     * @param refPt hypervolume require reference point
+     * @return 
+     */
     @Override
-    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef) {
-        return compute(popA, popRef);
+    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef, Solution refPt) {
+        return compute(popA, popRef,refPt);
     }
 
     @Override

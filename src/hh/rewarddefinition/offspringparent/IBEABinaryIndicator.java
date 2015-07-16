@@ -7,7 +7,6 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.IBinaryIndicator;
-import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -38,14 +37,21 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
     private double[] upBound;
     
     private final IBinaryIndicator indicator;
+    
+    /**
+     * Some indicators need a reference point like hypervolume and the R family indicators
+     */
+    private Solution refPoint;
 
     /**
      * 
      * @param indicator The indicator to use
      * @param kappa the IBEA parameter to scale indicator values
+     * @param refPoint
      */
-    public IBEABinaryIndicator(IBinaryIndicator indicator,double kappa) {
+    public IBEABinaryIndicator(IBinaryIndicator indicator,double kappa,Solution refPoint) {
         this.indicator = indicator;
+        this.refPoint = refPoint;
         this.kappa = kappa;
         //has to be the population because parent may not lie on PF or in archive
         this.operatesOn = RewardDefinedOn.POPULATION;
@@ -80,11 +86,8 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
     private double measureQuality(Solution soln1, Solution soln2){
         Solution normSoln1 = new Solution(normalizeObjectives(soln1));
         Solution normSoln2 = new Solution(normalizeObjectives(soln2));
-        NondominatedPopulation popA = new NondominatedPopulation();
-        popA.add(normSoln1);
-        NondominatedPopulation popB = new NondominatedPopulation();
-        popB.add(normSoln2);
-        return indicator.compute(popA, popB);
+        Solution normRefPt = new Solution(normalizeObjectives(refPoint));
+        return indicator.compute(normSoln1, normSoln2,normRefPt);
     }
     
     /**

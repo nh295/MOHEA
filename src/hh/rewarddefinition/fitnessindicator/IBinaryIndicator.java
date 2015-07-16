@@ -19,25 +19,28 @@ public interface IBinaryIndicator {
      * Computes the indicator value when comparing population A to population B
      * @param popA
      * @param popB
+     * @param refPt some indicators require a reference point
      * @return 
      */
-    public double compute(NondominatedPopulation popA, NondominatedPopulation popB);
+    public double compute(NondominatedPopulation popA, NondominatedPopulation popB,Solution refPt);
     
     /**
      * Computes the indicator value when comparing solution A to solution B. Used in IBEA setting
      * @param solnA
      * @param solnB
+     * @param refPt some indicators require a reference point
      * @return 
      */
-    public double compute(Solution solnA, Solution solnB);
+    public double compute(Solution solnA, Solution solnB, Solution refPt);
 
     
     /**
      * Computes the indicator value when comparing popA to the refPop
      * @param popA
      * @param popRef reference population
+     * @param refPt some indicators require a reference point
      * @return indicator value 
      */
-    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef);
+    public double computeWRef(NondominatedPopulation popA, NondominatedPopulation popRef, Solution refPt);
     
 }
