@@ -7,6 +7,7 @@
 package hh.rewarddefinition.fitnessindicator;
 
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Solution;
 
 /**
  * Used for binary indicators
@@ -21,6 +22,14 @@ public interface IBinaryIndicator {
      * @return 
      */
     public double compute(NondominatedPopulation popA, NondominatedPopulation popB);
+    
+    /**
+     * Computes the indicator value when comparing solution A to solution B. Used in IBEA setting
+     * @param solnA
+     * @param solnB
+     * @return 
+     */
+    public double compute(Solution solnA, Solution solnB);
 
     
     /**

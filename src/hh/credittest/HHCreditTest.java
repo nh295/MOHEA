@@ -50,8 +50,8 @@ public class HHCreditTest {
         String[] problems = new String[]{"UF5"};
 //        String[] problems = new String[]{" "};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
-//        pool = Executors.newFixedThreadPool(1);
+//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
+        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -69,10 +69,10 @@ public class HHCreditTest {
 //            String[] selectors = new String[]{"PM", "AP"};
             String[] selectors = new String[]{"PM"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP","OPIPFAE","OPIPFHV","OPIPFR2","OPIPFR3","OPIEAAE","OPIEAHV","OPIEAR2","OPIEAR3",
+//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIHV","OPIR2","OPIR3",
 //                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPIPFAE"};
+            String[] creditDefs = new String[]{"OPIAE"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with

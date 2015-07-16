@@ -77,29 +77,17 @@ public class RewardDefFactory {
             case "ODP": //offspring dominates parent
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
-            case "OPIPFAE": //offspring parent additive epsilon indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa, RewardDefinedOn.PARETOFRONT);
+            case "OPIAE": //offspring parent additive epsilon indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa);
                 break;
-            case "OPIPFHV": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(new Solution(refPoint)), kappa, RewardDefinedOn.PARETOFRONT);
+            case "OPIHV": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(new Solution(refPoint)), kappa);
                 break;
-            case "OPIPFR2": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.PARETOFRONT);
+            case "OPIR2": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec), kappa);
                 break;
-            case "OPIPFR3": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.PARETOFRONT);
-                break;
-            case "OPIEAAE": //offspring parent additive epsilon indicator using archive
-                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa, RewardDefinedOn.ARCHIVE);
-                break;
-            case "OPIEAHV": //offspring parent hypervolume indicator using archive
-                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(new Solution(refPoint)), kappa, RewardDefinedOn.ARCHIVE);
-                break;
-            case "OPIEAR2": //offspring parent hypervolume indicator using archive
-                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.ARCHIVE);
-                break;
-            case "OPIEAR3": //offspring parent hypervolume indicator using archive
-                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec), kappa, RewardDefinedOn.ARCHIVE);
+            case "OPIR3": //offspring parent hypervolume indicator using pareto front
+                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(new Solution(idealPoint), numVec), kappa);
                 break;
             case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);

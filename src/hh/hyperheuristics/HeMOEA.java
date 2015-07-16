@@ -242,21 +242,16 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent,null);
-                        archive.add(child);
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null);
+                        population.add(child);
                         break;
-                    case PARETOFRONT:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent,paretoFront);
-                        archive.add(child);
-                        break;
-                    case ARCHIVE:
-                        creditValue = ((IBEABinaryIndicator)creditDef).compute(child, refParent,archive);
-                        break;
+                    case POPULATION:
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population);
                     default:
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
-                population.add(child);
+                archive.add(child);
                 creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
             }
         } else if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {

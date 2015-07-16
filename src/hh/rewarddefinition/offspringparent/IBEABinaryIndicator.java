@@ -43,12 +43,12 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      * 
      * @param indicator The indicator to use
      * @param kappa the IBEA parameter to scale indicator values
-     * @param operatesOn enum to specify whether to use solutions in population or archive
      */
-    public IBEABinaryIndicator(IBinaryIndicator indicator,double kappa,RewardDefinedOn operatesOn) {
+    public IBEABinaryIndicator(IBinaryIndicator indicator,double kappa) {
         this.indicator = indicator;
         this.kappa = kappa;
-        this.operatesOn = operatesOn;
+        //has to be the population because parent may not lie on PF or in archive
+        this.operatesOn = RewardDefinedOn.POPULATION;
     }
 
     /**
@@ -62,10 +62,6 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      * @return
      */
     private double computeFitness(Solution soln, Population pop, double c) {
-        if (lowBound == null || upBound == null) {
-            computeBounds(pop);
-        }
-        updateBounds(soln);
         double fitness = 0.0;
         for (Solution solution : pop) {
             fitness += -Math.exp(-measureQuality(solution, soln) / (c * kappa));
@@ -102,7 +98,12 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      * @return the positive percent improvement in fitness. If no improvement then return 0.0
      */
     @Override
-    public double compute(Solution offspring, Solution parent, Population pop) {
+    public double compute(Solution offspring, Solution parent, Population pop) {   
+        if (lowBound == null || upBound == null) {
+            computeBounds(pop);
+        }
+        updateBounds(offspring);
+        
         //compute fitness of offspring
         pop.add(offspring);
         double maxIVal = maxIndicatorVal(pop);

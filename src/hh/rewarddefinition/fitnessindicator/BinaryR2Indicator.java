@@ -40,6 +40,30 @@ public class BinaryR2Indicator implements IBinaryIndicator {
     }
 
     /**
+     * In this implementation the order of the inputs matter. formula based on
+     * "R2-IBEA: R2 Indicator Based Evolutionary Algorithm for Multiobjective
+     * Optimization"
+     *
+     * @param solnA
+     * @param solnB
+     * @return
+     */
+    @Override
+    public double compute(Solution solnA, Solution solnB) {
+        NondominatedPopulation singlePop = new NondominatedPopulation();
+        singlePop.add(solnA);
+        NondominatedPopulation doublePop = new NondominatedPopulation();
+        doublePop.add(solnA);
+        double valA = 0.0;
+        double valB = 0.0;
+        for (WtVector vec : wtVecs) {
+            valA += popUtility(vec, singlePop);
+            valB += popUtility(vec, doublePop);
+        }
+        return valA-valB;
+    }
+
+    /**
      * Returns the maximum value over all the solution utilities wrt to a weight
      * vector
      *
@@ -82,7 +106,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
         // creates full factorial matrix. Code is based on 2013a Matlab 
         //fullfact(levels). Eliminate rows with sum != the number of vectors.
         int numObj = referencePt.getNumberOfObjectives();
-        int numExp = (int)Math.pow(numVecs, numObj);
+        int numExp = (int) Math.pow(numVecs, numObj);
         int[][] experiments = new int[numExp][numObj];
 
         int ncycles = numExp;
@@ -107,25 +131,22 @@ public class BinaryR2Indicator implements IBinaryIndicator {
                 }
             }
         }
-        
+
         wtVecs = new ArrayList<>();
         //Find valid row vectors (ones that add up to numVecs) 
-        for(int i=0;i<numExp;i++){
+        for (int i = 0; i < numExp; i++) {
             double sum = 0.0;
-            for(int j=0; j<numObj; j++){
-                sum+=experiments[i][j];
+            for (int j = 0; j < numObj; j++) {
+                sum += experiments[i][j];
             }
-            if(sum==numVecs){
+            if (sum == numVecs) {
                 double[] wts = new double[numObj];
-                for(int k=0; k<numObj; k++){
-                    wts[k] = ((double)experiments[i][k])/((double)numObj);
+                for (int k = 0; k < numObj; k++) {
+                    wts[k] = ((double) experiments[i][k]) / ((double) numObj);
                 }
                 wtVecs.add(new WtVector(wts));
             }
         }
-        
-        
-        
     }
 
     @Override

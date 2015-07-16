@@ -22,9 +22,9 @@ import org.moeaframework.core.indicator.Hypervolume;
 public class BinaryHypervolumeIndicator implements IBinaryIndicator {
 
     private DominanceComparator domComparator;
-    
+
     private final Hypervolume HV;
-    
+
     private final Solution referencePt;
 
     /**
@@ -39,10 +39,10 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
     }
 
     /**
-     * 
+     *
      * @param popA
      * @param popB (can be reference population)
-     * @return 
+     * @return
      */
     @Override
     public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
@@ -50,13 +50,19 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
         if (popA.size() == 1 && popB.size() == 1) {
             Solution soln1 = popA.get(0);
             Solution soln2 = popB.get(0);
-            if (domComparator.compare(soln1, soln2) == -1) {
-                return volume(soln2) - volume(soln1);
-            } else {
-                return volume(new Solution[]{soln1, soln2}) - volume(soln1);
-            }
-        }else
+            return compute(soln1, soln2);
+        } else {
             throw new UnsupportedOperationException("No such method for computing binary HV value for populations of more than one");
+        }
+    }
+
+    @Override
+    public double compute(Solution solnA, Solution solnB) {
+        if (domComparator.compare(solnA, solnB) == -1) {
+            return volume(solnB) - volume(solnA);
+        } else {
+            return volume(new Solution[]{solnA, solnB}) - volume(solnA);
+        }
     }
 
     /**
@@ -96,6 +102,5 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
     public String toString() {
         return "BIHV";
     }
-    
 
 }

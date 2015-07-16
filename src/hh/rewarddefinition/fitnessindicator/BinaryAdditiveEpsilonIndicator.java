@@ -30,7 +30,6 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
      */
     @Override
     public double compute(NondominatedPopulation popA, NondominatedPopulation popB) {
-        int numObjs = popA.get(0).getNumberOfObjectives();
         double eps_i = 0.0;
         for (int i = 0; i < popB.size(); i++) {
             Solution solution1 = popB.get(i);
@@ -38,17 +37,22 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
 
             for (int j = 0; j < popA.size(); j++) {
                 Solution solution2 = popA.get(j);
-                double eps_k = 0.0;
-
-                for (int k = 0; k < numObjs; k++) {
-                    eps_k = Math.max(eps_k, solution2.getObjective(k)
-                            - solution1.getObjective(k));
-                }
-                eps_j = Math.min(eps_j, eps_k);
+                eps_j = Math.min(eps_j, compute(solution1, solution2));
             }
             eps_i = Math.max(eps_i, eps_j);
         }
         return eps_i;
+    }
+
+    @Override
+    public double compute(Solution solnA, Solution solnB) {
+        int numObjs = solnA.getNumberOfObjectives();
+        double eps_k = 0.0;
+        for (int k = 0; k < numObjs; k++) {
+            eps_k = Math.max(eps_k, solnB.getObjective(k)
+                    - solnA.getObjective(k));
+        }
+        return eps_k;
     }
 
     @Override
@@ -60,6 +64,5 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
     public String toString() {
         return "BIAE";
     }
-    
-    
+
 }
