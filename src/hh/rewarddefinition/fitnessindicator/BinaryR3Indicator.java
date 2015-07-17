@@ -39,7 +39,7 @@ public class BinaryR3Indicator extends BinaryR2Indicator{
 
     @Override
     public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop,Solution refPt) {
-        return compute(popA,refPop,refPt);
+        return compute(refPop,popA,refPt);
     }
     
      @Override

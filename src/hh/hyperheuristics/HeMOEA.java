@@ -16,7 +16,6 @@ import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinitionType;
 import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
-import hh.rewarddefinition.offspringparent.IBEABinaryIndicator;
 import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
 import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
 import hh.selectionhistory.HeuristicSelectionHistory;

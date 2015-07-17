@@ -31,7 +31,7 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
      */
     @Override
     public double compute(NondominatedPopulation popA, NondominatedPopulation popB, Solution refPt) {
-        double eps_i = 0.0;
+        double eps_i = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < popB.size(); i++) {
             Solution solution1 = popB.get(i);
             double eps_j = Double.POSITIVE_INFINITY;
@@ -47,18 +47,18 @@ public class BinaryAdditiveEpsilonIndicator implements IBinaryIndicator {
 
     /**
      * 
-     * @param solnA
-     * @param solnB
+     * @param solution1
+     * @param solution2
      * @param refPt additive epsilon indicator does not need a reference point
      * @return 
      */
     @Override
-    public double compute(Solution solnA, Solution solnB, Solution refPt) {
-        int numObjs = solnA.getNumberOfObjectives();
-        double eps_k = 0.0;
+    public double compute(Solution solution1, Solution solution2, Solution refPt) {
+        int numObjs = solution1.getNumberOfObjectives();
+        double eps_k = Double.NEGATIVE_INFINITY;
         for (int k = 0; k < numObjs; k++) {
-            eps_k = Math.max(eps_k, solnB.getObjective(k)
-                    - solnA.getObjective(k));
+            eps_k = Math.max(eps_k, solution2.getObjective(k)
+                    - solution1.getObjective(k));
         }
         return eps_k;
     }
