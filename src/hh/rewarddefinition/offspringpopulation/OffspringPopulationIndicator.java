@@ -62,8 +62,11 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
             NondominatedPopulation afterOffspring = (NondominatedPopulation) ndpop;
             
             if (afterOffspring.add(offspring)) {
-                //improvements over old population will result in a negative 
-                return -indicator.computeWRef(afterOffspring,beforeOffspring,refPt);
+                //improvements over old population will result in a positive credit
+                double reward = indicator.computeWRef(beforeOffspring,afterOffspring,refPt);
+                if(reward<0)
+                    throw new RuntimeException("Reward is negative even though nondominated population improved. Use monotonic indicator!");
+                return reward;
             } else {
                 return 0.0;
             }

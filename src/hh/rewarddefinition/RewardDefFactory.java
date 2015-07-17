@@ -69,7 +69,7 @@ public class RewardDefFactory {
         //ideal point used in R family indicators
         double[] defIdeal = new double[problem.getNumberOfObjectives()];
         Arrays.fill(defIdeal, 0.0);
-        double[] idealPoint = prop.getDoubleArray("ref point", defRef);
+        double[] idealPoint = prop.getDoubleArray("ref point", defIdeal);
         int numVec = prop.getInt("numVec", 100);
         //kappa parameter used in IBEA
         double kappa = prop.getDouble("kappa", 0.05);
@@ -85,10 +85,10 @@ public class RewardDefFactory {
                 credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(problem), kappa, new Solution(refPoint));
                 break;
             case "OPIR2": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(numObj,numVec), kappa, new Solution(refPoint));
+                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(numObj,numVec), kappa, new Solution(idealPoint));
                 break;
             case "OPIR3": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(refPoint));
+                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
                 break;
             case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);

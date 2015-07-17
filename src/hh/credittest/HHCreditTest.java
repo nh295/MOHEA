@@ -56,7 +56,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
             }
@@ -72,7 +73,7 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPopIPFAE"};
+            String[] creditDefs = new String[]{"OPopIPFR3"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
