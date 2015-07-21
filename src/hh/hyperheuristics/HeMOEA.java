@@ -238,7 +238,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null);
-                        population.add(child);
+                        addToPopulation(child);
                         break;
                     case POPULATION:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population);
@@ -248,7 +248,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
                 archive.add(child);
-                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
+                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue/(double)children.length, alpha));
             }
         } else if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
             for (Solution child : children) {
@@ -313,9 +313,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
 
         heuristicSelector.update(creditRepo, creditAgg);
-        heuristicSelectionHistory.add(heuristic);
-        updateCreditHistory();
-        updateQualityHistory();
+//        heuristicSelectionHistory.add(heuristic);
+//        updateCreditHistory();
+//        updateQualityHistory();
     }
 
     /**

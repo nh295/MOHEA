@@ -55,7 +55,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     @Override
     public double compute(Solution offspring, Iterable<Solution> ndpop, Variation heuristic) {
         try {
-            if (!ndpop.getClass().equals(NondominatedPopulation.class)) {
+            if (!ndpop.getClass().isAssignableFrom(NondominatedPopulation.class)) {
                 throw new IllegalArgumentException("Invalid solution collection: " + ndpop.getClass() + ". Needs to by NondominatedPopulation.");
             }
             NondominatedPopulation beforeOffspring = ((NondominatedPopulation) ndpop).clone(); 
