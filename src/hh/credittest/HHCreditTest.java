@@ -50,8 +50,8 @@ public class HHCreditTest {
         String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
-        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -64,14 +64,14 @@ public class HHCreditTest {
             String probName = problem;
             System.out.println(probName);
             int numberOfSeeds = 30;
-            int maxEvaluations = 300000;
+            int maxEvaluations = 1000;
             int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"PM", "AP"};
             String[] selectors = new String[]{"PM"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
-//                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
+//            String[] creditDefs = new String[]{"ODP",//,"OPIAE","OPIR2","OPIR3",
+//                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
             String[] creditDefs = new String[]{"OPIAE"};
 

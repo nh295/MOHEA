@@ -68,7 +68,7 @@ public class OffspringParetoRank extends AbstractOffspringPopulation{
     }
             
     @Override
-    public double compute(Solution offspring, Iterable<Solution> population,Variation heuristic) {
+    public double compute(Solution offspring, Iterable<Solution> population) {
         throw new UnsupportedOperationException("TODO fix");
 //        Population pop = new Population(population);
 //        pop.add(offspring);

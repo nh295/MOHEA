@@ -232,23 +232,23 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT) {
             for (Solution child : children) {
                 evaluate(child);
-
+                
+                int solnRemoved = addToPopulation(child);
                 double creditValue;
-                //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
+                //credit definitions operating on population and archive does NOT modify the population by adding the child to the population/archive
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null);
-                        addToPopulation(child);
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null,solnRemoved);
                         break;
                     case POPULATION:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population);
+                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population,solnRemoved);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
                 archive.add(child);
-                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
+                creditRepo.update(heuristic, new DecayingReward(iteration, creditValue/(double)children.length, alpha));
             }
         } else if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
             for (Solution child : children) {
@@ -257,23 +257,21 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
                 switch (creditDef.getOperatesOn()) {
                     case POPULATION:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
-                        addToPopulation(child);
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population);
                         archive.add(child);
                         break;
                     case PARETOFRONT:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront, heuristic);
-                        addToPopulation(child);
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
                         archive.add(child);
                         break;
                     case ARCHIVE:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive, heuristic);
-                        addToPopulation(child);
+                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "
                                 + "recognized. Used " + creditDef.getType() + ".");
                 }
+                addToPopulation(child);
                 creditRepo.update(heuristic, new DecayingReward(iteration, creditValue, alpha));
 //                System.out.println(heuristic+": "+creditValue);
             }
@@ -314,9 +312,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
 
         heuristicSelector.update(creditRepo, creditAgg);
-        heuristicSelectionHistory.add(heuristic);
-        updateCreditHistory();
-        updateQualityHistory();
+//        heuristicSelectionHistory.add(heuristic);
+//        updateCreditHistory();
+//        updateQualityHistory();
     }
 
     /**

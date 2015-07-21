@@ -83,16 +83,20 @@ public class ParentDomination extends AbstractOffspringParent {
     }
 
     /**
-     * Computes the reward of an offspring solution with respect to its
-     * parents.
+     * Computes the reward of an offspring solution with respect to its parents.
      *
      * @param offspring offspring solutions that will receive credits
      * @param parent the parent solutions to compare the offspring solutions
      * with
+     * @param pop population may be needed to calculate the fitness of the
+     * offspring and parent solutions. This implementation does not utilize this
+     * information
+     * @param removedSolution the solution index that was just removed from the
+     * population. This implementation does not utilize this information
      * @return the value of reward to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, Solution parent,Population pop) {
+    public double compute(Solution offspring, Solution parent, Population pop, int removedSolution) {
         switch (comparator.compare(parent, offspring)) {
             case -1:
                 return creditParentDominates;

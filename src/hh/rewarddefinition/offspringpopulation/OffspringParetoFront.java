@@ -45,11 +45,10 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
      * Adds the offspring solution to the Pareto front to see if the Pareto front changes. If it changes, the heuristic will receive a reward
      * @param offspring solution that will receive credits
      * @param population the population to compare the offspring solutions with
-     * @param heuristic that created offspring solution
      * @return the value of credit to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, Iterable<Solution> population,Variation heuristic) {
+    public double compute(Solution offspring, Iterable<Solution> population) {
         if(population.getClass()!=NondominatedPopulation.class)
             throw new ClassCastException("Need to be NondominatedPopulation: " + population.getClass());
         NondominatedPopulation ndpop = (NondominatedPopulation)population;

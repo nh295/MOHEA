@@ -137,8 +137,9 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 	 * solution or a non-dominated solution.
 	 * 
 	 * @param newSolution the new solution being added to the population
+         * @return the solution position that was removed. If the new solution does not replace any solution, return -1;
 	 */
-	protected void addToPopulation(Solution newSolution) {
+	protected int addToPopulation(Solution newSolution) {
 		List<Integer> dominates = new ArrayList<Integer>();
 		boolean dominated = false;
 
@@ -152,14 +153,18 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 				dominated = true;
 			}
 		}
-
+                int out;
 		if (!dominates.isEmpty()) {
-			population.remove(dominates.get(pprng.nextInt(dominates.size())));
+                        out = dominates.get(pprng.nextInt(dominates.size()));
+			population.remove(out);
 			population.add(newSolution);
 		} else if (!dominated) {
+                    out = pprng.nextInt(population.size());
 			population.remove(pprng.nextInt(population.size()));
 			population.add(newSolution);
-		}
+		} else 
+                    out = -1;
+                return out;
 	}
 
 	@Override

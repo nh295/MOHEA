@@ -7,7 +7,7 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.IBinaryIndicator;
-import org.moeaframework.core.NondominatedPopulation;
+import java.util.ArrayList;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -23,34 +23,53 @@ import org.moeaframework.core.Solution;
  *
  * @author nozomihitomi
  */
-public class IBEABinaryIndicator extends AbstractOffspringParent{
+public class IBEABinaryIndicator extends AbstractOffspringParent {
 
     /**
      * IBEA scaling factor
      */
     private final double kappa;
 
-
     /**
      * Bounds used to rescale the objectives in the population
      */
     private double[] lowBound;
     private double[] upBound;
-    
-    private final IBinaryIndicator indicator;
-    
+
     /**
-     * Some indicators need a reference point like hypervolume and the R family indicators
+     * The maximum indicator value over all pair wise comparisons in population
+     */
+    private double maxIndicatorVal;
+
+    /**
+     * indicator values used to find maximum. Values are stored to quickly
+     * updated the maximum value;
+     */
+    private ArrayList<ArrayList<Double>> indicatorVals;
+
+    /**
+     * The binary indicator to use
+     */
+    private final IBinaryIndicator indicator;
+
+    /**
+     * Solution indices that give maxIndicatorVal
+     */
+    private int[] maxPair = new int[]{0, 0};
+
+    /**
+     * Some indicators need a reference point like hypervolume and the R family
+     * indicators
      */
     private final Solution refPoint;
 
     /**
-     * 
+     *
      * @param indicator The indicator to use
      * @param kappa the IBEA parameter to scale indicator values
      * @param refPoint
      */
-    public IBEABinaryIndicator(IBinaryIndicator indicator,double kappa,Solution refPoint) {
+    public IBEABinaryIndicator(IBinaryIndicator indicator, double kappa, Solution refPoint) {
         this.indicator = indicator;
         this.refPoint = refPoint;
         this.kappa = kappa;
@@ -84,53 +103,56 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      * @param soln2 the solution removed from the population
      * @return
      */
-    private double measureQuality(Solution soln1, Solution soln2){
+    private double measureQuality(Solution soln1, Solution soln2) {
         Solution normSoln1 = new Solution(normalizeObjectives(soln1));
         Solution normSoln2 = new Solution(normalizeObjectives(soln2));
         Solution normRefPt = new Solution(normalizeObjectives(refPoint));
-        return indicator.compute(normSoln1, normSoln2,normRefPt);
+        return indicator.compute(normSoln1, normSoln2, normRefPt);
     }
-    
+
     /**
      * This method compares the fitness of the offspring and its parent wrt to
      * the population.
      *
      * @param offspring
      * @param parent of the offspring solution
-     * @param pop population is assumed to contain the parent solution but not
+     * @param pop population is assumed to contain both the parent solution and
      * the offspring solution
-     * @return the positive percent improvement in fitness. If no improvement then return 0.0
+     * @param removedSolution the solution index that was just removed from the
+     * population
+     * @return the positive percent improvement in fitness. If no improvement
+     * then return 0.0
      */
     @Override
-    public double compute(Solution offspring, Solution parent, Population pop) {   
+    public double compute(Solution offspring, Solution parent, Population pop, int removedSolution) {
         Population clonePop = new Population(pop);
+        //only run on initial run.
         if (lowBound == null || upBound == null) {
             computeBounds(clonePop);
+            maxIndicatorVal = maxIndicatorVal(clonePop);
+        } else {
+            //updates the bounds based on just the new solution
+            updateBounds(offspring);
+//            if (removedSolution != -1) { //if this condition is met then the offspring replaced a solution in the population
+//                maxIndicatorVal = updateMaxVal(removedSolution, pop, offspring);
+//            }
+            // only look for max if one of the solutions in the previous pair is no longer in the population
+            if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
+                maxIndicatorVal = maxIndicatorVal(clonePop);
+            }
         }
-        updateBounds(offspring);
-        
-        //compute fitness of offspring
-        clonePop.add(offspring);
-        
-        long start = System.nanoTime();
-        double maxIVal = maxIndicatorVal(clonePop);
-        long end = System.nanoTime();
-        long time = end-start;
-        
-        start = System.nanoTime();
-        NondominatedPopulation ndpop = new NondominatedPopulation(clonePop);
-        end = System.nanoTime();
-        time = end-start;
-        
-        clonePop.remove(clonePop.size() - 1); //remove offspring that was just added
-        double offspringFitness = computeFitness(offspring, clonePop, maxIVal);
+        if (removedSolution != -1) //if this condition is met then the offspring replaced a solution in the population
+        {
+            clonePop.remove(clonePop.size() - 1); //removes offspring from pop to compute its fitness
+        }
+        double offspringFitness = computeFitness(offspring, clonePop, maxIndicatorVal);
 
         //compute fitness of parent
         clonePop.remove(parent);
         clonePop.add(offspring);
-        double parentFitness = computeFitness(parent, clonePop, maxIVal);
+        double parentFitness = computeFitness(parent, clonePop, maxIndicatorVal);
 
-        double improvement = (offspringFitness-parentFitness)/parentFitness;
+        double improvement = (offspringFitness - parentFitness) / parentFitness;
         if (improvement > 0) {
             return improvement;
         } else {
@@ -167,7 +189,6 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
         for (int i = 0; i < soln.getNumberOfObjectives(); i++) {
             upBound[i] = Math.max(upBound[i], soln.getObjective(i));
             lowBound[i] = Math.min(lowBound[i], soln.getObjective(i));
-
         }
     }
 
@@ -193,22 +214,71 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      * @return the maximum indicator value
      */
     private double maxIndicatorVal(Population pop) {
+        indicatorVals = new ArrayList<>(pop.size());
         double max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < pop.size(); i++) {
+            indicatorVals.add(new ArrayList<Double>(pop.size()));
             for (int j = 0; j < pop.size(); j++) {
                 if (i == j) {
-                    continue;
+                    indicatorVals.get(i).add(j, Double.NEGATIVE_INFINITY);
+                } else {
+                    double val = measureQuality(pop.get(i), pop.get(j));
+                    indicatorVals.get(i).add(j, val);
+                    if (max < val) {
+                        maxPair[0] = i;
+                        maxPair[1] = j;
+                        max = val;
+                    }
                 }
-                max = Math.max(max, measureQuality(pop.get(i), pop.get(j)));
             }
         }
         return max;
     }
 
-    @Override
-    public String toString() {
-        return "OPa_"+indicator.toString() + operatesOn;
+    /**
+     * Faster way to update the maximum indicator value with one new solution
+     *
+     * @param removedSolution the index of the solution that the new solution
+     * replaced
+     * @param pop the population including the offspring solution
+     * @param offspring new solution added to the population
+     * @return
+     */
+    private double updateMaxVal(int removedSolution, Population pop, Solution offspring) {
+        indicatorVals.remove(removedSolution);
+        for (int i = 0; i < indicatorVals.size(); i++) {
+            ArrayList<Double> row = indicatorVals.get(i);
+            row.remove(removedSolution);
+            row.add(measureQuality(pop.get(i), offspring));
+        }
+        indicatorVals.add(new ArrayList<Double>(pop.size()));
+        for (int j = 0; j < pop.size() - 1; j++) {
+            double val = measureQuality(offspring, pop.get(j));
+            indicatorVals.get(pop.size() - 1).add(j, val);
+        }
+        indicatorVals.get(pop.size() - 1).add(pop.size() - 1, Double.NEGATIVE_INFINITY);
+
+        // only look for max if one of the solutions in the previous pair is no longer in the population
+        if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
+            double max = Double.NEGATIVE_INFINITY;
+            for (int i = 0; i < pop.size(); i++) {
+                for (int j = 0; j < pop.size(); j++) {
+                    double val = indicatorVals.get(i).get(j);
+                    if (max < val) {
+                        maxPair[0] = i;
+                        maxPair[1] = j;
+                        max = val;
+                    }
+                }
+            }
+            maxIndicatorVal = max;
+        }
+        return maxIndicatorVal;
     }
 
-    
+    @Override
+    public String toString() {
+        return "OPa_" + indicator.toString() + operatesOn;
+    }
+
 }

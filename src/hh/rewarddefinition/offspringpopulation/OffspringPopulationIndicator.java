@@ -39,6 +39,8 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     public OffspringPopulationIndicator(IBinaryIndicator indicator,RewardDefinedOn operatesOn, Solution refPt) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
+        if(this.operatesOn.equals(RewardDefinedOn.ARCHIVE)||this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
+            throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
         this.refPt = refPt;
     }
 
@@ -49,13 +51,12 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
      *
      * @param offspring
      * @param ndpop nondominated population: pareto front or archive
-     * @param heuristic
      * @return the improvement in the indicator value. 0.0 if no improvement
      */
     @Override
-    public double compute(Solution offspring, Iterable<Solution> ndpop, Variation heuristic) {
+    public double compute(Solution offspring, Iterable<Solution> ndpop) {
         try {
-            if (!ndpop.getClass().equals(NondominatedPopulation.class)) {
+            if (!ndpop.getClass().isAssignableFrom(NondominatedPopulation.class)) {
                 throw new IllegalArgumentException("Invalid solution collection: " + ndpop.getClass() + ". Needs to by NondominatedPopulation.");
             }
             NondominatedPopulation beforeOffspring = ((NondominatedPopulation) ndpop).clone(); 

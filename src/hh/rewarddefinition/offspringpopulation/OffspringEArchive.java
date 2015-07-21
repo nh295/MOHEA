@@ -43,11 +43,10 @@ public class OffspringEArchive extends AbstractOffspringPopulation{
      * Adds the offspring solution to the archive to see if the Pareto front changes. If it changes, the heuristic will receive a reward
      * @param offspring solution that will receive credits
      * @param archive the archive to compare the offspring solutions with
-     * @param heuristic that created offspring solution
      * @return the value of credit to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, Iterable<Solution> archive,Variation heuristic) {
+    public double compute(Solution offspring, Iterable<Solution> archive) {
         if(!archive.getClass().equals(EpsilonBoxDominanceArchive.class))
             throw new ClassCastException("Need to be NondominatedPopulation: " + archive.getClass());
         EpsilonBoxDominanceArchive ndpop = (EpsilonBoxDominanceArchive)archive;
