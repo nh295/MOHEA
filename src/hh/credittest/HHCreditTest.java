@@ -47,7 +47,7 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1", "UF2", "UF3" ,"UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF5"};
+        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
 //        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
@@ -73,7 +73,7 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "IPF", "IEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPopIPFR3"};
+            String[] creditDefs = new String[]{"OPIAE"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with

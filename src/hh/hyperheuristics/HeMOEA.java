@@ -238,7 +238,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null);
-                        population.add(child);
+                        addToPopulation(child);
                         break;
                     case POPULATION:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population);
@@ -258,6 +258,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 switch (creditDef.getOperatesOn()) {
                     case POPULATION:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population, heuristic);
+                        addToPopulation(child);
                         archive.add(child);
                         break;
                     case PARETOFRONT:

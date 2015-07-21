@@ -7,6 +7,7 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.IBinaryIndicator;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -102,22 +103,32 @@ public class IBEABinaryIndicator extends AbstractOffspringParent{
      */
     @Override
     public double compute(Solution offspring, Solution parent, Population pop) {   
+        Population clonePop = new Population(pop);
         if (lowBound == null || upBound == null) {
-            computeBounds(pop);
+            computeBounds(clonePop);
         }
         updateBounds(offspring);
         
         //compute fitness of offspring
-        pop.add(offspring);
-        double maxIVal = maxIndicatorVal(pop);
-        pop.remove(pop.size() - 1); //remove offspring that was just added
-        double offspringFitness = computeFitness(offspring, pop, maxIVal);
+        clonePop.add(offspring);
+        
+        long start = System.nanoTime();
+        double maxIVal = maxIndicatorVal(clonePop);
+        long end = System.nanoTime();
+        long time = end-start;
+        
+        start = System.nanoTime();
+        NondominatedPopulation ndpop = new NondominatedPopulation(clonePop);
+        end = System.nanoTime();
+        time = end-start;
+        
+        clonePop.remove(clonePop.size() - 1); //remove offspring that was just added
+        double offspringFitness = computeFitness(offspring, clonePop, maxIVal);
 
         //compute fitness of parent
-        pop.remove(parent);
-        pop.add(offspring);
-        double parentFitness = computeFitness(parent, pop, maxIVal);
-        pop.add(parent);
+        clonePop.remove(parent);
+        clonePop.add(offspring);
+        double parentFitness = computeFitness(parent, clonePop, maxIVal);
 
         double improvement = (offspringFitness-parentFitness)/parentFitness;
         if (improvement > 0) {
