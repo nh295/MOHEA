@@ -83,7 +83,8 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
         qualities = creditRepo.estimateQuality(qualEst, getNumberOfIterations());
         for(Variation heuristic:qualities.keySet()) {
             //if current quality becomes negative, adjust to 0
-            if (qualities.get(heuristic) < 0.0) {
+            double qual = qualities.get(heuristic);
+            if (qual < 0.0 || Double.isNaN(qual)) {
                 qualities.put(heuristic, 0.0);
             }
         }

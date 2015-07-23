@@ -19,13 +19,13 @@ import org.moeaframework.core.Variation;
  *
  * @author nozomihitomi
  */
-public class SumRanks implements IQualityEstimation{
+public class RankRewards implements IQualityEstimation{
 
     private final QualityEstimator qualEst;
 
     private final double paramD;
 
-    public SumRanks(double paramD) {
+    public RankRewards(double paramD) {
         if (paramD > 1.0 || paramD < 0.0) {
             throw new IllegalArgumentException("Invalid D value: D must be in [0,1]. D is " + paramD);
         }
@@ -33,6 +33,12 @@ public class SumRanks implements IQualityEstimation{
         qualEst = new QualityEstimator();
     }
 
+    /**
+     * In this implementation, a quality measure can be NaN if the sum of the decayed ranks is zero. 
+     * @param iteration
+     * @param credHistRepo
+     * @return 
+     */
     @Override
     public HashMap<Variation, Double> estimate(int iteration, CreditHistoryRepository credHistRepo) {
         HashMap<Variation, Double> out = new HashMap<>();

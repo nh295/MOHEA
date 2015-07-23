@@ -5,12 +5,13 @@
  */
 package hh.credittest;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.qualityestimation.MeanRewards;
 import hh.credithistory.RewardHistoryWindow;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
+import hh.qualityestimation.IQualityEstimation;
+import hh.qualityestimation.MeanRewards;
+import hh.qualityestimation.RankRewards;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -108,7 +109,7 @@ public class HHCreditTest {
                         heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
-                        IQualityEstimation creditAgg = new MeanRewards();
+                        IQualityEstimation creditAgg = new RankRewards(1.0);
 
                         ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new RewardHistoryWindow(windowSize), windowSize);
 
