@@ -312,6 +312,8 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
 
         heuristicSelector.update(creditRepo, creditAgg);
+        if(iteration==4000)
+            System.out.println("");
 //        heuristicSelectionHistory.add(heuristic);
 //        updateCreditHistory();
 //        updateQualityHistory();

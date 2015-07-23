@@ -10,7 +10,6 @@ import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.qualityestimation.IQualityEstimation;
-import hh.qualityestimation.MeanRewards;
 import hh.qualityestimation.RankRewards;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -64,17 +63,17 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
-            int maxEvaluations = 1000;
+            int numberOfSeeds = 9;
+            int maxEvaluations = 10000;
             int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"PM", "AP"};
-            String[] selectors = new String[]{"PM"};
+            String[] selectors = new String[]{"Random"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP",//,"OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPIAE"};
+            String[] creditDefs = new String[]{"ODP"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
