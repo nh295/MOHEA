@@ -80,12 +80,8 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      * @param qualEst method to aggregate the past credits to compute the heuristic's reward
      */
     protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
-        Collection<Variation> heuristicsRewarded = creditRepo.getLastRewardedHeuristic();
-        Iterator<Variation> rewardIter = heuristicsRewarded.iterator();
-        while (rewardIter.hasNext()) {
-            Variation heuristic = rewardIter.next();
-            qualities.put(heuristic, creditRepo.estimateQuality(qualEst, getNumberOfIterations(), heuristic));
-
+        qualities = creditRepo.estimateQuality(qualEst, getNumberOfIterations());
+        for(Variation heuristic:qualities.keySet()) {
             //if current quality becomes negative, adjust to 0
             if (qualities.get(heuristic) < 0.0) {
                 qualities.put(heuristic, 0.0);

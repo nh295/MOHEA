@@ -22,11 +22,19 @@ public interface ICreditRepository {
     /**
      * Method returns the current quality of the specified heuristic
      * @param qualEst The method to estimate the quality of a heuristic based on the history of credits
-     * @param iteration the iteration to aggregate up to
-     * @param heuristic
+     * @param iteration the iteration to aggregate up to from beginning of stored history
+     * @param heuristic to update the quality for
      * @return the current quality of the specified heuristic
      */
     public double estimateQuality(IQualityEstimation qualEst, int iteration,Variation heuristic);
+    
+    /**
+     * Method returns the current qualities of all heuristics based on credit history
+     * @param qualEst The method to estimate the quality of a heuristic based on the history of credits
+     * @param iteration the iteration to aggregate up to from beginning of stored history
+     * @return 
+     */
+    public HashMap<Variation,Double> estimateQuality(IQualityEstimation qualEst, int iteration);
     
     /**
      * Updates the credit history for the specified credit

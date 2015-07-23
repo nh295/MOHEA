@@ -9,7 +9,11 @@ package hh.qualityestimation;
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.DecayingReward;
 import hh.credithistory.IRewardHistory;
+import hh.creditrepository.CreditHistoryRepository;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import org.moeaframework.core.Variation;
 
 /**
  * Aggregates the credits by summing all credits in history.
@@ -44,4 +48,14 @@ public class SumRewards implements IQualityEstimation{
         }
         return aggregate;
     }
+    
+    @Override
+    public HashMap<Variation, Double> estimate(int iteration, CreditHistoryRepository credHistRepo) {
+        HashMap<Variation,Double> out = new HashMap<>();
+        for(Variation heuristic:credHistRepo.getHeuristics()){
+            out.put(heuristic, estimate(iteration,credHistRepo.getHistory(heuristic)));
+        }
+        return out;
+    }
+
 }
