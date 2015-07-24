@@ -120,7 +120,7 @@ public class TestRun implements Callable {
     public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh = newHeMOEA();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()

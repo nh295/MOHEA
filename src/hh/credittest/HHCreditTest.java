@@ -63,17 +63,17 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 9;
+            int numberOfSeeds = 12;
             int maxEvaluations = 10000;
             int windowSize = 300;
             //Setup heuristic selectors
-//            String[] selectors = new String[]{"PM", "AP"};
-            String[] selectors = new String[]{"Random"};
+            String[] selectors = new String[]{"PM"};//, "AP", "MAB"};
+//            String[] selectors = new String[]{"Random"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP",//,"OPIAE","OPIR2","OPIR3",
-//                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
-//                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"ODP"};
+            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
+                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
+                "CPF", "CEA"};
+//            String[] creditDefs = new String[]{"OPIR2"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -147,8 +147,8 @@ public class HHCreditTest {
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
 //                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".qual");
-                            hh.reset();
-                            hh=null;
+//                            hh.reset();
+//                            hh=null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }

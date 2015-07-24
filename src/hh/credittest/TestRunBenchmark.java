@@ -55,7 +55,7 @@ public class TestRunBenchmark extends TestRun{
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
-        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
