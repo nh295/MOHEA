@@ -73,27 +73,6 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
     }
     
     /**
-     * Updates the quality of the heuristic based on the aggregation applied the
-     * heuristic's credit history. If the quality becomes negative, it is reset
-     * to 0.0. Only updates those heuristics that were just rewarded.
-     * @param creditRepo the credit repository that store the past earned rewards
-     * @param qualEst method to aggregate the past credits to compute the heuristic's reward
-     */
-    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
-        Collection<Variation> heuristicsRewarded = creditRepo.getLastRewardedHeuristic();
-        Iterator<Variation> rewardIter = heuristicsRewarded.iterator();
-        while (rewardIter.hasNext()) {
-            Variation heuristic = rewardIter.next();
-            qualities.put(heuristic, creditRepo.estimateQuality(qualEst, getNumberOfIterations(), heuristic));
-
-            //if current quality becomes negative, adjust to 0
-            if (qualities.get(heuristic) < 0.0) {
-                qualities.put(heuristic, 0.0);
-            }
-        }
-    }
-    
-    /**
      * calculate the sum of all qualities across the heuristics
      * @return the sum of the heuristics' qualities
      */

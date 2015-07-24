@@ -148,11 +148,12 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     }
     
     /**
-     * Clears credit reposit
+     * Resets stored qualities and iteration count
      */
     @Override
     public void reset(){
         resetQualities();
+        iterations = 0;
     }
     
     /**
@@ -178,6 +179,24 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     @Override
     public Collection<Variation> getHeuristics(){
         return heuristics;
+    }
+    
+    /**
+     * Updates the quality of the heuristic based on the aggregation applied the
+     * heuristic's credit history. If the quality becomes negative, it is reset
+     * to 0.0. Only updates those heuristics that were just rewarded.
+     * @param creditRepo the credit repository that store the past earned rewards
+     * @param qualEst method to aggregate the past credits to compute the heuristic's reward
+     */
+    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
+        qualities = creditRepo.estimateQuality(qualEst, getNumberOfIterations());
+        for(Variation heuristic:qualities.keySet()) {
+            //if current quality becomes negative, adjust to 0
+            double qual = qualities.get(heuristic);
+            if (qual < 0.0 || Double.isNaN(qual)) {
+                qualities.put(heuristic, 0.0);
+            }
+        }
     }
     
 

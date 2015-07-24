@@ -90,7 +90,7 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
      * Gets the sum of all credit assigned to the specified heuristic, summed
      * over the history
      *
-     * @param iteration The iteration to take the sum to
+     * @param iteration The iteration to take the sum to from the beginning of the stored history
      * @param heuristic the heuristic to query
      * @return the sum of all credit assigned to the specified heuristic, summed
      * over the history
@@ -99,5 +99,15 @@ public class CreditHistoryRepository extends CreditRepository implements Seriali
     public double estimateQuality(IQualityEstimation qualEst, int iteration, Variation heuristic) {
         return qualEst.estimate(iteration, creditHistory.get(heuristic));
     }
-
+    
+    /**
+     * Method returns the current qualities of all heuristics based on credit history
+     * @param qualEst The method to estimate the quality of a heuristic based on the history of credits
+     * @param iteration the iteration to aggregate up to from beginning of stored history
+     * @return 
+     */
+    @Override
+    public HashMap<Variation,Double> estimateQuality(IQualityEstimation qualEst, int iteration){
+        return qualEst.estimate(iteration, this);
+    }
 }

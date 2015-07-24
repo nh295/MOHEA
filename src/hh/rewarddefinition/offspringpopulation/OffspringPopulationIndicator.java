@@ -56,7 +56,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     @Override
     public double compute(Solution offspring, Iterable<Solution> ndpop) {
         try {
-            if (!ndpop.getClass().isAssignableFrom(NondominatedPopulation.class)) {
+            if (!NondominatedPopulation.class.isAssignableFrom(ndpop.getClass())) {
                 throw new IllegalArgumentException("Invalid solution collection: " + ndpop.getClass() + ". Needs to by NondominatedPopulation.");
             }
             NondominatedPopulation beforeOffspring = ((NondominatedPopulation) ndpop).clone(); 

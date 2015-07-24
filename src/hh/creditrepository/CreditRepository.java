@@ -57,6 +57,21 @@ public class CreditRepository implements ICreditRepository,Serializable{
         rh.add(creditRepository.get(heuristic));
         return qualEst.estimate(iteration,rh);
     }
+    
+    /**
+     * Method returns the current qualities of all heuristics based on credit history
+     * @param qualEst The method to estimate the quality of a heuristic based on the history of credits
+     * @param iteration the iteration to aggregate up to from beginning of stored history
+     * @return 
+     */
+    @Override
+    public HashMap<Variation,Double> estimateQuality(IQualityEstimation qualEst, int iteration){
+        HashMap<Variation,Double> out = new HashMap<>();
+        for(Variation heuristic : getHeuristics()){
+            out.put(heuristic, estimateQuality(qualEst,iteration,heuristic));
+        }
+        return out;
+    }
 
     /**
      * Replaces the reward assigned to the specified heuristic with the given credit

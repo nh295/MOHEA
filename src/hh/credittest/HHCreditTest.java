@@ -5,12 +5,13 @@
  */
 package hh.credittest;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.qualityestimation.MeanRewards;
 import hh.credithistory.RewardHistoryWindow;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
+import hh.qualityestimation.IQualityEstimation;
+import hh.qualityestimation.MeanRewards;
+import hh.qualityestimation.RankRewards;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -70,10 +71,10 @@ public class HHCreditTest {
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"PM"};
             //setup credit definitions
-            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
-                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
-                "CPF", "CEA"};
-//            String[] creditDefs = new String[]{"OPIAE"};
+//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
+//                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
+//                "CPF", "CEA"};
+            String[] creditDefs = new String[]{"OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with

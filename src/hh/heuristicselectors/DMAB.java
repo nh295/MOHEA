@@ -10,8 +10,6 @@ import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
 import hh.creditrepository.CreditHistoryRepository;
 import hh.creditrepository.ICreditRepository;
-import hh.nextheuristic.AbstractHeuristicSelector;
-import hh.selectionhistory.HeuristicSelectionHistory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,18 +24,7 @@ import org.moeaframework.core.Variation;
  *
  * @author nozomihitomi
  */
-public class DMAB extends AbstractHeuristicSelector {
-
-    /**
-     * Coefficient to control exploration vs exploitation of low-level
-     * heuristics
-     */
-    private final double beta;
-
-    /**
-     * History to keep count of how many times a heuristic has been played
-     */
-    private HeuristicSelectionHistory heuristicSelectionHistory;
+public class DMAB extends MAB {
 
     private HashMap<Variation, Arm> arms;
 
@@ -54,7 +41,7 @@ public class DMAB extends AbstractHeuristicSelector {
     /**
      * Sums/averages the credits stored in a credit history
      */
-    private QualityEstimator crediAggregator;
+    private final QualityEstimator crediAggregator;
 
     /**
      * Constructor requires a credit repository type: only ICreditRepository
@@ -67,58 +54,23 @@ public class DMAB extends AbstractHeuristicSelector {
      * @param lambda Threshold parameter for PH test
      */
     public DMAB(Collection<Variation> heuristics, double beta, double delta, double lambda) {
-        super(heuristics);
-        this.beta = beta;
+        super(heuristics, beta);
         this.crediAggregator = new QualityEstimator();
 
-        heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
         arms = new HashMap();
         Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {
             arms.put(iter.next(), new Arm(delta, lambda));
         }
     }
-
-    /**
-     * Selects the next heuristic based on DMAB method. If selection count is
-     * zero, a random heuristic is selected with uniform probability
-     *
-     * @return
-     */
-    @Override
-    public Variation nextHeuristic() {
-        Variation vari;
-        if (heuristicSelectionHistory.getTotalSelectionCount() == 0) {
-            vari = getRandomHeuristic(heuristics);
-        } else {
-            vari = argMax(heuristics);
-        }
-        incrementIterations();
-        return vari;
-    }
-
-    /**
-     * This function is Upper Confidence Bound used in multi-armed bandit
-     * policies
-     *
-     * @param heuristic the heuristic to be evaluated
-     * @return the value resulting from the evaluation of the heuristic
-     * @throws NoSuchMethodException
-     */
-    @Override
-    protected double function2maximize(Variation heuristic) throws NoSuchMethodException {
-        int numPlayed = heuristicSelectionHistory.getSelectedTimes(heuristic);
-        int totalPlayCount = heuristicSelectionHistory.getTotalSelectionCount();
-        return arms.get(heuristic).avg + beta * Math.sqrt(Math.log10(numPlayed) / totalPlayCount);
-    }
-
+    
     /**
      * Clears credit repository, selection history, and information stored in
      * each arm on credit deviations
      */
     @Override
     public final void reset() {
-        heuristicSelectionHistory.clear();
+        super.reset();
         Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {
             arms.get(iter.next()).reset();

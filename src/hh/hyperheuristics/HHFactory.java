@@ -6,6 +6,7 @@
 package hh.hyperheuristics;
 
 import hh.heuristicselectors.AdaptivePursuit;
+import hh.heuristicselectors.MAB;
 import hh.heuristicselectors.ProbabilityMatching;
 import hh.heuristicselectors.RandomSelect;
 import hh.nextheuristic.AbstractHeuristicGenerator;
@@ -61,7 +62,9 @@ public class HHFactory {
                 heuristicSelector = new AdaptivePursuit(heuristics, pmin, beta);
                 }
                 break;
-            case "DMAB": //Dynamic Armed Bandit
+            case "MAB": //Multi-Armed Bandit
+                double c = properties.getDouble("c", 5.0);
+                heuristicSelector = new MAB(heuristics, c);
                 break;
             default: throw new IllegalArgumentException("Invalid heuristic selector specified:" + name);
         }
