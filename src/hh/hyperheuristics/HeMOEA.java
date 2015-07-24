@@ -106,7 +106,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     /**
      * Iteration count
      */
-    private int iteration = 0;
+    private int iteration;
 
     /**
      * Name to id the hyper-heuristic
@@ -161,6 +161,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         this.creditHistory = new CreditHistoryRepository(heuristics, new RewardHistory());
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
+        this.iteration = 0;
 
         //Initialize the stored pareto front
         super.initialize();
@@ -389,6 +390,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      */
     @Override
     public void reset() {
+        iteration = 0;
         heuristicSelectionHistory.clear();
         heuristicSelector.reset();
         numberOfEvaluations = 0;

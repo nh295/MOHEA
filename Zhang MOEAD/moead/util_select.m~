@@ -1,0 +1,40 @@
+function selIndex = util_select()
+%UTILSELECT select the subproblems according to the subproblems' utility
+%
+% the 10-tournament selection is used here.
+%
+
+    global subproblems params objDim rnduni;
+    
+    selected =1:objDim; % set the initial selection of the first m weight, the edging subproboelm.
+    candidate = 1:length(subproblems);
+    
+    selSize = ceil(params.popsize/params.selportion);
+    
+    % should allow change from params.
+    toursize = 10;
+    
+    while(length(selected)<selSize)
+        remainingNumber = length(candidate);
+        bestindex = crandom;
+        
+        for i=1:toursize
+            index = randi(remainingNumber);
+            if (subproblems(remainingIndex(index)).utility > ...
+                    subproblems(remainingIndex(bestindex)).utility)
+                bestindex = index;
+            end
+        end
+        
+        %remove the bestindex from remainingNumbe
+        remainingIndex = setdiff(remainingIndex,bestindex);
+        selIndex = union(selIndex, bestindex);
+    end
+    
+    %add the edging index.
+    for i=1:length(subproblems)
+        if find(subproblems(i).weight==0)
+            selIndex = union(selIndex, i);
+        end
+    end
+end

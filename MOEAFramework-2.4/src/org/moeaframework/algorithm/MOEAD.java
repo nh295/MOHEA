@@ -55,7 +55,7 @@ public class MOEAD extends AbstractAlgorithm {
 	/**
 	 * Represents an individual (population slot) in the MOEA/D algorithm.
 	 */
-	private static class Individual implements Serializable {
+	protected static class Individual implements Serializable {
 
 		private static final long serialVersionUID = 868794189268472009L;
 
@@ -220,7 +220,7 @@ public class MOEAD extends AbstractAlgorithm {
 	/**
 	 * The current population.
 	 */
-	private List<Individual> population;
+	protected List<Individual> population;
 
 	/**
 	 * The ideal point; each index stores the best observed value for each
@@ -252,19 +252,19 @@ public class MOEAD extends AbstractAlgorithm {
 	/**
 	 * The variation operator.
 	 */
-	private final Variation variation;
+	private Variation variation;
 
 	/**
 	 * The frequency, in generations, in which utility values are updated.  Set
 	 * to {@code -1} to disable utility-based search.
 	 */
-	private final int updateUtility;
+	protected final int updateUtility;
 
 	/**
 	 * The current generation number.
 	 */
-	private int generation;
-
+	protected int generation;
+        
 	/**
 	 * Constructs the MOEA/D algorithm with the specified components.  This
 	 * version of MOEA/D uses utility-based search as described in [2].
@@ -462,7 +462,7 @@ public class MOEAD extends AbstractAlgorithm {
 	 * 
 	 * @param solution the solution
 	 */
-	private void updateIdealPoint(Solution solution) {
+	protected void updateIdealPoint(Solution solution) {
 		for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
 			idealPoint[i] = Math.min(idealPoint[i], solution.getObjective(i));
 		}
@@ -490,7 +490,7 @@ public class MOEAD extends AbstractAlgorithm {
 	 * @return the population indices to be operated on in the current
 	 *         generation
 	 */
-	private List<Integer> getSubproblemsToSearch() {
+	protected List<Integer> getSubproblemsToSearch() {
 		List<Integer> indices = new ArrayList<Integer>();
 		
 		if (updateUtility < 0) {
@@ -533,7 +533,7 @@ public class MOEAD extends AbstractAlgorithm {
 	 * @param index the index of the first parent
 	 * @return the population indices to be considered during mating
 	 */
-	private List<Integer> getMatingIndices(int index) {
+	protected List<Integer> getMatingIndices(int index) {
 		List<Integer> matingIndices = new ArrayList<Integer>();
 
 		if (PRNG.nextDouble() <= delta) {
@@ -558,7 +558,7 @@ public class MOEAD extends AbstractAlgorithm {
 	 * @return the fitness of the specified solution using the Chebyshev
 	 *         weights
 	 */
-	private double fitness(Solution solution, double[] weights) {
+	protected double fitness(Solution solution, double[] weights) {
 		double max = Double.NEGATIVE_INFINITY;
 
 		for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
@@ -581,12 +581,14 @@ public class MOEAD extends AbstractAlgorithm {
 	 * @param solution the solution
 	 * @param matingIndices the population indices that are available for
 	 *        updating
+     * @return Nozomi added for hyper-heuristic. Returns the indices that were replaced by offspring solution
 	 */
-	private void updateSolution(Solution solution,
+	protected List<Integer> updateSolution(Solution solution,
 			List<Integer> matingIndices) {
 		int c = 0;
 		PRNG.shuffle(matingIndices);
 		
+                List<Integer> out = new ArrayList();
 		for (int i = 0; i < matingIndices.size(); i++) {
 			Individual individual = population.get(matingIndices.get(i));
 
@@ -594,18 +596,20 @@ public class MOEAD extends AbstractAlgorithm {
 					individual.getSolution(), individual.getWeights())) {
 				individual.setSolution(solution);
 				c = c + 1;
+                                out.add(matingIndices.get(i));
 			}
 			
 			if (c >= eta) {
 				break;
 			}
 		}
+                return out;
 	}
 
 	/**
 	 * Updates the utility of each individual.
 	 */
-	private void updateUtility() {
+	protected void updateUtility() {
 		for (Individual individual : population) {
 			double oldFitness = individual.getFitness();
 			double newFitness = fitness(individual.getSolution(), idealPoint);
@@ -622,7 +626,7 @@ public class MOEAD extends AbstractAlgorithm {
 			individual.setFitness(newFitness);
 		}
 	}
-
+        
 	@Override
 	public void iterate() {
 		List<Integer> indices = getSubproblemsToSearch();

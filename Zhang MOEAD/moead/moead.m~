@@ -1,0 +1,158 @@
+function pareto = moead( mop, varargin)
+%MOEAD run moea/d algorithms for the given mop.
+% MOP could be obtained by function 'testmop.m'.
+% the controlling parameter can be passed in by varargin, the folliwing
+% parameters are defined in here. More other parameters can be passed by
+% modify loadparams.m problem by problem.
+%   seed: the random seed.
+%   popsize: The subproblem's size.
+%   niche: the neighboursize, must less then the popsize.
+%   evaluation: the total evaluation of the moead algorithms before finish.
+%   dynamic: whether to use dynamic resource allocation.
+%   selportion: the selection portion for the dynamic resource allocation
+
+    %global variable definition.
+    global subproblems params itrCounter evalCounter rnduni;
+    %global idealpoint objDim parDim evalCounter;
+    
+    %load the parameters.
+    params=loadparams(mop, varargin);
+    
+    %set the random generator.
+    %rs = RandStream.create('mt19937ar', 'Seed', params.seed);
+    %RandStream.setDefaultStream(rs);
+    seed = rem((params.seed+23),1377);
+    rnduni = -seed;
+    
+    %the counters.
+    evalCounter = 0;
+    itrCounter = 5;
+    
+    %and Initialize the algorithm.
+    init(mop);
+    
+    while ~terminate()
+        evolve(mop); % one generation of evaluation.
+        itrCounter=itrCounter+1;
+        
+        if (rem(itrCounter,50)==0) % updating of the utility.
+            util_update(); 
+            status();
+        end        
+    end
+    
+    %display the result.subproblems(i).optimal=newobj(i);
+    pareto=[subproblems.curpoint];
+    pp=[pareto.objective];
+    scatter(pp(1,:), pp(2,:));
+    %disp(sprintf('total time used %u', etime(clock, starttime)));
+end
+
+% The evoluation setp in MOEA/D
+function evolve(mop)
+  global subproblems idealpoint params rnduni evalCounter;
+
+  % select the subproblem according to its utility.
+  % if params.dynamic is not true, then no selection is used.
+  if (params.dynamic)
+    selindex = util_select();
+  else
+    selindex = 1:length(subproblems);  
+  end
+  
+  disp(selindex(1:5));
+
+  global selectionSize;
+  selectionSize = length(selindex);
+  
+  for i=1:length(selindex)
+    index = selindex(i);
+    
+    [r, rnduni]=crandom(rnduni);
+    updateneighbour = r < params.updateprob;
+    %new point generation using genetic operations, and evaluate it.
+    ind = genetic_op(index, updateneighbour, mop.domain);
+    
+    [obj,ind] = evaluate(mop, ind);
+    %update the idealpoint.
+    idealpoint = min(idealpoint, obj);
+    disp(obj);
+    
+    %updation.
+    update(index, ind, updateneighbour);
+
+    %clear!
+    clear ind obj updateneighbour;
+  end
+end
+
+% update the index's neighbour with the given individual.
+% index is the subproblem's index in the main population.
+% ind is the individual structure.
+% updatenieghbour is a bool determine whether the neighbourhood of index, or the whole population should be updated.
+% this procedure is also governed by a parameter from params: params.updatenb, which determine how many subproblem
+% should be updated at most by this new individual.
+function update(index, ind, updateneighbour)
+  global subproblems idealpoint params;
+  
+  % collect the updation index
+  if (updateneighbour)
+    updateindex = subproblems(index).neighbour;
+  else
+    updateindex = 1:length(subproblems);
+  end
+  
+  updateindex = random_shuffle(updateindex);
+  time=0;
+  
+  for i=1:length(updateindex)
+      idx = updateindex(i);
+      updateweight = subproblems(idx).weight;
+      
+      newobj=subobjective(updateweight, ind.objective,  idealpoint, 'te');
+      old=subobjective(updateweight, subproblems(idx).curpoint.objective,  idealpoint, 'te');
+      
+      if (newobj<old)
+         subproblems(idx).curpoint=ind;
+         time = time+1; 
+      end
+      if (time>=params.updatenb)
+          return;
+      end
+  end
+  
+  % do the comparision.
+%   updateweight = [subproblems(updateindex).weight];
+%   oops = [subproblems(updateindex).curpoint];
+%   newobj=subobjective(updateweight, ind.objective,  idealpoint, 'te');
+%   oldobj=subobjective(updateweight, [oops.objective], idealpoint, 'te' );
+%   C = newobj < oldobj;
+%   
+%   % find the one need to be updated in betterIndex.
+%   betterIndex = find(C);
+%   updateNumber = params.updatenb;
+%   if (length(betterIndex)>updateNumber)
+%       randp = randperm(length(betterIndex));
+%       randp = randp(1:updateNumber);
+%       betterIndex = betterIndex(randp);
+%   end
+%   
+%   % do the updation.
+%   [subproblems(updateindex(betterIndex)).curpoint]= deal(ind);
+%   clear C newobj oops oldobj;
+end
+
+function y =terminate()
+    global params evalCounter;
+    y = evalCounter>params.evaluation;
+end
+
+function status()
+    global evalCounter itrCounter selectionSize subproblems;
+    %average utility
+    averageutil = mean([subproblems.utility]);
+    %if (~rem(itrCounter, 30))
+    disp(sprintf('Itr:%d\tSel:%d\tEval:%d\tUtilM:%1.4f', ...
+        itrCounter, selectionSize, evalCounter, averageutil));
+    %end
+end
