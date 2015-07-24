@@ -46,8 +46,8 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF1", "UF2", "UF3" ,"UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF1", "UF2", "UF3" ,"UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
@@ -56,24 +56,24 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
             }
             String probName = problem;
             System.out.println(probName);
             int numberOfSeeds = 30;
-            int maxEvaluations = 1000;
+            int maxEvaluations = 300000;
             int windowSize = 300;
             //Setup heuristic selectors
-//            String[] selectors = new String[]{"PM", "AP"};
-            String[] selectors = new String[]{"PM"};
+            String[] selectors = new String[]{"PM", "AP"};
+//            String[] selectors = new String[]{"PM"};
             //setup credit definitions
-//            String[] creditDefs = new String[]{"ODP",//,"OPIAE","OPIR2","OPIR3",
-//                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
-//                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPIAE"};
+            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
+                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
+                "CPF", "CEA"};
+//            String[] creditDefs = new String[]{"OPIAE"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with

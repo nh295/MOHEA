@@ -1,0 +1,6 @@
+AdditiveEpsilonIndicator,0.2648657932451323
+GenerationalDistance,0.017994275735429943
+Hypervolume,2.400329675720634
+InvertedGenerationalDistance,0.0046308346960978
+NFE,300000
+Elapsed Time,2469.598663267

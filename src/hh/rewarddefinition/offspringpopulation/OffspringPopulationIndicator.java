@@ -39,7 +39,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     public OffspringPopulationIndicator(IBinaryIndicator indicator,RewardDefinedOn operatesOn, Solution refPt) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
-        if(this.operatesOn.equals(RewardDefinedOn.ARCHIVE)||this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
+        if(!this.operatesOn.equals(RewardDefinedOn.ARCHIVE)&&!this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
         this.refPt = refPt;
     }
