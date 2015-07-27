@@ -133,13 +133,13 @@ public class IBEABinaryIndicator extends AbstractOffspringParent {
         } else {
             //updates the bounds based on just the new solution
             updateBounds(offspring);
-//            if (removedSolution != -1) { //if this condition is met then the offspring replaced a solution in the population
-//                maxIndicatorVal = updateMaxVal(removedSolution, pop, offspring);
-//            }
-            // only look for max if one of the solutions in the previous pair is no longer in the population
-            if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
-                maxIndicatorVal = maxIndicatorVal(clonePop);
+            if (removedSolution != -1) { //if this condition is met then the offspring replaced a solution in the population
+                maxIndicatorVal = updateMaxVal(removedSolution, pop, offspring);
             }
+            // only look for max if one of the solutions in the previous pair is no longer in the population
+//            if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
+//                maxIndicatorVal = maxIndicatorVal(clonePop);
+//            }
         }
         if (removedSolution != -1) //if this condition is met then the offspring replaced a solution in the population
         {

@@ -112,6 +112,44 @@ public class TestRun implements Callable {
     }
     
     /**
+     * Returns a new Hyper eMOEA instance.
+     *
+     * @param properties the properties for customizing the new {@code eMOEA}
+     * instance
+     * @param problem the problem
+     * @return a new {@code eMOEA} instance
+     */
+    private IHyperHeuristic newMOEADHH() {
+        
+        int populationSize = (int) properties.getDouble("populationSize", 600);
+        double crediMemory = properties.getDouble("creditMemory", 1.0);
+
+        System.out.println("alpha:" + crediMemory);
+
+        Initialization initialization = new RandomInitialization(problem,
+                populationSize);
+
+        Population population = new Population();
+
+        DominanceComparator comparator = new ParetoDominanceComparator();
+
+        EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(epsilonDouble);
+                
+        final TournamentSelection selection = new TournamentSelection(
+                2, comparator);
+        
+        //Use default values for selectors
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
+        rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
+                
+        HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
+            initialization, selector, rewardDef, creditRepo,
+            creditAgg, crediMemory);
+
+        return hemoea;
+    }
+    
+    /**
      * Goes through one run of the algorithm. Returns the algorithm object. Can get the population from the algorithm object
      * @return the algorithm object. Can get the population from the algorithm object
      * @throws Exception 
@@ -120,14 +158,14 @@ public class TestRun implements Callable {
     public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh = newHeMOEA();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
                 .withEpsilon(epsilonDouble)
-                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);

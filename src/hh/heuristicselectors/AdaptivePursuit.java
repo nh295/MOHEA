@@ -52,7 +52,7 @@ public class AdaptivePursuit extends ProbabilityMatching {
         }
 
         //Initialize the probabilities such that a random heuristic gets the pmax
-        int heurisitic_lead = random.nextInt(probabilities.size());
+        int heurisitic_lead = pprng.nextInt(probabilities.size());
         Iterator<Variation> iter = probabilities.keySet().iterator();
         int count = 0;
         while (iter.hasNext()) {

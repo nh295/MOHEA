@@ -6,7 +6,7 @@ function [AEI,GD,HV,IGD] = getMOEAIndicators(filename)
 %HV is the hypervolume
 %IGD is the inverted generational distance
 
-data = csvread(filename,0,1);
+data = csvread(filename,0,2);
 
 %sometimes there are 0.0 values added to end, so get rid of them
 data = data(:,sum(data,1)>0);

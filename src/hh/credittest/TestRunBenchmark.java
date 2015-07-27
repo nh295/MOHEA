@@ -55,22 +55,20 @@ public class TestRunBenchmark extends TestRun{
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
-        Instrumenter instrumenter = new Instrumenter().withFrequency(10000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
                 .withEpsilon(epsilonDouble)
-                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(alg);
 
         // run the executor using the listener to collect results
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss");
-        String stamp = dateFormat.format(new Date());
-        System.out.println("Starting "+ algorithm +" on " + problem.getName() + "_" + stamp);
+        System.out.println("Starting "+ algorithm +" on " + problem.getName());
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
@@ -81,9 +79,10 @@ public class TestRunBenchmark extends TestRun{
         System.out.println("Done with optimization");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
+        String name = String.valueOf(System.nanoTime());
         
         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + algorithm + "_" + stamp;
+                + algorithm + "_" + name;
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
@@ -108,7 +107,7 @@ public class TestRunBenchmark extends TestRun{
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-//        NondominatedPopulation ndPop = instAlgorithm.getResult();
+        NondominatedPopulation ndPop = instAlgorithm.getResult();
 //        try {
 //            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
 //        } catch (IOException ex) {
