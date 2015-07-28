@@ -53,8 +53,8 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
@@ -75,7 +75,7 @@ public class HHCreditTest {
             int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"Random", "PM", "AP"};
-            String[] selectors = new String[]{"Random","MAB"};
+            String[] selectors = new String[]{"MAB"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
@@ -150,14 +150,14 @@ public class HHCreditTest {
 //                                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
 //                            }
 //                            save selection history
-                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+                            IOSelectionHistory.saveHistory(hh.getSelectionHistory(),
                                     name + ".hist");
                             //save credit history
-//                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
+//                          IOCreditHistory.saveHistory(hh.getCreditHistory(),
 //                          path + File.separator + "results" + File.separator + problem.getName() + "_"
 //                          + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".credit");
                             //save quality history
-//                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
+//                            IOQualityHistory.saveHistory(hh.getQualityHistory(),
 //                                    name + ".qual");
                             hh.reset();
                             hh = null;

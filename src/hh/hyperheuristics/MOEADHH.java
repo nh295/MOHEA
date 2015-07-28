@@ -190,11 +190,9 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             for (Solution child : offspring) {
                 evaluate(child);
                 updateIdealPoint(child);
-                List<Integer> replacedParents = updateSolution(child, matingIndices);
-                double childFit = fitness(child,population.get(index).getWeights());
-                for(Integer i:replacedParents){
-                    double parentFit = fitness(population.get(i).getSolution(),population.get(i).getWeights());
-                    reward+= (parentFit-childFit)/parentFit;
+                List<Double> improvements = updateSolution(child, matingIndices);
+                for(Double improv:improvements){
+                    reward+= improv;
                 }
             }
             creditRepo.update(heuristic, new Reward(iteration, reward));

@@ -70,7 +70,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
         Iterator<Variation> iter = heuristics.iterator();
         ArrayList<Variation> ties = new ArrayList();
         Variation leadHeuristic = null;
-        double maxVal = -1000000000;
+        double maxVal = Double.NEGATIVE_INFINITY;
         try{
         while(iter.hasNext()){
             Variation heuristic_i = iter.next();

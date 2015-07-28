@@ -8,11 +8,9 @@ package hh.heuristicselectors;
 import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
 import hh.qualityestimation.IQualityEstimation;
-import hh.selectionhistory.HeuristicSelectionHistory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import javafx.scene.ParallelCamera;
 import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Variation;
 
