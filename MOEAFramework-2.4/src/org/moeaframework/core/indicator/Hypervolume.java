@@ -258,12 +258,7 @@ public class Hypervolume extends NormalizedIndicator {
 
 	@Override
 	public double evaluate(NondominatedPopulation approximationSet) {
-            //For Hyperheuristic journal paper using reference point at 2.0 for all objectives
-            double multiplier = 1;
-            for(int i=0;i<problem.getNumberOfObjectives();i++){
-                multiplier*=2.0;
-            }
-		return multiplier*evaluate(problem, normalize(approximationSet));
+		return evaluate(problem, normalize(approximationSet));
 	}
 
 	/**

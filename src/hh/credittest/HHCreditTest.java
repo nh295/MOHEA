@@ -5,6 +5,7 @@
  */
 package hh.credittest;
 
+import hh.IO.IOSelectionHistory;
 import hh.credithistory.RewardHistoryWindow;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
@@ -12,6 +13,8 @@ import hh.hyperheuristics.IHyperHeuristic;
 import hh.qualityestimation.IQualityEstimation;
 import hh.qualityestimation.MeanRewards;
 import hh.qualityestimation.RankRewards;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -21,11 +24,14 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
+import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
+import org.moeaframework.util.statistics.RankedObservation;
 
 /**
  *
@@ -47,11 +53,11 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"UF1", "UF2", "UF3" ,"UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-//        String[] problems = new String[]{"UF1"};
+//        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 //        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
@@ -65,16 +71,16 @@ public class HHCreditTest {
             String probName = problem;
             System.out.println(probName);
             int numberOfSeeds = 30;
-            int maxEvaluations = 300000;
+            int maxEvaluations = 300030;
             int windowSize = 300;
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM", "AP"};
-//            String[] selectors = new String[]{"PM"};
+//            String[] selectors = new String[]{"Random", "PM", "AP"};
+            String[] selectors = new String[]{"Random","MAB"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3"};
+            String[] creditDefs = new String[]{"CEA"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -89,7 +95,7 @@ public class HHCreditTest {
                         for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
                             epsilonDouble[i] = EpsilonHelper.getEpsilon(prob);
                         }
-                        
+
                         //Setup algorithm parameters
                         Properties prop = new Properties();
                         prop.put("populationSize", "600");
@@ -101,15 +107,20 @@ public class HHCreditTest {
                         ArrayList<Variation> heuristics = new ArrayList<>();
                         OperatorFactory of = OperatorFactory.getInstance();
                         Properties heuristicProp = new Properties();
-                        heuristics.add(of.getVariation("um", heuristicProp, prob));
-                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
-                        IQualityEstimation creditAgg = new MeanRewards();
+                        IQualityEstimation creditAgg = new RankRewards(1.0);
+//                        IQualityEstimation creditAgg = new MeanRewards();
 
                         ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new RewardHistoryWindow(windowSize), windowSize);
 
@@ -128,28 +139,28 @@ public class HHCreditTest {
                         try {
                             IHyperHeuristic hh = run.get();
                             
+                            String name = path + File.separator + "results" + File.separator + probName + "_"
+                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+
                             //save the approximation set
-//                            NondominatedPopulation ndPop = instAlgorithm.getResult();
+//                            NondominatedPopulation ndPop = hh.getResult();
 //                            try {
-//                                PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+//                                PopulationIO.writeObjectives(new File(name + ".NDpop"), ndPop);
 //                            } catch (IOException ex) {
 //                                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
 //                            }
-                            //save selection history
-//                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
-//                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".hist");
-
+//                            save selection history
+                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+                                    name + ".hist");
                             //save credit history
 //                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
 //                          path + File.separator + "results" + File.separator + problem.getName() + "_"
 //                          + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".credit");
                             //save quality history
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
-//                                    path + File.separator + "results" + File.separator + prob.getName() + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".qual");
+//                                    name + ".qual");
                             hh.reset();
-                            hh=null;
+                            hh = null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }

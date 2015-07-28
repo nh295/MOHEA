@@ -38,6 +38,9 @@ import org.moeaframework.core.operator.program.SubtreeCrossover;
 import org.moeaframework.core.operator.program.PointMutation;
 import org.moeaframework.core.operator.real.AdaptiveMetropolis;
 import org.moeaframework.core.operator.real.DifferentialEvolution;
+import org.moeaframework.core.operator.real.DifferentialEvolution2;
+import org.moeaframework.core.operator.real.DifferentialEvolution3;
+import org.moeaframework.core.operator.real.DifferentialEvolution4;
 import org.moeaframework.core.operator.real.PCX;
 import org.moeaframework.core.operator.real.PM;
 import org.moeaframework.core.operator.real.SBX;
@@ -367,6 +370,20 @@ public class OperatorFactory {
 				return new DifferentialEvolution(
 						properties.getDouble("de.crossoverRate", 0.1), 
 						properties.getDouble("de.stepSize", 0.5));
+                        }else if (name.equalsIgnoreCase("de2")) {	
+				return new DifferentialEvolution2(
+						properties.getDouble("de2.crossoverRate", 0.1), 
+						properties.getDouble("de2.stepSize", 0.5));
+                        }else if (name.equalsIgnoreCase("de3")) {	
+				return new DifferentialEvolution3(
+						properties.getDouble("de3.crossoverRate", 0.1), 
+						properties.getDouble("de3.stepSize", 0.5),
+                                                properties.getDouble("de3.stepSize2", 0.5));
+                        }else if (name.equalsIgnoreCase("de4")) {	
+				return new DifferentialEvolution4(
+						properties.getDouble("de4.crossoverRate", 0.1), 
+						properties.getDouble("de4.stepSize", 0.5),
+                                                properties.getDouble("de3.stepSize2", 0.5));
 			} else if (name.equalsIgnoreCase("pcx")) {
 				return new PCX(
 						(int)properties.getDouble("pcx.parents", 10),

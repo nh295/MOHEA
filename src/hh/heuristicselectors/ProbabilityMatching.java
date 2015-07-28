@@ -55,7 +55,7 @@ public class ProbabilityMatching extends AbstractHeuristicSelector {
      */
     @Override
     public Variation nextHeuristic() {
-        double p = random.nextDouble();
+        double p = pprng.nextDouble();
         Iterator<Variation> iter = probabilities.keySet().iterator();
         double sum = 0.0;
         Variation heuristic = null;

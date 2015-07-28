@@ -12,10 +12,11 @@ origin = cd(path);
 files = dir('*.res');
 cd(origin)
 nfiles = length(files);
-AEI  = zeros(nfiles,1);
-GD  = zeros(nfiles,1);
-HV  = zeros(nfiles,1);
-IGD  = zeros(nfiles,1);
+npts = 9;
+AEI  = zeros(nfiles,npts);
+GD  = zeros(nfiles,npts);
+HV  = zeros(nfiles,npts);
+IGD  = zeros(nfiles,npts);
 yesFile = false(nfiles,1);
 for i=1:nfiles
     a = strfind(files(i).name,selector);
@@ -28,10 +29,10 @@ for i=1:nfiles
             disp(files(i).name)
             continue
         end
-        AEI(i) = tAEI;
-        GD(i) = tGD;
-        HV(i) = tHV;
-        IGD(i) = tIGD;
+        AEI(i,:) = tAEI;
+        GD(i,:) = tGD;
+        HV(i,:) = tHV;
+        IGD(i,:) = tIGD;
         yesFile(i) = true;
     end
 end

@@ -12,6 +12,7 @@ import hh.creditrepository.ICreditRepository;
 import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
+import hh.hyperheuristics.MOEADHH;
 import hh.nextheuristic.INextHeuristic;
 import java.io.File;
 import java.io.FileWriter;
@@ -112,22 +113,61 @@ public class TestRun implements Callable {
     }
     
     /**
+     * Returns a new Hyper eMOEA instance.
+     *
+     * @param properties the properties for customizing the new {@code eMOEA}
+     * instance
+     * @param problem the problem
+     * @return a new {@code eMOEA} instance
+     */
+    private IHyperHeuristic newMOEADHH() {
+        
+        int populationSize = (int) properties.getDouble("populationSize", 600);
+        double crediMemory = properties.getDouble("creditMemory", 1.0);
+
+        System.out.println("alpha:" + crediMemory);
+
+        Initialization initialization = new RandomInitialization(problem,
+                populationSize);
+        
+        double cr = properties.getDouble("crossoverRate", 1.0);
+       
+        int neighborhoodSize = properties.getInt("neighborhood", 20);
+        
+        double delta = properties.getDouble("delta", 0.9);
+        
+        double eta = properties.getDouble("eta", 1.0);
+        
+        int updateUtility = properties.getInt("update", 50);
+        
+        //Use default values for selectors
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
+        rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
+                
+        MOEADHH hemoea = new MOEADHH(problem, neighborhoodSize, initialization, 
+            delta, eta, updateUtility, selector, rewardDef, creditRepo,
+            creditAgg, crediMemory,cr);
+
+        return hemoea;
+    }
+    
+    /**
      * Goes through one run of the algorithm. Returns the algorithm object. Can get the population from the algorithm object
      * @return the algorithm object. Can get the population from the algorithm object
      * @throws Exception 
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-        IHyperHeuristic hh = newHeMOEA();
+        IHyperHeuristic hh = newMOEADHH();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
                 .withEpsilon(epsilonDouble)
-                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);

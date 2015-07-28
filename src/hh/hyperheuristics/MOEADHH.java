@@ -116,12 +116,11 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     private final double cr;
 
     public MOEADHH(Problem problem, int neighborhoodSize,
-            Initialization initialization, Variation variation,
-            double delta, double eta, int updateUtility,
+            Initialization initialization, double delta, double eta, int updateUtility,
             INextHeuristic heuristicSelector, IRewardDefinition creditDef,
             ICreditRepository creditRepo, IQualityEstimation creditAgg,
             double alpha, double crossoverRate) {
-        super(problem, neighborhoodSize, initialization, variation, delta, eta, updateUtility);
+        super(problem, neighborhoodSize, initialization, heuristicSelector.getHeuristics().iterator().next(), delta, eta, updateUtility);
         checkHeuristics(heuristicSelector, creditRepo);
         this.heuristics = heuristicSelector.getHeuristics();
         this.heuristicSelector = heuristicSelector;
@@ -200,6 +199,9 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             }
             creditRepo.update(heuristic, new Reward(iteration, reward));
             heuristicSelector.update(creditRepo, creditAgg);
+            heuristicSelectionHistory.add(heuristic);
+            updateCreditHistory();
+            updateQualityHistory();
         }
 
         generation++;
@@ -247,21 +249,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                 throw new RuntimeException("Mismatch in heuristics in INextHeuristic and ICrediRepository:" + heur);
             }
         }
-    }
-
-    /**
-     * reuses the previous population contribution rewards. This method updates
-     * the iteration coutner in the rewards from the previous iteration
-     *
-     * @return the rewards for each heuristic with the up to date iteration
-     * count
-     */
-    private HashMap<Variation, Reward> reusePrevPopContRewards() {
-        for (Variation heur : heuristics) {
-            Reward r = new Reward(iteration, prevPopContRewards.get(heur).getValue());
-            prevPopContRewards.put(heur, r);
-        }
-        return prevPopContRewards;
     }
 
     /**

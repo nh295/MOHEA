@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Variation;
 
 /**
@@ -28,7 +29,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     /**
      * Random number generator for selecting heuristics.
      */
-    protected final Random random = new Random();
+    protected final ParallelPRNG pprng = new ParallelPRNG();
     
     /**
      * The number of times nextHeuristic() is called
@@ -117,18 +118,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      * @return the randomly selected heuristic
      */
     protected Variation getRandomHeuristic(Collection<Variation> heuristics){
-        int randInt = random.nextInt(heuristics.size());
-        Iterator<Variation> iter = heuristics.iterator();
-        int count = 0;
-        Variation randHeuristic = null;
-        while(iter.hasNext()){
-            if(count==randInt)
-                randHeuristic = iter.next();
-            else
-                iter.next();
-            count++;
-        }
-        return randHeuristic;
+        return pprng.nextItem(new ArrayList<>(heuristics));
     }
     
     /**

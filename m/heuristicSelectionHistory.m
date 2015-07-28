@@ -51,7 +51,7 @@ for i=1:numfile
 end
 
 avgSelectionRate = squeeze(mean(selectAvgs,3));
-plot(1:1:100,avgSelectionRate)
+plot(linspace(0,100,mSegments),avgSelectionRate)
 legend(heuristics)
 title('Selection Rate of Each Heuristic')
 xlabel('% of optimization process')
