@@ -562,8 +562,7 @@ public class MOEAD extends AbstractAlgorithm {
 		double max = Double.NEGATIVE_INFINITY;
 
 		for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
-			max = Math.max(max, Math.max(weights[i], 0.0001)
-					* Math.abs(solution.getObjective(i) - idealPoint[i]));
+			max = Math.max(max, weights[i]* Math.abs(solution.getObjective(i) - idealPoint[i]));
 		}
 
 		if (solution.violatesConstraints()) {
@@ -583,20 +582,20 @@ public class MOEAD extends AbstractAlgorithm {
 	 *        updating
      * @return Nozomi added for hyper-heuristic. Returns the indices that were replaced by offspring solution
 	 */
-	protected List<Integer> updateSolution(Solution solution,
+	protected List<Double> updateSolution(Solution solution,
 			List<Integer> matingIndices) {
 		int c = 0;
 		PRNG.shuffle(matingIndices);
 		
-                List<Integer> out = new ArrayList();
+                ArrayList<Double> out = new ArrayList();
 		for (int i = 0; i < matingIndices.size(); i++) {
 			Individual individual = population.get(matingIndices.get(i));
-
-			if (fitness(solution, individual.getWeights()) < fitness(
-					individual.getSolution(), individual.getWeights())) {
+                        double fitness1 = fitness(solution, individual.getWeights());
+                        double fitness2 = fitness(individual.getSolution(), individual.getWeights());
+			if (fitness1<fitness2) {
 				individual.setSolution(solution);
 				c = c + 1;
-                                out.add(matingIndices.get(i));
+                                out.add((fitness2-fitness1)/fitness2);
 			}
 			
 			if (c >= eta) {
