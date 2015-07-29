@@ -136,7 +136,7 @@ public class TestRun implements Callable {
         
         double delta = properties.getDouble("delta", 0.9);
         
-        double eta = properties.getDouble("eta", 1.0);
+        double eta = properties.getDouble("eta", 20.0);
         
         int updateUtility = properties.getInt("update", 50);
         

@@ -31,7 +31,6 @@ import org.moeaframework.core.Variation;
 import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
-import org.moeaframework.util.statistics.RankedObservation;
 
 /**
  *
@@ -54,11 +53,11 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF2"};
 //        String[] problems = new String[]{" "};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(1);
+//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -70,12 +69,12 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 12;
             int maxEvaluations = 300030;
             int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"Random", "PM", "AP"};
-            String[] selectors = new String[]{"Random","MAB"};
+            String[] selectors = new String[]{"MAB"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
@@ -113,6 +112,10 @@ public class HHCreditTest {
 //                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
 //                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
 //                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
                         heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));

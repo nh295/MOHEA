@@ -84,7 +84,7 @@ public class MAB extends AbstractHeuristicSelector {
     @Override
     protected double function2maximize(Variation heuristic) {
         int numPlayed = selectionCounts.get(heuristic);
-        return qualities.get(heuristic) + c * Math.sqrt(2 * getNumberOfIterations() / Math.log(numPlayed));
+        return qualities.get(heuristic) + c * Math.sqrt(2 * Math.log(getNumberOfIterations())/ numPlayed);
     }
 
     @Override
