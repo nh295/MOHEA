@@ -168,19 +168,24 @@ public class PM implements Variation, Serializable {
 		double dx = ub - lb;
 		double delta;
 
-		if (u < 0.5) {
-			double bl = (x - lb) / dx;
-			double b = 2 * u + (1 - 2 * u)
-					* (Math.pow(1 - bl, (distributionIndex + 1)));
-			delta = Math.pow(b, (1.0 / (distributionIndex + 1))) - 1.0;
+//		if (u < 0.5) {
+//			double bl = (x - lb) / dx;
+//			double b = 2 * u + (1 - 2 * u)
+//					* (Math.pow(1 - bl, (distributionIndex + 1)));
+//			delta = Math.pow(b, (1.0 / (distributionIndex + 1))) - 1.0;
+//		} else {
+//			double bu = (ub - x) / dx;
+//			double b = 2 * (1 - u) + 2 * (u - 0.5)
+//					* (Math.pow(1 - bu, (distributionIndex + 1)));
+//			delta = 1.0 - Math.pow(b, (1.0 / (distributionIndex + 1)));
+//		}
+                if (u < 0.5) {
+			delta = Math.pow(2.0*u, (1.0 / (distributionIndex + 1))) - 1.0;
 		} else {
-			double bu = (ub - x) / dx;
-			double b = 2 * (1 - u) + 2 * (u - 0.5)
-					* (Math.pow(1 - bu, (distributionIndex + 1)));
-			delta = 1.0 - Math.pow(b, (1.0 / (distributionIndex + 1)));
+			delta = 1.0 - Math.pow(2.0-2.0*u, (1.0 / (distributionIndex + 1)));
 		}
 
-		x = x + delta * dx;
+		x = x + delta * Math.max(Math.abs(x-lb), Math.abs(x-ub));
 
 		if (x < lb) {
 			x = lb;
