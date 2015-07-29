@@ -237,7 +237,7 @@ public class MOEAD extends AbstractAlgorithm {
 	 * The probability of mating with a solution in the neighborhood rather
 	 * than the entire population.
 	 */
-	private final double delta;
+	public final double delta;
 
 	/**
 	 * The maximum number of population slots a solution can replace.

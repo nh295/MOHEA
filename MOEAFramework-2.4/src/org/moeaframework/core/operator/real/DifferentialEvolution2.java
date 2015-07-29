@@ -48,7 +48,7 @@ import org.moeaframework.core.variable.RealVariable;
  * </ol>
  */
 public class DifferentialEvolution2 implements Variation,Serializable {
-    private static final long serialVersionUID = -6964014318401473260L;
+    private static final long serialVersionUID = 4732477096316054838L;
 
 	/**
 	 * The crossover rate.

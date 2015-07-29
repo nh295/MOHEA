@@ -47,34 +47,34 @@ public class HHCreditTest {
      * List of future tasks to perform
      */
     private static ArrayList<Future<IHyperHeuristic>> futures;
-
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF2"};
+        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF2"};
 //        String[] problems = new String[]{" "};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 12;
+            int numberOfSeeds = 30;
             int maxEvaluations = 300030;
             int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"Random", "PM", "AP"};
-            String[] selectors = new String[]{"MAB"};
+            String[] selectors = new String[]{"Random","MAB"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
@@ -153,8 +153,8 @@ public class HHCreditTest {
 //                                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
 //                            }
 //                            save selection history
-                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
-                                    name + ".hist");
+//                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
+//                                    name + ".hist");
                             //save credit history
 //                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
 //                          path + File.separator + "results" + File.separator + problem.getName() + "_"

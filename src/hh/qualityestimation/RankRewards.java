@@ -59,7 +59,7 @@ public class RankRewards implements IQualityEstimation{
         //Find decay
         ArrayList<Double> sortedSums = new ArrayList(sums.keySet());
         Collections.sort(sortedSums);
-        int rank = 1;
+        int rank = 0;
         double qualSum = 0.0;
         for (Double key : sortedSums) {
             ArrayList<Variation> heuristics = sums.get(key);

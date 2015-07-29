@@ -15,10 +15,13 @@ import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
 import hh.selectionhistory.HeuristicSelectionHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
+import org.jfree.util.ArrayUtilities;
 import org.moeaframework.algorithm.MOEAD;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
@@ -111,6 +114,17 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     private HashMap<Variation, Reward> prevPopContRewards;
     
     /**
+     * Probability that an offspring will mate with neighbors
+     */
+    private double delta;
+    
+     /**
+     * Indices for the population
+     */
+    private final List<Integer> popIndices;
+
+    
+    /**
      * crossover rate
      */
     private final double cr;
@@ -128,6 +142,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         this.creditDef = creditDef;
         this.creditAgg = creditAgg;
         this.alpha = alpha;
+        this.delta = delta;
         this.cr = crossoverRate;
         this.heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
         this.creditHistory = new CreditHistoryRepository(heuristics, new RewardHistory());
@@ -144,6 +159,10 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         for (Variation heur : heuristics) {
             prevPopContRewards.put(heur, new Reward(0, 0.0));
         }
+        
+        popIndices = new ArrayList<Integer>();
+        for(int i=0;i<population.size();i++)
+            popIndices.add(i);
 
     }
 
@@ -181,11 +200,13 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             }
             
             Solution[] offspring;
-            if(pprng.nextDouble()<cr)
+            boolean inNeighborhood = pprng.nextDouble()<delta;
+            if(inNeighborhood)
                 offspring = heuristic.evolve(parents);
-            else
+            else{
                 offspring = new Solution[]{population.get(index).getSolution()};
-
+                matingIndices = popIndices;
+            }
             double reward = 0.0;
             for (Solution child : offspring) {
                 evaluate(child);
