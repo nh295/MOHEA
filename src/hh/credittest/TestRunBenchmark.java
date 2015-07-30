@@ -53,6 +53,7 @@ public class TestRunBenchmark extends TestRun{
     @Override
     public IHyperHeuristic call() {
         StandardAlgorithms sa = new StandardAlgorithms();
+        prop.setDouble("de.crossoverRate", 1.0);
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
@@ -108,11 +109,11 @@ public class TestRunBenchmark extends TestRun{
         }
         
         NondominatedPopulation ndPop = instAlgorithm.getResult();
-//        try {
-//            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
-//        } catch (IOException ex) {
-//            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+        } catch (IOException ex) {
+            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //save selection history
 //        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
