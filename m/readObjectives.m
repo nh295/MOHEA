@@ -4,7 +4,7 @@ function NDPop = readObjectives(filename,numObjectives)
 %solutions in the nondominated population 
 
 fid = fopen(filename);
-maxSolution = 1000;
+maxSolution = 600;
 
 NDPop = zeros(maxSolution,numObjectives);
 count = 1;

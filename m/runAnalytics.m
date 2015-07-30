@@ -22,7 +22,7 @@
 % also finds the % past 90% attainment on hypervolume
 
 problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'UF1_'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5'};
 selectors = {'MAB'};
 % creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
 % selectors = {''};
@@ -43,8 +43,8 @@ for j=1:length(selectors)
 %             res.HV = squeeze(HV(:,end));
 %             res.IGD = squeeze(IGD(:,end));
 %             save(strcat(problemName{k},'_',selectors{j},'_',creditDef{i},'.mat'),'res');
-            
-            subplot(2,length(problemName)/2,k)
+%             
+            subplot(2,ceil(length(problemName)/2),k)
             title(problemName{k});
             hold on
             [data,labels,p,avg1,avg2] = runKWsignificance(path,selectors{j},creditDef{i},'RandomNormMOEADHH',problemName{k});

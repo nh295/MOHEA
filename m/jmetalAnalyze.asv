@@ -1,0 +1,36 @@
+function jmetalAnalyze(path1,path2,problem)
+
+masterPath = 'C:\Users\SEAK2\Nozomi\MOHEA\mRes';
+javaaddpath('\dist\MOHEA.jar');
+import org.moeaframework.*
+
+prob = ProblemFactory.getInstance().getProblem(problem);
+refset = ProblemFactory.getInstance().getReferemceSet(problem);
+HVindicator = Hypervolume(prob,refset);
+IGDIndicator = InvertedGenerationalDistance(prob,refset);
+
+origin = cd(path1);
+files1 = dir('FUN*');
+for i=1:length(files)
+    ndpop1 = loadObjs(files1);
+    
+end
+cd(path2)
+files2 = dir('FUN*');
+ndpop2 = loadObjs(files2);
+cd(origin)
+
+
+
+HVindicator.evaluate(
+
+end
+
+function ndpop = loadObjs(filename)
+objs = dlmread(strcat(path1,filesep,filename));
+[a,~] = size(objs);
+ndpop = NondominatedPopulation;
+for j=1:a
+    ndpop.add(Solution(objs(j,:)));
+end
+end
