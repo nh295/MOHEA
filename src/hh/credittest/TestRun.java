@@ -138,7 +138,7 @@ public class TestRun implements Callable {
         
         double eta = properties.getDouble("eta", 20.0);
         
-        int updateUtility = properties.getInt("update", 50);
+        int updateUtility = properties.getInt("updateUtility", 50);
         
         //Use default values for selectors
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);

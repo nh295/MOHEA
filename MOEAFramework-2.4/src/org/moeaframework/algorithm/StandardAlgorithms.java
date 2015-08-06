@@ -304,13 +304,11 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		
 		if (properties.contains("neighborhoodSize")) {
 			neighborhoodSize = Math.max(20, 
-					(int)(properties.getDouble("neighborhoodSize", 0.1)
-							* populationSize));
+					(int)(properties.getDouble("neighborhoodSize", 0.1)));
 		}
 		
 		if (properties.contains("eta")) {
-			eta = Math.max(2, (int)(properties.getDouble("eta", 0.01) 
-					* populationSize));
+			eta = Math.max(2, (int)(properties.getDouble("eta", 0.01)));
 		}
 
 		MOEAD algorithm = new MOEAD(

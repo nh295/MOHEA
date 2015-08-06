@@ -52,17 +52,23 @@ public class TestRunBenchmark extends TestRun{
     
     @Override
     public IHyperHeuristic call() {
-        StandardAlgorithms sa = new StandardAlgorithms();
+        //MOEAD properties
         prop.setDouble("de.crossoverRate", 1.0);
+        prop.setDouble("updateUtility",50.0);
+        prop.setDouble("neighborhoodSize", 20.0);
+        prop.setDouble("eta", 2.0);
+        prop.setDouble("delta", 0.9);
+        
+        StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeCollector()
-                .withEpsilon(epsilonDouble)
+//                .attachAdditiveEpsilonIndicatorCollector()
+//                .attachGenerationalDistanceCollector()
+//                .attachInvertedGenerationalDistanceCollector()
+//                .attachHypervolumeCollector()
+//                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
@@ -82,8 +88,8 @@ public class TestRunBenchmark extends TestRun{
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
         String name = String.valueOf(System.nanoTime());
         
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + algorithm + "_" + name;
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_";
+//                + algorithm + "_" + name;
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 

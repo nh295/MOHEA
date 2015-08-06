@@ -53,7 +53,7 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF2"};
 //        String[] problems = new String[]{" "};
 
 //        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
@@ -141,11 +141,11 @@ public class HHCreditTest {
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
-                            
-                            String name = path + File.separator + "results" + File.separator + probName + "_"
-                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-
-                            //save the approximation set
+//                            
+//                            String name = path + File.separator + "results" + File.separator + probName + "_";
+////                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//
+//                            //save the approximation set
 //                            NondominatedPopulation ndPop = hh.getResult();
 //                            try {
 //                                PopulationIO.writeObjectives(new File(name + ".NDpop"), ndPop);
@@ -162,8 +162,8 @@ public class HHCreditTest {
                             //save quality history
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
 //                                    name + ".qual");
-                            hh.reset();
-                            hh = null;
+//                            hh.reset();
+//                            hh = null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
