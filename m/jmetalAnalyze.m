@@ -1,12 +1,10 @@
 function [res1,res2]=jmetalAnalyze(path1,path2,problem)
 
-masterPath = 'C:\Users\SEAK2\Nozomi\MOHEA\mRes';
-javaaddpath('\dist\MOHEA.jar');
-import org.moeaframework.*
+javaaddpath(strcat('dist',filesep,'MOHEA.jar'));
 
 probfactory = org.moeaframework.core.spi.ProblemFactory.getInstance();
 prob = probfactory.getProblem(problem);
-refset = probfactory.getReferemceSet(problem);
+refset = probfactory.getReferenceSet(problem);
 HVindicator = org.moeaframework.core.indicator.Hypervolume(prob,refset);
 IGDIndicator = org.moeaframework.core.indicator.InvertedGenerationalDistance(prob,refset);
 
@@ -14,8 +12,8 @@ IGDIndicator = org.moeaframework.core.indicator.InvertedGenerationalDistance(pro
 origin = cd(path1);
 files1 = dir('FUN*');
 res1 = zeros(length(files1),2);
-for i=1:length(files)
-    ndpop = loadObjs(files1);
+for i=1:length(files1)
+    ndpop = loadObjs(path1,files1(i).name);
     res1(i,1)=HVindicator.evaluate(ndpop);
     res1(i,2)=IGDIndicator.evaluate(ndpop);
 end
@@ -23,23 +21,23 @@ end
 cd(path2)
 files2 = dir('FUN*');
 res2 = zeros(length(files2),2);
-for i=1:length(files)
-    ndpop = loadObjs(files1);
+for i=1:length(files2)
+    ndpop = loadObjs(path2,files2(i).name);
     res2(i,1)=HVindicator.evaluate(ndpop);
     res2(i,2)=IGDIndicator.evaluate(ndpop);
 end
 cd(origin)
 
-javarmpath('\dist\MOHEA.jar');
+javarmpath(strcat('dist',filesep,'MOHEA.jar'));
 
 
 end
 
-function ndpop = loadObjs(filename)
-objs = dlmread(strcat(path1,filesep,filename));
+function ndpop = loadObjs(path,filename)
+objs = dlmread(strcat(path,filesep,filename));
 [a,~] = size(objs);
 ndpop = org.moeaframework.core.NondominatedPopulation;
 for j=1:a
-    ndpop.add(Solution(objs(j,:)));
+    ndpop.add(org.moeaframework.core.Solution(objs(j,:)));
 end
 end
