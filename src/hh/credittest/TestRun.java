@@ -138,17 +138,17 @@ public class TestRun implements Callable {
         
         double eta = properties.getDouble("eta", 2.0);
         
-        int updateUtility = properties.getInt("update", 50);
+        int updateUtility = properties.getInt("updateUtility", 50);
         
         //Use default values for selectors
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
-        MOEADHH hemoea = new MOEADHH(problem, neighborhoodSize, initialization, 
+        MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization, 
             delta, eta, updateUtility, selector, rewardDef, creditRepo,
             creditAgg, crediMemory,cr);
 
-        return hemoea;
+        return moeadhh;
     }
     
     /**
@@ -158,15 +158,16 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-        IHyperHeuristic hh = newMOEADHH();
+//        IHyperHeuristic hh = newMOEADHH();
+        IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeCollector()
-                .withEpsilon(epsilonDouble)
+//                .attachAdditiveEpsilonIndicatorCollector()
+//                .attachGenerationalDistanceCollector()
+//                .attachInvertedGenerationalDistanceCollector()
+//                .attachHypervolumeCollector()
+//                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
