@@ -63,10 +63,10 @@ public class InvertedGenerationalDistance extends NormalizedIndicator {
 		double sum = 0.0;
 
 		for (int i = 0; i < referenceSet.size(); i++) {
-			sum += Math.pow(IndicatorUtils.distanceToNearestSolution(problem,
-					referenceSet.get(i), approximationSet), 2.0);
+			sum += IndicatorUtils.distanceToNearestSolution(problem,
+					referenceSet.get(i), approximationSet);
 		}
 
-		return Math.sqrt(sum) / referenceSet.size();
+		return sum / referenceSet.size();
 	}
     }

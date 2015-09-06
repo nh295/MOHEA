@@ -236,7 +236,8 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 
                 int solnRemoved = addToPopulation(child);
                 double creditValue;
-                //credit definitions operating on population and archive does NOT modify the population by adding the child to the population/archive
+                //credit definitions operating on population and archive does 
+                //NOT modify the population by adding the child to the population/archive
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null,solnRemoved);
@@ -255,7 +256,10 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             for (Solution child : children) {
                 evaluate(child);
                 double creditValue;
-                //credit definitions operating on population and archive will modify the population by adding the child to the population/archive
+                //credit definitions operating on population and archive will 
+                //modify the population by adding the child to the population/
+                //archive. For computational efficiency (e.g. don't have to 
+                //compute dominance for reward computation and for population update)
                 switch (creditDef.getOperatesOn()) {
                     case POPULATION:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population);

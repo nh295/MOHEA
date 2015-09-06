@@ -62,8 +62,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
             }
@@ -79,7 +79,7 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2","OPIR3",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIPFR3","OPopIEAAE","OPopIEAR2","OPopIEAR3",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"CEA"};
+            String[] creditDefs = new String[]{"OPopIEAR2"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -106,20 +106,20 @@ public class HHCreditTest {
                         ArrayList<Variation> heuristics = new ArrayList<>();
                         OperatorFactory of = OperatorFactory.getInstance();
                         Properties heuristicProp = new Properties();
-//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
-                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristics.add(of.getVariation("um", heuristicProp, prob));
+                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
                         IQualityEstimation creditAgg = new RankRewards(1.0);
@@ -129,13 +129,13 @@ public class HHCreditTest {
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-//                        TestRun test = new TestRun(path, prob, probName,
-//                                typeProp, creditAgg, credRepo,
-//                                maxEvaluations);
+                        TestRun test = new TestRun(path, prob, probName,
+                                typeProp, creditAgg, credRepo,
+                                maxEvaluations);
 
                         //benchmark built-in MOEA
-                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
-                            typeProp, "MOEAD", maxEvaluations);
+//                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
+//                            typeProp, "MOEAD", maxEvaluations);
                         futures.add(pool.submit(test));
                     }
                     for (Future<IHyperHeuristic> run : futures) {

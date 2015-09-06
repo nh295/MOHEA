@@ -33,6 +33,17 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
      */
     public BinaryHypervolumeIndicator(Problem problem) {
         NondominatedPopulation refPop = new NondominatedPopulation();
+        //Create a refpopulation with solutions that have objectives all 0 except
+        //in one dimension set to 1.0. This is so that when using the 
+        //MOEAFramework HV calculator, the normalization doesn't do anything
+        for(int i=0; i<problem.getNumberOfObjectives(); i++){
+            Solution soln = problem.newSolution();
+            for(int j=0; j<problem.getNumberOfObjectives(); j++){
+                soln.setObjective(j, 0.0);
+            }
+            soln.setObjective(i,1.0);
+            refPop.add(soln);
+        }
         this.HV = new Hypervolume(problem, refPop);
         this.domComparator = new ParetoDominanceComparator();
     }
@@ -74,7 +85,7 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
     private double volume(Solution soln,Solution refPt) {
         double vol = 0.0;
         for (int i = 0; i < soln.getNumberOfObjectives(); i++) {
-            vol *= refPt.getObjective(i) - soln.getObjective(i);
+            vol *= refPt.getObjective(i) - soln.getObjective(i); //assume minimization problem
         }
         if (vol < 0) //if point is dominated by reference point
         {

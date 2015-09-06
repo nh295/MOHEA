@@ -60,6 +60,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
         NondominatedPopulation singlePop = new NondominatedPopulation();
         singlePop.add(solnA);
         NondominatedPopulation doublePop = new NondominatedPopulation();
+        doublePop.add(solnA);
         doublePop.add(solnB);
         double valA = 0.0;
         double valB = 0.0;
@@ -71,7 +72,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
     }
 
     /**
-     * Returns the maximum value over all the solution utilities wrt to a weight
+     * Returns the minimum value over all the solution utilities wrt to a weight
      * vector
      *
      * @param vec weight vector

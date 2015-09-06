@@ -136,10 +136,6 @@ public class IBEABinaryIndicator extends AbstractOffspringParent {
             if (removedSolution != -1) { //if this condition is met then the offspring replaced a solution in the population
                 maxIndicatorVal = updateMaxVal(removedSolution, pop, offspring);
             }
-            // only look for max if one of the solutions in the previous pair is no longer in the population
-//            if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
-//                maxIndicatorVal = maxIndicatorVal(clonePop);
-//            }
         }
         if (removedSolution != -1) //if this condition is met then the offspring replaced a solution in the population
         {
@@ -246,6 +242,7 @@ public class IBEABinaryIndicator extends AbstractOffspringParent {
      */
     private double updateMaxVal(int removedSolution, Population pop, Solution offspring) {
         indicatorVals.remove(removedSolution);
+        //treat indicatorVals like a matrix of indicator values. Rows correspond to indicator value of A to B. Columns correspond to indicator value of B to A
         for (int i = 0; i < indicatorVals.size(); i++) {
             ArrayList<Double> row = indicatorVals.get(i);
             row.remove(removedSolution);
@@ -256,9 +253,10 @@ public class IBEABinaryIndicator extends AbstractOffspringParent {
             double val = measureQuality(offspring, pop.get(j));
             indicatorVals.get(pop.size() - 1).add(j, val);
         }
+        //indicator val of A to A (itself) is negative infinity
         indicatorVals.get(pop.size() - 1).add(pop.size() - 1, Double.NEGATIVE_INFINITY);
 
-        // only look for max if one of the solutions in the previous pair is no longer in the population
+        // only look for max indicator value if one of the solutions in the previous pair is no longer in the population
         if (removedSolution == maxPair[0] || removedSolution == maxPair[1]) {
             double max = Double.NEGATIVE_INFINITY;
             for (int i = 0; i < pop.size(); i++) {

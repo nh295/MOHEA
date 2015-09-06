@@ -163,11 +163,11 @@ public class TestRun implements Callable {
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-//                .attachHypervolumeCollector()
-//                .withEpsilon(epsilonDouble)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+                .attachHypervolumeCollector()
+                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
