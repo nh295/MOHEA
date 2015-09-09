@@ -136,7 +136,7 @@ public class TestRun implements Callable {
         
         double delta = properties.getDouble("delta", 0.9);
         
-        double eta = properties.getDouble("eta", 20.0);
+        double eta = properties.getDouble("eta", 2.0);
         
         int updateUtility = properties.getInt("updateUtility", 50);
         
@@ -163,11 +163,11 @@ public class TestRun implements Callable {
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-//                .attachHypervolumeCollector()
-//                .withEpsilon(epsilonDouble)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+                .attachHypervolumeCollector()
+                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 

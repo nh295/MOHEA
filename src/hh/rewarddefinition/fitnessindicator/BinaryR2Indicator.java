@@ -60,6 +60,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
         NondominatedPopulation singlePop = new NondominatedPopulation();
         singlePop.add(solnA);
         NondominatedPopulation doublePop = new NondominatedPopulation();
+        doublePop.add(solnA);
         doublePop.add(solnB);
         double valA = 0.0;
         double valB = 0.0;
@@ -71,7 +72,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
     }
 
     /**
-     * Returns the maximum value over all the solution utilities wrt to a weight
+     * Returns the minimum value over all the solution utilities wrt to a weight
      * vector
      *
      * @param vec weight vector
@@ -80,9 +81,9 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      * @return the utility of the nondominated population
      */
     protected double popUtility(WtVector vec, NondominatedPopulation pop, Solution refPt) {
-        double popUtil = Double.POSITIVE_INFINITY;
+        double popUtil = Double.NEGATIVE_INFINITY;
         for (Solution solution : pop) {
-            popUtil = Math.min(popUtil, solnUtility(vec, solution, refPt));
+            popUtil = Math.max(popUtil, solnUtility(vec, solution, refPt));
         }
         return popUtil;
     }
@@ -96,19 +97,19 @@ public class BinaryR2Indicator implements IBinaryIndicator {
      * @param vec weight vector
      * @param solution
      * @param refPt reference point
-     * @return utility of a solution wrt to a weight vector
+     * @return utility of a solution wrt to a weight vectorq
      */
     private double solnUtility(WtVector vec, Solution solution, Solution refPt) {
         double solnUtil = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
-            solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(refPt.getObjective(i) - solution.getObjective(i)));
+            solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(solution.getObjective(i) - refPt.getObjective(i)));
         }
-        return solnUtil;
+        return -1.0*solnUtil;
     }
 
     @Override
     public double computeWRef(NondominatedPopulation popA, NondominatedPopulation refPop, Solution refPt) {
-        return compute(popA, refPop, refPt);
+        return compute(refPop, popA, refPt);
     }
 
     /**

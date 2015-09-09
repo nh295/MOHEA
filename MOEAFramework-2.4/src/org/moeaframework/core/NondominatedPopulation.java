@@ -120,7 +120,7 @@ public class NondominatedPopulation extends Population implements Cloneable{
 	 * @param newSolution the solution to be added
 	 * @return true if the population was modified as a result of this operation
 	 */
-	protected boolean forceAddWithoutCheck(Solution newSolution) {
+	public boolean forceAddWithoutCheck(Solution newSolution) {
 		return super.add(newSolution);
 	}
 

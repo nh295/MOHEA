@@ -60,10 +60,11 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
                 throw new IllegalArgumentException("Invalid solution collection: " + ndpop.getClass() + ". Needs to by NondominatedPopulation.");
             }
             NondominatedPopulation beforeOffspring = ((NondominatedPopulation) ndpop).clone(); 
-            NondominatedPopulation afterOffspring = (NondominatedPopulation) ndpop;
+            NondominatedPopulation afterOffspring = ((NondominatedPopulation) ndpop).clone();
             
             if (afterOffspring.add(offspring)) {
-                //improvements over old population will result in a positive credit
+                ((NondominatedPopulation)ndpop).forceAddWithoutCheck(offspring);
+                //improvements over old population will result in a non negative value
                 double reward = indicator.computeWRef(beforeOffspring,afterOffspring,refPt);
                 if(reward<0)
                     throw new RuntimeException("Reward is negative even though nondominated population improved. Use monotonic indicator!");

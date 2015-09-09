@@ -21,12 +21,12 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-
 import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.AdaptiveMultimethodVariationCollector;
 import org.moeaframework.analysis.collector.AdaptiveTimeContinuationCollector;
@@ -41,12 +41,14 @@ import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Problem;
+import org.moeaframework.core.Solution;
 import org.moeaframework.core.indicator.AdditiveEpsilonIndicator;
 import org.moeaframework.core.indicator.Contribution;
 import org.moeaframework.core.indicator.GenerationalDistance;
 import org.moeaframework.core.indicator.Hypervolume;
 import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.Spacing;
+import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.spi.ProblemFactory;
 
 /**
@@ -80,6 +82,12 @@ public class Instrumenter extends ProblemBuilder {
 	 * otherwise.
 	 */
 	private boolean includeHypervolume;
+        
+        /**
+	 * {@code true} if the hypervolumejmetal collector is included; {@code false}
+	 * otherwise.
+	 */
+        private boolean includeHypervolumeJmetal;
 	
 	/**
 	 * {@code true} if the generational distance collector is included;
@@ -213,6 +221,17 @@ public class Instrumenter extends ProblemBuilder {
 	 */
 	public Instrumenter attachHypervolumeCollector() {
 		includeHypervolume = true;
+		
+		return this;
+	}
+        
+        /**
+	 * Includes the hypervolume collector from Jmetal when instrumenting algorithms.
+	 * 
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter attachHypervolumeJmetalCollector() {
+		includeHypervolumeJmetal = true;
 		
 		return this;
 	}
@@ -555,6 +574,13 @@ public class Instrumenter extends ProblemBuilder {
 			if (includeHypervolume) {
 				collectors.add(new IndicatorCollector(
 						new Hypervolume(problem, referenceSet), archive));
+			}
+                        if (includeHypervolumeJmetal) {
+                            double[] refPointObj = new double[problem.getNumberOfObjectives()];
+                            Arrays.fill(refPointObj, 2.0);
+                            Solution refPoint = new Solution(refPointObj);
+				collectors.add(new IndicatorCollector(
+						new FastHypervolume(problem, referenceSet,refPoint), archive));
 			}
 			
 			if (includeGenerationalDistance) {
