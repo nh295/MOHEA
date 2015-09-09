@@ -42,6 +42,11 @@ public class BinaryR3Indicator extends BinaryR2Indicator{
         return compute(refPop,popA,refPt);
     }
     
+    @Override
+    public double compute(Solution solnA, Solution solnB, Solution refPt) {
+        throw new UnsupportedOperationException("No papers use a IBEA R3 indicator. Need precedence first...");
+    }
+    
      @Override
     public String toString() {
         return "BIR3";

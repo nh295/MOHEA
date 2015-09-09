@@ -87,9 +87,9 @@ public class RewardDefFactory {
             case "OPIR2": //offspring parent hypervolume indicator using pareto front
                 credDef = new IBEABinaryIndicator(new BinaryR2Indicator(numObj,numVec), kappa, new Solution(idealPoint));
                 break;
-            case "OPIR3": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
-                break;
+//            case "OPIR3": //offspring parent hypervolume indicator using pareto front
+//                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
+//                break;
             case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);
                 break;
@@ -105,18 +105,18 @@ public class RewardDefFactory {
             case "OPopIPFR2": //offpsring improvement to R2 indicator value for pareto front
                 credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT,new Solution(idealPoint));
                 break;
-            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
-                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT,new Solution(idealPoint));
-                break;
+//            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
+//                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT,new Solution(idealPoint));
+//                break;
             case "OPopIEAAE": //offpsring improvement to additive epsilon indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new BinaryAdditiveEpsilonIndicator(),RewardDefinedOn.ARCHIVE,null);
                 break;
             case "OPopIEAR2": //offpsring improvement to R2 indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(numObj,numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));
                 break;
-            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
-                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj, numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));
-                break;
+//            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
+//                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj, numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));
+//                break;
             case "CPF": //contribution to pareto front
                 credDef = new ParetoFrontContribution(satisfy, disatisfy);
                 break;

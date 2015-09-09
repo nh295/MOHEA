@@ -6,12 +6,13 @@
 package hh.rewarddefinition.fitnessindicator;
 
 import java.util.Arrays;
-import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.indicator.Hypervolume;
+import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 
 /**
  * Binary hypervolume indicator from Zitzler, E., & Simon, K. (2004).
@@ -25,7 +26,7 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
 
     private DominanceComparator domComparator;
 
-    private final Hypervolume HV;
+    private final FastHypervolume FHV;
 
     /**
      *
@@ -44,7 +45,9 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
             soln.setObjective(i,1.0);
             refPop.add(soln);
         }
-        this.HV = new Hypervolume(problem, refPop);
+        double[] refPoint = new double[problem.getNumberOfObjectives()];
+        Arrays.fill(refPoint, 2.0);
+        this.FHV = new FastHypervolume(problem, refPop,new Solution(refPoint));
         this.domComparator = new ParetoDominanceComparator();
     }
 
@@ -101,7 +104,7 @@ public class BinaryHypervolumeIndicator implements IBinaryIndicator {
      * @return
      */
     private double volume(Solution[] solutions,Solution refPt) {
-        return HV.evaluate(new NondominatedPopulation(Arrays.asList(solutions)));
+        return FHV.evaluate(new NondominatedPopulation(Arrays.asList(solutions)));
     }
 
     /**
