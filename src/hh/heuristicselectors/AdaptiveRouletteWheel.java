@@ -18,7 +18,7 @@ import org.moeaframework.core.Variation;
  *
  * @author nozomihitomi
  */
-public class AdaptivePursuit extends ProbabilityMatching {
+public class AdaptiveRouletteWheel extends RouletteWheel {
 
     /**
      * The maximum probability that the heuristic with the highest credits can
@@ -39,12 +39,11 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * is the minimum selection probability
      *
      * @param heuristics from which to select from 
-     * @param alpha the adaptation rate
-     * @param beta the learning rate
      * @param pmin the minimum selection probability
+     * @param beta the learning rate
      */
-    public AdaptivePursuit(Collection<Variation> heuristics, double alpha, double beta, double pmin) {
-        super(heuristics, alpha, pmin);
+    public AdaptiveRouletteWheel(Collection<Variation> heuristics, double pmin, double beta) {
+        super(heuristics, pmin);
         this.pmax = 1 - (probabilities.size() - 1) * pmin;
         this.beta = beta;
         if (pmax < pmin) {
@@ -65,26 +64,19 @@ public class AdaptivePursuit extends ProbabilityMatching {
             count++;
         }
     }
-    
+
     /**
-     * Updates the probabilities stored in the selector
+     * Updates the probabilities stored in the map by finding the heuristic with
+     * the most credits and apply pmax to that heuristic and pmin to all other
+     * heuristics
      * @param creditRepo the credit repository that store the past earned credits
      * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
     public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
-        super.updateQuality(creditRepo, null);
-        updateProbabilities();
-    }
+        super.updateQuality(creditRepo, creditAgg);
 
-    /**
-     * Updates the selection probabilities of the heuristics according to the
-     * qualities of each heuristic.
-     */
-    @Override
-    protected void updateProbabilities(){
-
-        Variation leadHeuristic = argMax(qualities.keySet());
+        Variation leadHeuristic = argMax(creditRepo.getHeuristics());
 
         Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {

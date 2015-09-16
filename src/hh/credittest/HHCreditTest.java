@@ -7,6 +7,7 @@ package hh.credittest;
 
 import hh.IO.IOSelectionHistory;
 import hh.credithistory.RewardHistoryWindow;
+import hh.creditrepository.CreditRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
@@ -53,7 +54,7 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF11"};
+        String[] problems = new String[]{"UF1"};
 //        String[] problems = new String[]{" "};
 
 //        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
@@ -71,10 +72,9 @@ public class HHCreditTest {
             System.out.println(probName);
             int numberOfSeeds = 1;
             int maxEvaluations = 300030;
-            int windowSize = 300;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"Random", "PM", "AP"};
-            String[] selectors = new String[]{"PM"};
+            String[] selectors = new String[]{"AP"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
@@ -122,10 +122,10 @@ public class HHCreditTest {
 //                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
-                        IQualityEstimation creditAgg = new RankRewards(1.0);
-//                        IQualityEstimation creditAgg = new MeanRewards();
+//                        IQualityEstimation creditAgg = new RankRewards(1.0);
+                        IQualityEstimation creditAgg = null;
 
-                        ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new RewardHistoryWindow(windowSize), windowSize);
+                        ICreditRepository credRepo = new CreditRepository(heuristics);
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
@@ -142,8 +142,8 @@ public class HHCreditTest {
                         try {
                             IHyperHeuristic hh = run.get();
 //                            
-//                            String name = path + File.separator + "results" + File.separator + probName + "_";
-////                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+                            String name = path + File.separator + "results" + File.separator + probName + "_";
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //
 //                            //save the approximation set
 //                            NondominatedPopulation ndPop = hh.getResult();

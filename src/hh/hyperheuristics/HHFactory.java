@@ -6,8 +6,10 @@
 package hh.hyperheuristics;
 
 import hh.heuristicselectors.AdaptivePursuit;
+import hh.heuristicselectors.AdaptiveRouletteWheel;
 import hh.heuristicselectors.MAB;
 import hh.heuristicselectors.ProbabilityMatching;
+import hh.heuristicselectors.RouletteWheel;
 import hh.heuristicselectors.RandomSelect;
 import hh.nextheuristic.AbstractHeuristicGenerator;
 import hh.nextheuristic.AbstractHeuristicSelector;
@@ -53,13 +55,16 @@ public class HHFactory {
                 break;
             case "PM":{ //Probability matching
                 double pmin = properties.getDouble("pmin", 0.1);
-                heuristicSelector = new ProbabilityMatching(heuristics,pmin);
+                double alpha = properties.getDouble("alpha", 0.8);
+                heuristicSelector = new ProbabilityMatching(heuristics,alpha,pmin);
                 }
                 break;
             case "AP":{ //Adaptive Pursuit
                 double pmin = properties.getDouble("pmin", 0.1);
+                
+                double alpha = properties.getDouble("alpha", 0.8);
                 double beta = properties.getDouble("beta", 0.8);
-                heuristicSelector = new AdaptivePursuit(heuristics, pmin, beta);
+                heuristicSelector = new AdaptivePursuit(heuristics, alpha, beta,pmin);
                 }
                 break;
             case "MAB": //Multi-Armed Bandit
