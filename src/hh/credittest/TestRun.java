@@ -161,12 +161,13 @@ public class TestRun implements Callable {
 //        IHyperHeuristic hh = newMOEADHH();
         IHyperHeuristic hh = newHeMOEA();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
                 .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
@@ -174,7 +175,7 @@ public class TestRun implements Callable {
         Algorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName());
+        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
 
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
