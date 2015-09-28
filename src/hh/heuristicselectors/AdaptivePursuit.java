@@ -39,11 +39,12 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * is the minimum selection probability
      *
      * @param heuristics from which to select from 
-     * @param pmin the minimum selection probability
+     * @param alpha the adaptation rate
      * @param beta the learning rate
+     * @param pmin the minimum selection probability
      */
-    public AdaptivePursuit(Collection<Variation> heuristics, double pmin, double beta) {
-        super(heuristics, pmin);
+    public AdaptivePursuit(Collection<Variation> heuristics, double alpha, double beta, double pmin) {
+        super(heuristics, alpha, pmin);
         this.pmax = 1 - (probabilities.size() - 1) * pmin;
         this.beta = beta;
         if (pmax < pmin) {
@@ -64,19 +65,26 @@ public class AdaptivePursuit extends ProbabilityMatching {
             count++;
         }
     }
-
+    
     /**
-     * Updates the probabilities stored in the map by finding the heuristic with
-     * the most credits and apply pmax to that heuristic and pmin to all other
-     * heuristics
+     * Updates the probabilities stored in the selector
      * @param creditRepo the credit repository that store the past earned credits
      * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
     public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
-        super.updateQuality(creditRepo, creditAgg);
+        super.updateQuality(creditRepo, null);
+        updateProbabilities();
+    }
 
-        Variation leadHeuristic = argMax(creditRepo.getHeuristics());
+    /**
+     * Updates the selection probabilities of the heuristics according to the
+     * qualities of each heuristic.
+     */
+    @Override
+    protected void updateProbabilities(){
+
+        Variation leadHeuristic = argMax(qualities.keySet());
 
         Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {

@@ -46,6 +46,7 @@ public class BinaryR2Indicator implements IBinaryIndicator {
     }
 
     /**
+     * TODO this is really slow!
      * In this implementation the order of the inputs matter. formula based on
      * Phan, D. H., & Suzuki, J. (2013). R2-IBEA: R2 indicator based
      * evolutionary algorithm for multiobjective optimization. IEEE Congress on

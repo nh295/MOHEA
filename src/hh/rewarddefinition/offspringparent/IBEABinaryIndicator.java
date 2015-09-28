@@ -24,7 +24,7 @@ import org.moeaframework.core.Solution;
  * @author nozomihitomi
  */
 public class IBEABinaryIndicator extends AbstractOffspringParent {
-
+    
     /**
      * IBEA scaling factor
      */

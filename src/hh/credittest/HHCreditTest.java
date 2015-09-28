@@ -7,6 +7,7 @@ package hh.credittest;
 
 import hh.IO.IOSelectionHistory;
 import hh.credithistory.RewardHistoryWindow;
+import hh.creditrepository.CreditRepository;
 import hh.creditrepository.ICreditRepository;
 import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
@@ -71,7 +72,6 @@ public class HHCreditTest {
             System.out.println(probName);
             int numberOfSeeds = 30;
             int maxEvaluations = 300030;
-            int windowSize = 300;
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"PM"};
@@ -134,10 +134,10 @@ public class HHCreditTest {
 //                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
-                        IQualityEstimation creditAgg = new RankRewards(1.0);
-//                        IQualityEstimation creditAgg = new MeanRewards();
+//                        IQualityEstimation creditAgg = new RankRewards(1.0);
+                        IQualityEstimation creditAgg = null;
 
-                        ICreditRepository credRepo = new SlidingWindowRepository(heuristics, new RewardHistoryWindow(windowSize), windowSize);
+                        ICreditRepository credRepo = new CreditRepository(heuristics);
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
@@ -154,8 +154,8 @@ public class HHCreditTest {
                         try {
                             IHyperHeuristic hh = run.get();
 //                            
-//                            String name = path + File.separator + "results" + File.separator + probName + "_";
-////                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+                            String name = path + File.separator + "results" + File.separator + probName + "_";
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //
 //                            //save the approximation set
 //                            NondominatedPopulation ndPop = hh.getResult();
