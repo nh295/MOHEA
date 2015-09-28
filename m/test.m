@@ -1,33 +1,18 @@
-probName = 'UF8_';
+% 
+% javaaddpath('C:\Users\SEAK2\Nozomi\FRRMAB\dist\FRRMAB.jar');
+% javaaddpath('C:\Users\SEAK2\Nozomi\MOHEA\dist\MOHEA.jar');
+% 
+% hh.credittest.HHCreditTest.main('C:\Users\SEAK2\Nozomi\MOHEA\');
+% jmetal.metaheuristics.moead.MOEAD_main.main('CEC2009_UF2');
 
-getAllResults(path,'Random','Parent',probName);
-getAllResults(path,'Random','ImmediateParetoFr',probName);
-getAllResults(path,'Random','ImmediateParetoRan',probName);
-getAllResults(path,'Random','ImmediateEA',probName);
-getAllResults(path,'Random','AggregateParetoFr',probName);
-getAllResults(path,'Random','AggregateParetoRa',probName);
-getAllResults(path,'Random','AggregateEA',probName);
+close all
+myDataFRRMAB = dlmread('C:\Users\SEAK2\Nozomi\MOHEA\results\UF2_.NDpop');
+theirDataFRRMAB = dlmread('C:\Users\SEAK2\Nozomi\FRRMAB\FUN0');
 
-getAllResults(path,'Adaptive','Parent',probName);
-getAllResults(path,'Adaptive','ImmediateParetoFr',probName);
-getAllResults(path,'Adaptive','ImmediateParetoRan',probName);
-getAllResults(path,'Adaptive','ImmediateEA',probName);
-getAllResults(path,'Adaptive','AggregateParetoFr',probName);
-getAllResults(path,'Adaptive','AggregateParetoRa',probName);
-getAllResults(path,'Adaptive','AggregateEA',probName);
+hold on
+scatter(theirDataFRRMAB(:,1),theirDataFRRMAB(:,2),'r')
+scatter(myDataFRRMAB(:,1),myDataFRRMAB(:,2),'b')
+shg
 
-getAllResults(path,'Probability','Parent',probName);
-getAllResults(path,'Probability','ImmediateParetoFr',probName);
-getAllResults(path,'Probability','ImmediateParetoRan',probName);
-getAllResults(path,'Probability','ImmediateEA',probName);
-getAllResults(path,'Probability','AggregateParetoFr',probName);
-getAllResults(path,'Probability','AggregateParetoRa',probName);
-getAllResults(path,'Probability','AggregateEA',probName);
-
-getAllResults(path,'DMAB','Parent',probName);
-getAllResults(path,'DMAB','ImmediateParetoFr',probName);
-getAllResults(path,'DMAB','ImmediateParetoRan',probName);
-getAllResults(path,'DMAB','ImmediateEA',probName);
-getAllResults(path,'DMAB','AggregateParetoFr',probName);
-getAllResults(path,'DMAB','AggregateParetoRa',probName);
-getAllResults(path,'DMAB','AggregateEA',probName);
+% javarmpath('C:\Users\SEAK2\Nozomi\FRRMAB\dist\FRRMAB.jar');
+% javarmpath('C:\Users\SEAK2\Nozomi\MOHEA\dist\MOHEA.jar');

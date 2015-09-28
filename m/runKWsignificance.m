@@ -8,7 +8,7 @@ file1 = dir(strcat(problemName,'_',selector1,'_',creditDef1,'.mat'));
 res1 = load(file1.name,'res');
 
 cd(strcat(path,filesep,'Benchmarks',filesep,benchmark))
-file2 = dir(strcat(problemName,'_',benchmark,'.mat'));
+file2 = dir(strcat(problemName,'_',benchmark,'_Parent.mat'));
 res2 = load(file2.name,'res');
 cd(origin)
 
@@ -20,7 +20,7 @@ for i=1:ntrials
 end
 labels = [tmp(:,1);tmp(:,2)];
 
-data = [res1.res.IGD;res2.res.IGD];
+data = [res1.res.fHV;res2.res.fHV];
 avg1 = mean(res1.res.IGD);
 avg2 = mean(res2.res.IGD);
 
