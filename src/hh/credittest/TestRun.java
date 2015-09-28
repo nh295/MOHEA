@@ -167,6 +167,7 @@ public class TestRun implements Callable {
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
                 .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();

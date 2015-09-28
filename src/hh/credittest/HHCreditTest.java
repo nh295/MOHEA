@@ -54,11 +54,11 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1", "UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF1"};
+        String[] problems = new String[]{"UF12"};
 //        String[] problems = new String[]{" "};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -70,7 +70,7 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 1;
+            int numberOfSeeds = 6;
             int maxEvaluations = 300030;
             //Setup heuristic selectors
 //            String[] selectors = new String[]{"Random", "PM", "AP"};
@@ -79,7 +79,7 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"ODP"};
+            String[] creditDefs = new String[]{"CEA"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -107,7 +107,7 @@ public class HHCreditTest {
                         OperatorFactory of = OperatorFactory.getInstance();
                         Properties heuristicProp = new Properties();
                         heuristics.add(of.getVariation("um", heuristicProp, prob));
-                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
                         heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
