@@ -6,12 +6,9 @@
 package hh.hyperheuristics;
 
 import hh.heuristicselectors.AdaptivePursuit;
-import hh.heuristicselectors.AdaptiveRouletteWheel;
-import hh.heuristicselectors.MAB;
 import hh.heuristicselectors.ProbabilityMatching;
 import hh.heuristicselectors.RouletteWheel;
 import hh.heuristicselectors.RandomSelect;
-import hh.nextheuristic.AbstractHeuristicGenerator;
 import hh.nextheuristic.AbstractHeuristicSelector;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
@@ -67,29 +64,9 @@ public class HHFactory {
                 heuristicSelector = new AdaptivePursuit(heuristics, alpha, beta,pmin);
                 }
                 break;
-            case "MAB": //Multi-Armed Bandit
-                double c = properties.getDouble("c", 5.0);
-                heuristicSelector = new MAB(heuristics, c);
-                break;
             default: throw new IllegalArgumentException("Invalid heuristic selector specified:" + name);
         }
         
         return heuristicSelector;
-    }
-    
-    public AbstractHeuristicGenerator getHeuristicGenerator(String name, TypedProperties properties){
-         AbstractHeuristicGenerator heuristicGenerator = null;
-        
-        switch(name){
-            case "HGA":{ //Probability matching
-                double pmin = properties.getDouble("pmin", 0.1);
-                double alpha = properties.getDouble("alpha", 0.8);
-//                heuristicGenerator = new HyperGA(creditRepo, creditAgg, pmin, alpha);
-                }
-                break;
-            default: throw new IllegalArgumentException("Invalid heuristic selector specified:" + name);
-        }
-        
-        return heuristicGenerator; 
     }
 }

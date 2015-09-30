@@ -6,9 +6,8 @@
 
 package hh.heuristicselectors;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
+import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
 
@@ -45,7 +44,7 @@ public class RandomSelect extends AbstractHeuristicSelector{
     }
 
     @Override
-    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
+    public void update(Reward reward, Variation heuristic) {
         //no need to do any updates
     }
     

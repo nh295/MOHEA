@@ -5,15 +5,9 @@
  */
 package hh.credittest;
 
+import hh.IO.IOQualityHistory;
 import hh.IO.IOSelectionHistory;
-import hh.credithistory.RewardHistoryWindow;
-import hh.creditrepository.CreditRepository;
-import hh.creditrepository.ICreditRepository;
-import hh.creditrepository.SlidingWindowRepository;
 import hh.hyperheuristics.IHyperHeuristic;
-import hh.qualityestimation.IQualityEstimation;
-import hh.qualityestimation.MeanRewards;
-import hh.qualityestimation.RankRewards;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,10 +49,10 @@ public class HHCreditTest {
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10","UF11","UF12","UF13"};
         String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-//        String[] problems = new String[]{" "};
+//        String[] problems = new String[]{"UF1"};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(1);
+//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -70,17 +64,16 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 1;
             int maxEvaluations = 300030;
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM", "AP"};
-//            String[] selectors = new String[]{"PM"};
+//            String[] selectors = new String[]{"PM", "AP"};
+            String[] selectors = new String[]{"AP"};
             //setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPIAE",
-                "OPIR2", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2"};
+            String[] creditDefs = new String[]{"CEA"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -109,7 +102,6 @@ public class HHCreditTest {
                             default: throw new UnsupportedOperationException("Unsupported test problem: Problems with 2,3, and 5 objectives are supported");
                         }
                         prop.put("populationSize", popSize);
-                        prop.put("creditMemory", "1.0");
                         prop.put("HH", selector);
                         prop.put("CredDef", credDefStr);
 
@@ -134,26 +126,22 @@ public class HHCreditTest {
 
                         //Choose credit aggregation method
 //                        IQualityEstimation creditAgg = new RankRewards(1.0);
-                        IQualityEstimation creditAgg = null;
-
-                        ICreditRepository credRepo = new CreditRepository(heuristics);
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-                        TestRun test = new TestRun(path, prob, probName,
-                                typeProp, creditAgg, credRepo,
-                                maxEvaluations);
+//                        TestRun test = new TestRun(path, prob, probName,
+//                                typeProp, heuristics, maxEvaluations);
 
                         //benchmark built-in MOEA
-//                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
-//                            typeProp, "MOEAD", maxEvaluations);
+                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
+                            typeProp, "eMOEA", maxEvaluations);
                         futures.add(pool.submit(test));
                     }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
 //                            
-                            String name = path + File.separator + "results" + File.separator + probName + "_";
+//                            String name = path + File.separator + "results" + File.separator + probName + "_";
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //
 //                            //save the approximation set
@@ -174,7 +162,7 @@ public class HHCreditTest {
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
 //                                    name + ".qual");
 //                            hh.reset();
-//                            hh = null;
+                            hh = null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }

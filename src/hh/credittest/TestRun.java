@@ -5,10 +5,8 @@
  */
 package hh.credittest;
 
-import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.RewardDefFactory;
 import hh.rewarddefinition.IRewardDefinition;
-import hh.creditrepository.ICreditRepository;
 import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
@@ -54,17 +52,12 @@ public class TestRun implements Callable {
     private IRewardDefinition rewardDef;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
-    private final IQualityEstimation creditAgg;
     private final Collection<Variation> heuristics;
-    private ICreditRepository creditRepo;
 
     public TestRun(String path, Problem problem, String probName, TypedProperties properties,
-            IQualityEstimation creditAgg, ICreditRepository creditRepo,
-            int maxEvaluations) {
+            Collection<Variation> heuristics, int maxEvaluations) {
 
-        this.heuristics = creditRepo.getHeuristics();
-        this.creditRepo = creditRepo;
-        this.creditAgg = creditAgg;
+        this.heuristics = heuristics;
         this.properties = properties;
         this.problem = problem;
         this.epsilonDouble = properties.getDoubleArray("ArchiveEpsilon",
@@ -85,9 +78,6 @@ public class TestRun implements Callable {
     private IHyperHeuristic newHeMOEA() {
         
         int populationSize = (int) properties.getDouble("populationSize", 600);
-        double crediMemory = properties.getDouble("creditMemory", 1.0);
-
-        System.out.println("alpha:" + crediMemory);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -106,8 +96,7 @@ public class TestRun implements Callable {
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-            initialization, selector, rewardDef, creditRepo,
-            creditAgg, crediMemory);
+            initialization, selector, rewardDef);
 
         return hemoea;
     }
@@ -145,8 +134,7 @@ public class TestRun implements Callable {
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization, 
-            delta, eta, updateUtility, selector, rewardDef, creditRepo,
-            creditAgg, crediMemory,cr);
+            delta, eta, updateUtility, selector, rewardDef, crediMemory,cr);
 
         return moeadhh;
     }
@@ -176,7 +164,7 @@ public class TestRun implements Callable {
 
         // run the executor using the listener to collect results
         System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
-
+        long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
                 instAlgorithm.step();
@@ -185,7 +173,8 @@ public class TestRun implements Callable {
             }
             
         hh.terminate();
-        System.out.println("Done with optimization");
+        long finishTime = System.currentTimeMillis();
+        System.out.println("Done with optimization. Execution time: " + ((finishTime-startTime)/1000) + "s");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 

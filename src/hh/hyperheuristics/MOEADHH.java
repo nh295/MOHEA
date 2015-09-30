@@ -5,11 +5,8 @@
  */
 package hh.hyperheuristics;
 
-import hh.credithistory.RewardHistory;
-import hh.creditrepository.CreditHistoryRepository;
-import hh.creditrepository.ICreditRepository;
+
 import hh.nextheuristic.INextHeuristic;
-import hh.qualityestimation.IQualityEstimation;
 import hh.qualityhistory.HeuristicQualityHistory;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
@@ -18,10 +15,7 @@ import hh.selectionhistory.IHeuristicSelectionHistory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jfree.util.ArrayUtilities;
 import org.moeaframework.algorithm.MOEAD;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
@@ -47,16 +41,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      */
     private final IRewardDefinition creditDef;
 
-    /**
-     * The repository that will store all the credits earned by the heuristics
-     */
-    private ICreditRepository creditRepo;
-
-    /**
-     * the credit aggregation scheme used to process the credits from previous
-     * iterations
-     */
-    private final IQualityEstimation creditAgg;
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -65,12 +49,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      */
     private IHeuristicSelectionHistory heuristicSelectionHistory;
 
-    /**
-     * The credit history of all heuristics at every iteration. Can be extracted
-     * by getCreditHistory(). Used for analyzing the results to see the dynamics
-     * of the instantaneous credits received
-     */
-    private CreditHistoryRepository creditHistory;
 
     /**
      * The set of heuristics that the hyper heuristic is able to work with
@@ -132,20 +110,15 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     public MOEADHH(Problem problem, int neighborhoodSize,
             Initialization initialization, double delta, double eta, int updateUtility,
             INextHeuristic heuristicSelector, IRewardDefinition creditDef,
-            ICreditRepository creditRepo, IQualityEstimation creditAgg,
             double alpha, double crossoverRate) {
         super(problem, neighborhoodSize, initialization, heuristicSelector.getHeuristics().iterator().next(), delta, eta, updateUtility);
-        checkHeuristics(heuristicSelector, creditRepo);
         this.heuristics = heuristicSelector.getHeuristics();
         this.heuristicSelector = heuristicSelector;
-        this.creditRepo = creditRepo;
         this.creditDef = creditDef;
-        this.creditAgg = creditAgg;
         this.alpha = alpha;
         this.delta = delta;
         this.cr = crossoverRate;
         this.heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
-        this.creditHistory = new CreditHistoryRepository(heuristics, new RewardHistory());
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         this.iteration = 0;
@@ -216,10 +189,8 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                     reward+= improv;
                 }
             }
-            creditRepo.update(heuristic, new Reward(iteration, reward));
-            heuristicSelector.update(creditRepo, creditAgg);
+            heuristicSelector.update(new Reward(iteration, reward), heuristic);
             heuristicSelectionHistory.add(heuristic);
-            updateCreditHistory();
             updateQualityHistory();
         }
 
@@ -229,16 +200,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             updateUtility();
         }
 
-    }
-
-    /**
-     * Updates the credit history every iteration for each heuristic according
-     * to the INextHeuristic class used
-     */
-    private void updateCreditHistory() {
-        for (Variation heuristic : heuristics) {
-            creditHistory.update(heuristic, creditRepo.getLatestReward(heuristic));
-        }
     }
 
     /**
@@ -253,24 +214,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     }
 
     /**
-     * Checks to see if the heuristics in the INextHeuristic and the credit
-     * repository match
-     *
-     * @param heuristicSelector
-     * @param creditRepo
-     */
-    private void checkHeuristics(INextHeuristic heuristicSelector, ICreditRepository creditRepo) {
-        Iterator<Variation> iter = heuristicSelector.getHeuristics().iterator();
-        Collection<Variation> repoHeuristics = creditRepo.getHeuristics();
-        while (iter.hasNext()) {
-            Variation heur = iter.next();
-            if (!repoHeuristics.contains(heur)) {
-                throw new RuntimeException("Mismatch in heuristics in INextHeuristic and ICrediRepository:" + heur);
-            }
-        }
-    }
-
-    /**
      * Reset the hyperheuristic. Clear all selection history and the credit
      * repository
      */
@@ -280,7 +223,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         heuristicSelectionHistory.clear();
         heuristicSelector.reset();
         numberOfEvaluations = 0;
-        creditHistory.clear();
         qualityHistory.clear();
     }
 
@@ -294,15 +236,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         return heuristicSelectionHistory;
     }
 
-    /**
-     * Returns the entire history of credits for each heuristic.
-     *
-     * @return the entire history of credits for each heuristic.
-     */
-    @Override
-    public CreditHistoryRepository getCreditHistory() {
-        return creditHistory;
-    }
 
     /**
      * gets the quality history stored for each heuristic in the hyper-heuristic
@@ -322,22 +255,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     @Override
     public INextHeuristic getNextHeuristicSupplier() {
         return heuristicSelector;
-    }
-
-    /**
-     * Returns the latest credit received by each heuristic
-     *
-     * @return the latest credit received by each heuristic
-     */
-    @Override
-    public HashMap<Variation, Reward> getLatestCredits() {
-        HashMap<Variation, Reward> out = new HashMap<>();
-        Iterator<Variation> iter = creditRepo.getHeuristics().iterator();
-        while (iter.hasNext()) {
-            Variation heuristic = iter.next();
-            out.put(heuristic, creditRepo.getLatestReward(heuristic));
-        }
-        return out;
     }
 
     @Override

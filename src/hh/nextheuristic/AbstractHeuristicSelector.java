@@ -6,14 +6,10 @@
 
 package hh.nextheuristic;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.rewarddefinition.Reward;
-import hh.creditrepository.ICreditRepository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.core.ParallelPRNG;
@@ -172,14 +168,10 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     }
     
     /**
-     * Updates the quality of the heuristic based on the aggregation applied the
-     * heuristic's credit history. If the quality becomes negative, it is reset
+     * Checks the quality of the heuristic. If the quality becomes negative, it is reset
      * to 0.0. Only updates those heuristics that were just rewarded.
-     * @param creditRepo the credit repository that store the past earned rewards
-     * @param qualEst method to aggregate the past credits to compute the heuristic's reward
      */
-    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
-        qualities = creditRepo.estimateQuality(qualEst, getNumberOfIterations());
+    protected void checkQuality(){
         for(Variation heuristic:qualities.keySet()) {
             //if current quality becomes negative, adjust to 0
             double qual = qualities.get(heuristic);

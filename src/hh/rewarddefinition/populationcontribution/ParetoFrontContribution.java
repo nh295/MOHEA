@@ -7,7 +7,6 @@
 package hh.rewarddefinition.populationcontribution;
 
 import hh.rewarddefinition.Reward;
-import hh.rewarddefinition.DecayingReward;
 import hh.hyperheuristics.SerializableVal;
 import hh.rewarddefinition.RewardDefinedOn;
 import java.util.Collection;
@@ -64,9 +63,8 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
             if(soln.hasAttribute("heuristic")){
                 if(((SerializableVal)soln.getAttribute("heuristic")).getSval().equalsIgnoreCase(heuristic.toString())){
                     int createdIteration = ((SerializableVal)soln.getAttribute("iteration")).getIval();
-                    double alpha = ((SerializableVal)soln.getAttribute("alpha")).getDval();
-                    DecayingReward dc = new DecayingReward(createdIteration,1,alpha);
-                    sumReward+=rewardInPF*dc.fractionOriginalVal(iteration);
+                    Reward r = new Reward(createdIteration,1);
+                    sumReward+=rewardInPF*r.fractionOriginalVal(iteration);
                 }
             }
         }

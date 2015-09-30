@@ -5,8 +5,7 @@
  */
 package hh.heuristicselectors;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.creditrepository.ICreditRepository;
+import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import java.util.Iterator;
 import org.moeaframework.core.Variation;
@@ -68,12 +67,10 @@ public class AdaptivePursuit extends ProbabilityMatching {
     
     /**
      * Updates the probabilities stored in the selector
-     * @param creditRepo the credit repository that store the past earned credits
-     * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
      */
     @Override
-    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
-        super.updateQuality(creditRepo, null);
+    public void update(Reward reward, Variation heuristic) {
+        super.update(reward, heuristic);
         updateProbabilities();
     }
 
