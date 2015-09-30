@@ -5,9 +5,8 @@
  */
 package hh.heuristicselectors;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.creditrepository.ICreditRepository;
 import hh.nextheuristic.AbstractHeuristicSelector;
+import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -110,21 +109,6 @@ public class RouletteWheel extends AbstractHeuristicSelector {
     }
 
     /**
-     * Updates the probabilities stored in the selector
-     *
-     * @param creditRepo the credit repository that store the past earned
-     * credits
-     * @param creditAgg method to aggregate the past credits to compute the
-     * heuristic's reward
-     */
-    @Override
-    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
-        updateQuality(creditRepo, creditAgg);
-        updateProbabilities();
-        
-    }
-
-    /**
      * Updates the selection probabilities of the heuristics according to the
      * qualities of each heuristic.
      */
@@ -146,5 +130,17 @@ public class RouletteWheel extends AbstractHeuristicSelector {
                 probabilities.put(heuristic_i, newProb);
             }
         }
+    }
+
+    /**
+     * Selection probabilities are updated
+     * @param reward given to the heuristic
+     * @param heuristic to be rewarded
+     */
+    @Override
+    public void update(Reward reward, Variation heuristic) {
+        qualities.put(heuristic, qualities.get(heuristic)+reward.getValue());
+        super.checkQuality();
+        updateProbabilities();
     }
 }

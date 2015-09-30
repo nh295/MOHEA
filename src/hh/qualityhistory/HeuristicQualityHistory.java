@@ -6,8 +6,6 @@
 
 package hh.qualityhistory;
 
-import hh.selectionhistory.*;
-import hh.heuristicgenerators.HeuristicSequence;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;

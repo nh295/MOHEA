@@ -8,7 +8,6 @@ package hh.rewarddefinition.populationcontribution;
 
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinedOn;
-import hh.rewarddefinition.RewardDefinitionType;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Solution;
@@ -37,7 +36,7 @@ public class EArchiveContribution extends AbstractPopulationContribution{
         this.inArchive = inArchive;
         //by giving AggregateParetoFrontCredit a 1,0 score we can count how many
         //solutions per rank a heuristic is responsible for
-        aggPFcredit = new ParetoFrontContribution(inArchive, 0.0);
+        aggPFcredit = new ParetoFrontContribution(this.inArchive, 0.0);
     }
     
     /**

@@ -17,7 +17,6 @@ import hh.rewarddefinition.offspringpopulation.OffspringPopulationIndicator;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
-import hh.rewarddefinition.populationcontribution.ParetoRankContribution;
 import java.util.Arrays;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
@@ -119,9 +118,6 @@ public class RewardDefFactory {
 //                break;
             case "CPF": //contribution to pareto front
                 credDef = new ParetoFrontContribution(satisfy, disatisfy);
-                break;
-            case "CPR": //contribution to pareto rank
-                credDef = new ParetoRankContribution(satisfy, disatisfy, rank);
                 break;
             case "CEA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);

@@ -8,11 +8,9 @@ package hh.hyperheuristics;
 
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.IRewardDefinition;
-import hh.creditrepository.CreditHistoryRepository;
 import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
-import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.Variation;
@@ -35,12 +33,6 @@ public interface IHyperHeuristic extends Algorithm{
     public void reset();
     
     /**
-     * Returns the credit history stored for each heuristic in the hyper-heuristic
-     * @return 
-     */
-    public CreditHistoryRepository getCreditHistory();
-    
-    /**
      * gets the quality history stored for each heuristic in the hyper-heuristic
      * @return 
      */
@@ -58,11 +50,6 @@ public interface IHyperHeuristic extends Algorithm{
      */
     public INextHeuristic getNextHeuristicSupplier();
     
-    /**
-     * Returns the latest credit received by each heuristic
-     * @return the latest credit received by each heuristic
-     */
-    public HashMap<Variation,Reward> getLatestCredits();
     
     /**
      * Sets the hyper-heuristic's name

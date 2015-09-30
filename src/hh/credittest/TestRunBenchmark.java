@@ -6,19 +6,11 @@
 
 package hh.credittest;
 
-import hh.rewarddefinition.IRewardDefinition;
-import hh.creditrepository.CreditRepository;
 import hh.hyperheuristics.IHyperHeuristic;
-import hh.nextheuristic.INextHeuristic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,12 +18,10 @@ import org.moeaframework.Instrumenter;
 import org.moeaframework.algorithm.StandardAlgorithms;
 import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.InstrumentedAlgorithm;
-import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
-import org.moeaframework.core.Variation;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -45,7 +35,7 @@ public class TestRunBenchmark extends TestRun{
     
 
     public TestRunBenchmark(String path, Problem problem, String probName, TypedProperties properties, String algorithm, int maxEvaluations) {
-        super(path, problem, probName, properties, null,new CreditRepository(new ArrayList()), maxEvaluations);
+        super(path, problem, probName, properties, null, maxEvaluations);
         this.algorithm = algorithm;
         this.prop = properties;
     }
@@ -64,11 +54,12 @@ public class TestRunBenchmark extends TestRun{
         
         Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
                 .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-//                .attachHypervolumeCollector()
-//                .withEpsilon(epsilonDouble)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+                .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
+                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 

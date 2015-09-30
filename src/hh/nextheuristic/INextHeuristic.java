@@ -6,9 +6,7 @@
 
 package hh.nextheuristic;
 
-import hh.qualityestimation.IQualityEstimation;
 import hh.rewarddefinition.Reward;
-import hh.creditrepository.ICreditRepository;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Variation;
@@ -30,10 +28,10 @@ public interface INextHeuristic{
     /**
      * Method to update the internals of the hyper-heuristic selector or 
      * generator based on the given CreditRepository
-     * @param creditRepo the new credit repository
-     * @param creditAgg the credit aggregation strategy to compute the quality of the heuristic
+     * @param reward received 
+     * @param heuristic to be rewarded
      */
-    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg);
+    public void update(Reward reward,Variation heuristic);
     
     /**
      * Resets all stored history, qualities and credits

@@ -6,11 +6,9 @@
 
 package hh.heuristicselectors;
 
-import hh.qualityestimation.IQualityEstimation;
-import hh.creditrepository.ICreditRepository;
+import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import org.moeaframework.core.Variation;
 
 
@@ -46,17 +44,6 @@ public class ProbabilityMatching extends RouletteWheel {
     public String toString() {
         return "ProbabilityMatching";
     }
-
-    /**
-     * Updates the probabilities stored in the selector
-     * @param creditRepo the credit repository that store the past earned credits
-     * @param creditAgg method to aggregate the past credits to compute the heuristic's reward
-     */
-    @Override
-    public void update(ICreditRepository creditRepo, IQualityEstimation creditAgg) {
-        updateQuality(creditRepo, null);
-        super.updateProbabilities();
-    }
     
     /**
      * Updates the quality of the heuristic based on the last reward received by
@@ -65,22 +52,15 @@ public class ProbabilityMatching extends RouletteWheel {
      * becomes negative, it is reset to 0.0. Only updates those heuristics that
      * were just rewarded.
      *
-     * @param creditRepo the credit repository that store the past earned
-     * rewards
-     * @param qualEst method to aggregate the past credits to compute the
-     * heuristic's reward
+     * @param reward given to the heuristic
+     * @param heuristic to be rewarded
      */
     @Override
-    protected void updateQuality(ICreditRepository creditRepo, IQualityEstimation qualEst){
-        Iterator<Variation> iter = creditRepo.getLastRewardedHeuristic().iterator();
-        while(iter.hasNext()){
-            Variation heuristic = iter.next();
-            double reward = creditRepo.getLatestReward(heuristic).getValue();
-            double newQuality = (1-alpha)*qualities.get(heuristic) + reward;
-            if(newQuality<0.0 || Double.isNaN(newQuality))
-                newQuality = 0.0;
-            qualities.put(heuristic, newQuality);
-        }
+    public void update(Reward reward, Variation heuristic) {
+        double newQuality = (1-alpha)*qualities.get(heuristic) + reward.getValue();
+        qualities.put(heuristic, newQuality);
+        super.checkQuality();
+        super.updateProbabilities();
     }
     
     

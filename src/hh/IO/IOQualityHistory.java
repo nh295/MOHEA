@@ -6,10 +6,7 @@
 
 package hh.IO;
 
-import hh.rewarddefinition.Reward;
-import hh.creditrepository.CreditHistoryRepository;
 import hh.qualityhistory.HeuristicQualityHistory;
-import hh.selectionhistory.HeuristicSelectionHistory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
