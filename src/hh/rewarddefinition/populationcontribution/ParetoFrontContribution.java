@@ -40,7 +40,7 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
      */
     public ParetoFrontContribution(double rewardInPF,double rewardNotInPF) {
         super();
-        operatesOn = RewardDefinedOn.POPULATION;
+        operatesOn = RewardDefinedOn.PARETOFRONT;
         this.rewardNotInPF = rewardNotInPF;
         this.rewardInPF = rewardInPF;
     }
