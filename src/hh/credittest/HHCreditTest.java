@@ -129,12 +129,12 @@ public class HHCreditTest {
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-//                        TestRun test = new TestRun(path, prob, probName,
-//                                typeProp, heuristics, maxEvaluations);
+                        TestRun test = new TestRun(path, prob, probName,
+                                typeProp, heuristics, maxEvaluations);
 
                         //benchmark built-in MOEA
-                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
-                            typeProp, "eMOEA", maxEvaluations);
+//                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
+//                            typeProp, "eMOEA", maxEvaluations);
                         futures.add(pool.submit(test));
                     }
                     for (Future<IHyperHeuristic> run : futures) {
