@@ -26,6 +26,7 @@ import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.ParetoObjectiveComparator;
 import org.moeaframework.core.indicator.NormalizedIndicator;
 
 /**
@@ -69,7 +70,16 @@ public class FastHypervolume extends NormalizedIndicator{
 //    return hv ;
 //  }
 
-  public double computeHypervolume(Population pop, Solution referencePoint) {
+  public double computeHypervolume(Population population, Solution referencePoint) {
+      //first filter out all the points that do no dominate the referencePoint
+      Population pop = new Population();
+      ParetoObjectiveComparator domComp = new ParetoObjectiveComparator();
+      for(Solution soln:population){
+            if(domComp.compare(soln, referencePoint)==-1)
+                  pop.add(soln);
+      }
+      
+      
     double hv = 0.0;
     if (pop.isEmpty())
       hv = 0.0;
