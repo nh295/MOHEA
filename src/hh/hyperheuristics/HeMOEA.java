@@ -172,7 +172,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             parents = ArrayUtils.add(
                     selection.select(heuristic.getArity() - 1, population), refParent);
         }
-        pprng.shuffle(parents);
 
         Solution[] children = heuristic.evolve(parents);
 
@@ -187,9 +186,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 switch (creditDef.getOperatesOn()) {
                     case PARENT:
                         creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null,solnRemoved);
-                        break;
-                    case POPULATION:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population,solnRemoved);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "
@@ -207,10 +203,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 //archive. For computational efficiency (e.g. don't have to 
                 //compute dominance for reward computation and for population update)
                 switch (creditDef.getOperatesOn()) {
-                    case POPULATION:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population);
-                        archive.add(child);
-                        break;
                     case PARETOFRONT:
                         creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
                         archive.add(child);

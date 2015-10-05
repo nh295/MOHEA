@@ -5,11 +5,11 @@ javaaddpath(strcat('dist',filesep,'MOHEA.jar'));
 origin = cd;
 cd ..;
 
+% 
+% h1 = figure(1);
+% h2 = figure(2);
 
-h1 = figure(1);
-h2 = figure(2);
-
-probs = 8:10;
+probs = 1:10;
 
 for i=1:length(probs)
     
@@ -23,20 +23,23 @@ for i=1:length(probs)
     HVindicator = org.moeaframework.core.indicator.Hypervolume(prob,refset);
     GDindicator = org.moeaframework.core.indicator.GenerationalDistance(prob,refset);
     AEI = org.moeaframework.core.indicator.AdditiveEpsilonIndicator(prob,refset);
-    refPoint = org.moeaframework.core.Solution([2.0,2.0,2.0]);
+    if probs(i)<=7
+        refPoint = org.moeaframework.core.Solution([2.0,2.0]);
+    else
+        refPoint = org.moeaframework.core.Solution([2.0,2.0,2.0]);
+    end
     FastHVindicator = org.moeaframework.core.indicator.jmetal.FastHypervolume(prob,refset,refPoint);
     IGDIndicator = org.moeaframework.core.indicator.InvertedGenerationalDistance(prob,refset);
     
-    cd ..;
-    cd(strcat('FRRMAB',filesep,'results',filesep,'Benchmarks'));
-    resPath = cd;
+   cd('Benchmarks');
+   resPath = cd;
     
     %compute MOEAD metrics
-%     cd(strcat(resPath,filesep,'MOEAD_CEC2009_',problem));
+    cd(strcat(resPath,filesep,'MOEAD'));
     files = dir(strcat('MOEAD_CEC2009_',problem,'_FUN*'));
     res1 = zeros(length(files),5);
     for j=1:length(files)
-        ndpop = loadObjs1(files(j).name);
+        ndpop = loadObjs1(files(j).name,refPoint,prob);
         res1(j,1)=FastHVindicator.evaluate(ndpop);
         res1(j,2)=IGDIndicator.evaluate(ndpop);
         res1(j,3)=GDindicator.evaluate(ndpop);
@@ -54,11 +57,11 @@ res.IGD = res1(:,2);
 save(strcat(problem,'_MOEAD','.mat'),'res');
     
     %compute MOEAD-DRA metrics
-%     cd(strcat(resPath,filesep,'MOEADDRA',filesep,problem));
+    cd(strcat(resPath,filesep,'MOEADDRA'));
     files = dir(strcat('MOEAD_DRA_CEC2009_',problem,'_FUN*'));
     res2 = zeros(length(files),5);
     for j=1:length(files)
-        ndpop = loadObjs1(files(j).name);
+        ndpop = loadObjs1(files(j).name,refPoint,prob);
         res2(j,1)=FastHVindicator.evaluate(ndpop);
         res2(j,2)=IGDIndicator.evaluate(ndpop);
         res2(j,3)=GDindicator.evaluate(ndpop);
@@ -89,11 +92,11 @@ save(strcat(problem,'_MOEADDRA','.mat'),'res');
 %     end
     
     %compute FRRMAB metrics
-%     cd(strcat(resPath,filesep,'FRRMAB',filesep,problem));
-    files = dir(strcat('MOEAD_DRA_MAB_CEC2009_',problem,'_FUN*'));
+    cd(strcat(resPath,filesep,'FRRMAB'));
+    files = dir(strcat('MOEADDRA_MAB_CEC2009_',problem,'_FUN*'));
     res4 = zeros(length(files),5);
     for j=1:length(files)
-        ndpop = loadObjs1(files(j).name);
+        ndpop = loadObjs1(files(j).name,refPoint,prob);
         res4(j,1)=FastHVindicator.evaluate(ndpop);
         res4(j,2)=IGDIndicator.evaluate(ndpop);
         res4(j,3)=GDindicator.evaluate(ndpop);
@@ -103,11 +106,11 @@ save(strcat(problem,'_MOEADDRA','.mat'),'res');
 %         res4(j,1) = computeHV(set,[2,2],'min');
 %         res4(j,2) = computeIGD(set,ref);
     end
-        res.GD = res2(:,3);
-res.AEI = res2(:,5);
-res.HV = res2(:,4);
-res.fHV = res2(:,1);
-res.IGD = res2(:,2);
+        res.GD = res4(:,3);
+res.AEI = res4(:,5);
+res.HV = res4(:,4);
+res.fHV = res4(:,1);
+res.IGD = res4(:,2);
 save(strcat(problem,'_FRRMAB','.mat'),'res');
     
 %     %plot boxplot and mean for hypervolume
@@ -144,12 +147,25 @@ javarmpath(strcat('dist',filesep,'MOHEA.jar'));
 
 end
 
-function ndpop = loadObjs1(filename)
+%Loads in the points, but only adds them to the ndpop if they dominate
+%refPoint. ndPop is also subject to epsilon dominance to be fair in
+%comparison
+function ndpop = loadObjs1(filename,refPoint,prob)
 objs = dlmread(strcat(filename));
-[a,~] = size(objs);
-ndpop = org.moeaframework.core.NondominatedPopulation;
+elem_geq_refpt_objs = false(size(objs));
+for i=1:refPoint.getNumberOfObjectives
+    elem_geq_refpt_objs(:,i) = objs(:,i)<=refPoint.getObjective(i-1);
+end
+pts_dom_refpt=sum(elem_geq_refpt_objs,2)==refPoint.getNumberOfObjectives;
+pop_dom_refpt = objs(pts_dom_refpt,:);
+
+[a,~] = size(pop_dom_refpt);
+
+%set epsilon archive
+epsilon = org.moeaframework.analysis.sensitivity.EpsilonHelper.getEpsilon(prob);
+ndpop = org.moeaframework.core.EpsilonBoxDominanceArchive(epsilon);
 for j=1:a
-    ndpop.add(org.moeaframework.core.Solution(objs(j,:)));
+    ndpop.add(org.moeaframework.core.Solution(pop_dom_refpt(j,:)));
 end
 end
 

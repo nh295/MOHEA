@@ -52,7 +52,7 @@ public class TestRunBenchmark extends TestRun{
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
-        Instrumenter instrumenter = new Instrumenter().withFrequency(30000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
@@ -67,20 +67,21 @@ public class TestRunBenchmark extends TestRun{
 
         // run the executor using the listener to collect results
         System.out.println("Starting "+ algorithm +" on " + problem.getName());
-
+        long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
                 instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
 //                System.out.printf("%02.4f",(double)instAlgorithm.getNumberOfEvaluations()/(double)maxEvaluations);
             }
-        System.out.println("Done with optimization");
+        long finishTime = System.currentTimeMillis();
+        System.out.println("Done with optimization. Execution time: " + ((finishTime-startTime)/1000) + "s");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
         String name = String.valueOf(System.nanoTime());
         
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_";
-//                + algorithm + "_" + name;
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
+                + algorithm + "_" + name;
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 

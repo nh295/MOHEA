@@ -6,14 +6,11 @@
 
 package hh.hyperheuristics;
 
-import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
-import java.util.HashMap;
 import org.moeaframework.core.Algorithm;
-import org.moeaframework.core.Variation;
 
 /**
  * Hyperheuristic is the framework using a credit assignment and heuristic selection strategy 
