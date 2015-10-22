@@ -10,6 +10,7 @@ import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinedOn;
 import java.util.Collection;
 import java.util.HashMap;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -20,7 +21,15 @@ import org.moeaframework.core.Variation;
  */
 public class EArchiveContribution extends AbstractPopulationContribution{
     private final ParetoFrontContribution aggPFcredit;
+    
+    /**
+     * The amount of credit to give if operator did not create any solutions in archive
+     */
     private final double notInArchive;
+    
+    /**
+     * The amount of credit to give for every solution is in Archive
+     */
     private final double inArchive;
      
     /**
@@ -71,7 +80,7 @@ public class EArchiveContribution extends AbstractPopulationContribution{
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(Iterable<Solution> population, Collection<Variation> heuristics, int iteration) {
+    public HashMap<Variation, Reward> compute(NondominatedPopulation population, Collection<Variation> heuristics, int iteration) {
         HashMap<Variation,Reward> credits = new HashMap();
         for(Variation heuristic:heuristics){
             credits.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));

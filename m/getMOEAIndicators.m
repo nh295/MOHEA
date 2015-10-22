@@ -1,4 +1,4 @@
-function [AEI,GD,HV,fHV,IGD] = getMOEAIndicators(filename)
+function [AEI,GD,Inj,fHV,IGD] = getMOEAIndicators(filename)
 %reads the csv values starting from the 2nd column
 %filename must include path and extension
 %EI is the epsilon indicator
@@ -13,7 +13,7 @@ data = data(:,sum(data,1)>0);
 
 %get end of run indicator values
 AEI = data(1,:);
-GD = data(2,:);
-HV = data(3,:);
+Inj = data(2,:);
+GD = data(3,:);
 IGD = data(4,:);
 fHV = data(7,:);

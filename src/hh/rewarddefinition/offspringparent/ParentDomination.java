@@ -96,7 +96,7 @@ public class ParentDomination extends AbstractOffspringParent {
      * @return the value of reward to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, Solution parent, Population pop, int removedSolution) {
+    public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
         switch (comparator.compare(parent, offspring)) {
             case -1:
                 return creditParentDominates;

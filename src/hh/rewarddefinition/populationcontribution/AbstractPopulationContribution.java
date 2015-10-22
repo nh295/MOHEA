@@ -8,9 +8,10 @@ package hh.rewarddefinition.populationcontribution;
 
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.AbstractRewardDefintion;
-import hh.rewarddefinition.RewardDefinitionType;
+import hh.rewarddefinition.CreditFunctionType;
 import java.util.Collection;
 import java.util.HashMap;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -21,7 +22,7 @@ import org.moeaframework.core.Variation;
 public abstract class AbstractPopulationContribution extends AbstractRewardDefintion{
     
     public AbstractPopulationContribution(){
-        type = RewardDefinitionType.POPULATIONCONTRIBUTION;
+        type = CreditFunctionType.NCI;
     }
     
     /**
@@ -31,5 +32,5 @@ public abstract class AbstractPopulationContribution extends AbstractRewardDefin
      * @param iteration
      * @return 
      */
-    public abstract HashMap<Variation, Reward> compute(Iterable<Solution> population,Collection<Variation> heuristics,int iteration);
+    public abstract HashMap<Variation, Reward> compute(NondominatedPopulation population,Collection<Variation> heuristics,int iteration);
 }

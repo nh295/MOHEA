@@ -31,6 +31,7 @@ import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.AdaptiveMultimethodVariationCollector;
 import org.moeaframework.analysis.collector.AdaptiveTimeContinuationCollector;
 import org.moeaframework.analysis.collector.ApproximationSetCollector;
+import org.moeaframework.analysis.collector.ArchiveInjectionCollector;
 import org.moeaframework.analysis.collector.Collector;
 import org.moeaframework.analysis.collector.ElapsedTimeCollector;
 import org.moeaframework.analysis.collector.EpsilonProgressCollector;
@@ -124,6 +125,12 @@ public class Instrumenter extends ProblemBuilder {
 	 * {@code false} otherwise.
 	 */
 	private boolean includeEpsilonProgress;
+        
+        /**
+	 * {@code true} if the injection counter collector is included;
+	 * {@code false} otherwise.
+	 */
+        private boolean includeInjectionIndicator;
 	
 	/**
 	 * {@code true} if the adaptive multimethod variation collector is included;
@@ -171,6 +178,7 @@ public class Instrumenter extends ProblemBuilder {
 	 * The accumulator from the last instrumented algorithm.
 	 */
 	private Accumulator lastAccumulator;
+        
 	
 	/**
 	 * Constructs a new instrumenter instance, initially with no collectors.
@@ -319,6 +327,17 @@ public class Instrumenter extends ProblemBuilder {
 	 */
 	public Instrumenter attachEpsilonProgressCollector() {
 		includeEpsilonProgress = true;
+		
+		return this;
+	}
+        
+        /**
+	 * Includes the injection count collector when instrumenting algorithms
+	 * 
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter attachInjectionCollector() {
+		includeInjectionIndicator = true;
 		
 		return this;
 	}
@@ -617,6 +636,10 @@ public class Instrumenter extends ProblemBuilder {
 		
 		if (includeEpsilonProgress) {
 			collectors.add(new EpsilonProgressCollector());
+		}
+                
+                if (includeInjectionIndicator) {
+			collectors.add(new ArchiveInjectionCollector());
 		}
 		
 		if (includeAdaptiveMultimethodVariation) {

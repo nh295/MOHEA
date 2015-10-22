@@ -5,21 +5,18 @@
  */
 package hh.rewarddefinition;
 
-import hh.rewarddefinition.fitnessindicator.BinaryAdditiveEpsilonIndicator;
-import hh.rewarddefinition.fitnessindicator.BinaryHypervolumeIndicator;
-import hh.rewarddefinition.fitnessindicator.BinaryR2Indicator;
-import hh.rewarddefinition.fitnessindicator.BinaryR3Indicator;
-import hh.rewarddefinition.offspringparent.IBEABinaryIndicator;
+import hh.rewarddefinition.fitnessindicator.AdditiveEpsilonIndicator;
+import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
+import hh.rewarddefinition.fitnessindicator.R2Indicator;
+import hh.rewarddefinition.offspringparent.OPBinaryIndicator;
 import hh.rewarddefinition.offspringparent.ParentDomination;
 import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
 import hh.rewarddefinition.offspringpopulation.OffspringPopulationIndicator;
-import hh.rewarddefinition.offspringpopulation.OffspringParetoRank;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
 import java.util.Arrays;
 import org.moeaframework.core.Problem;
-import org.moeaframework.core.Solution;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -78,13 +75,13 @@ public class RewardDefFactory {
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPIAE": //offspring parent additive epsilon indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryAdditiveEpsilonIndicator(), kappa, new Solution(refPoint));
+                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa);
                 break;
             case "OPIHV": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryHypervolumeIndicator(problem), kappa, new Solution(refPoint));
+                credDef = new OPBinaryIndicator(new HypervolumeIndicator(problem), kappa);
                 break;
             case "OPIR2": //offspring parent hypervolume indicator using pareto front
-                credDef = new IBEABinaryIndicator(new BinaryR2Indicator(numObj,numVec), kappa, new Solution(idealPoint));
+                credDef = new OPBinaryIndicator(new R2Indicator(numObj,numVec), kappa);
                 break;
 //            case "OPIR3": //offspring parent hypervolume indicator using pareto front
 //                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
@@ -92,26 +89,31 @@ public class RewardDefFactory {
             case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);
                 break;
-            case "OPopPR": //within pareto rank
-                credDef = new OffspringParetoRank(satisfy, disatisfy, rank);
-                break;
             case "OPopEA": //in epsilon archive
                 credDef = new OffspringEArchive(satisfy, disatisfy);
                 break;
             case "OPopIPFAE": //offpsring improvement to additive epsilon indicator value for pareto front
-                credDef = new OffspringPopulationIndicator(new BinaryAdditiveEpsilonIndicator(),RewardDefinedOn.PARETOFRONT,null);
+                credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),RewardDefinedOn.PARETOFRONT);
+                break;
+            case "OPopIPFHV":
+                //offpsring improvement to hypervolume of pareto front
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem),RewardDefinedOn.PARETOFRONT);
                 break;
             case "OPopIPFR2": //offpsring improvement to R2 indicator value for pareto front
-                credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT,new Solution(idealPoint));
+                credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT);
                 break;
 //            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
 //                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj,numVec),RewardDefinedOn.PARETOFRONT,new Solution(idealPoint));
 //                break;
             case "OPopIEAAE": //offpsring improvement to additive epsilon indicator value for epsilon archive
-                credDef = new OffspringPopulationIndicator(new BinaryAdditiveEpsilonIndicator(),RewardDefinedOn.ARCHIVE,null);
+                credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),RewardDefinedOn.ARCHIVE);
+                break;
+            case "OPopIEAHV":
+                //offpsring improvement to hypervolume of pareto front
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
                 break;
             case "OPopIEAR2": //offpsring improvement to R2 indicator value for epsilon archive
-                credDef = new OffspringPopulationIndicator(new BinaryR2Indicator(numObj,numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));
+                credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),RewardDefinedOn.ARCHIVE);
                 break;
 //            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
 //                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj, numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));

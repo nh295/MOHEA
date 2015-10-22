@@ -17,6 +17,9 @@
  */
 package org.moeaframework.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.moeaframework.core.comparator.EpsilonBoxDominanceComparator;
@@ -50,6 +53,11 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 	 * that have occurred.
 	 */
 	private int numberOfDominatingImprovements;
+        
+        /**
+         * The number of times the archive is used for injection
+         */
+        private int injectionCount;
 
 	/**
 	 * Constructs an empty &epsilon;-box dominance archive using an additive
@@ -128,38 +136,52 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 
 	@Override
 	public boolean add(Solution newSolution) {
-		Iterator<Solution> iterator = iterator();
+		return addAndReturnRemovedSolutions(newSolution) != null;
+	}
+        
+     /**
+     * If {@code newSolution} is dominates any solution or is non-dominated with
+     * all solutions in this population, the dominated solutions are removed and
+     * {@code newSolution} is added to this population. Otherwise,
+     * {@code newSolution} is dominated and is not added to this population.
+     *
+     * @return returns a collection of the solutions that are no longer in the
+     * nondominated population. If return an empty list, new solution enters
+     * nondominated set but doesn't replace any solutions. If return null, then
+     * new solution didn't enter nondominated set
+     */
+     @Override
+    public Collection<Solution> addAndReturnRemovedSolutions(Solution newSolution) {
+        
+        ArrayList<Solution> removed = new ArrayList<>();
+        Iterator<Solution> iterator = iterator();
 
 		boolean same = false;
 		boolean dominates = false;
-
 		while (iterator.hasNext()) {
 			Solution oldSolution = iterator.next();
 			int flag = getComparator().compare(newSolution, oldSolution);
-
 			if (flag < 0) {
 				if (getComparator().isSameBox()) {
 					same = true;
 				} else {
 					dominates = true;
 				}
-
+                                removed.add(oldSolution);
 				iterator.remove();
 			} else if (flag > 0) {
-				return false;
+				return null;
 			}
 		}
-
 		if (!same) {
 			numberOfImprovements++;
-
 			if (dominates) {
 				numberOfDominatingImprovements++;
 			}
 		}
-
-		return forceAddWithoutCheck(newSolution);
-	}
+		forceAddWithoutCheck(newSolution);
+                return removed;
+    }
 
 	/**
 	 * Returns the &epsilon;-box dominance comparator used by this archive.
@@ -190,5 +212,20 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 	public int getNumberOfDominatingImprovements() {
 		return numberOfDominatingImprovements;
 	}
+        
+        /**
+         * Increments the number of times the archive has been used for injection
+         */
+        public void incrementInjection(){
+            injectionCount++;
+        }
+        
+        /**
+         * returns the number of times that the archive has been used for injection
+         * @return 
+         */
+        public int getInjectionCount(){
+            return injectionCount;
+        }
 
 }

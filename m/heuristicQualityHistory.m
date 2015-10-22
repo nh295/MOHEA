@@ -2,7 +2,6 @@ function heuristicQualityHistory(path,filenames)
 %heuristicQualityHistory plots the heuriatic quality history of each heuristic used. A
 %subplot shows the quality at every iteration
 %filenames should come from dir and have a field "name"
-
 import hh.*
 
 %load in data

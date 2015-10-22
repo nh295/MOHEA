@@ -9,7 +9,7 @@ import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
-import hh.rewarddefinition.RewardDefinitionType;
+import hh.rewarddefinition.CreditFunctionType;
 import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
 import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
 import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
@@ -29,6 +29,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Selection;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
+import org.moeaframework.core.operator.real.PM;
 
 /**
  *
@@ -39,7 +40,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     /**
      * The type of heuristic selection method
      */
-    private final INextHeuristic heuristicSelector;
+    private final INextHeuristic operatorSelector;
 
     /**
      * The Credit definition to be used that defines how much credit to receive
@@ -47,14 +48,12 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      */
     private final IRewardDefinition creditDef;
 
-
     /**
      * The history that stores all the heuristics selected by the hyper
      * heuristics. History can be extracted by getSelectionHistory(). Used for
      * analyzing the results to see the dynamics of heuristics selected
      */
     private IHeuristicSelectionHistory heuristicSelectionHistory;
-
 
     /**
      * The set of heuristics that the hyper heuristic is able to work with
@@ -66,6 +65,32 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      */
     private final Selection selection;
 
+    /**
+     * This counter keeps track of the archive's epsilon progress
+     */
+    private int epsilonProgressCounter;
+
+    /**
+     * This stores the value of the epsilon progress from the last iteration
+     */
+    private int prevEpsilonProgressCount;
+
+    /**
+     * The allowed number of iterations without epsilon progress
+     */
+    private final int lagWindow;
+
+    /**
+     * The injection rate. The fraction of the population to populate with
+     * archival solutions
+     */
+    private final double injectionRate;
+
+    /**
+     * Polynomial mutation operator used when after injecting archival solutions
+     * into population does not fill up population
+     */
+    private PM pm;
 
     /**
      * The history of the heuristics' qualities over time. Used for analyzing
@@ -111,21 +136,29 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * hyper-heuristic
      * @param creditDef the credit definition to score the performance of the
      * low-level heuristics
+     * @param injectionRate The fraction of the population to populate with
+     * archival solutions
+     * @param lagWindow The allowed number of iterations without epsilon
+     * progress
      */
     public HeMOEA(Problem problem, Population population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Initialization initialization, INextHeuristic heuristicSelector,
-            IRewardDefinition creditDef) {
+            IRewardDefinition creditDef, double injectionRate, int lagWindow) {
         super(problem, population, archive, selection, null, initialization);
 
         this.heuristics = heuristicSelector.getHeuristics();
         this.selection = selection;
-        this.heuristicSelector = heuristicSelector;
+        this.operatorSelector = heuristicSelector;
         this.creditDef = creditDef;
         this.heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
         this.qualityHistory = new HeuristicQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         this.iteration = 0;
+        this.epsilonProgressCounter = 0;
+        this.injectionRate = injectionRate;
+        this.pm = new PM(1 / problem.getNumberOfVariables(), 20);
+        this.lagWindow = lagWindow;
 
         //Initialize the stored pareto front
         super.initialize();
@@ -158,78 +191,78 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public void iterate() {
         iteration++;
 
+        //Check epsilon progress (if the epsilon domination count increases in archive)
+        if (prevEpsilonProgressCount == getArchive().getNumberOfDominatingImprovements()) {
+            epsilonProgressCounter++;
+            if (epsilonProgressCounter > lagWindow) {
+                injectFromArchive();
+            }
+        }
+
         //select next heuristic
-        Variation heuristic = heuristicSelector.nextHeuristic();
+        Variation operator = operatorSelector.nextHeuristic();
 
         Solution[] parents;
 
         Solution refParent; //used in OffspringParent Rewads
         if (archive.size() <= 1) {
-            parents = selection.select(heuristic.getArity(), population);
+            parents = selection.select(operator.getArity(), population);
             refParent = parents[pprng.nextInt(parents.length)];
         } else {
             refParent = archive.get(pprng.nextInt(archive.size()));
             parents = ArrayUtils.add(
-                    selection.select(heuristic.getArity() - 1, population), refParent);
+                    selection.select(operator.getArity() - 1, population), refParent);
         }
-        pprng.shuffle(parents);
 
-        Solution[] children = heuristic.evolve(parents);
-
-        if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPARENT) {
+        Solution[] children = operator.evolve(parents);
+        if (creditDef.getType() == CreditFunctionType.OP) {
             for (Solution child : children) {
                 evaluate(child);
-                
-                int solnRemoved = addToPopulation(child);
-                double creditValue;
+                Solution removedSoln = addToPopulation(child);
+                double creditValue = 0;
+                if (removedSoln != null) {
                 //credit definitions operating on population and archive does 
-                //NOT modify the population by adding the child to the population/archive
-                switch (creditDef.getOperatesOn()) {
-                    case PARENT:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, null,solnRemoved);
-                        break;
-                    case POPULATION:
-                        creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population,solnRemoved);
-                        break;
-                    default:
-                        throw new NullPointerException("Credit definition not "
-                                + "recognized. Used " + creditDef.getType() + ".");
+                    //NOT modify the population by adding the child to the population/archive
+                    switch (creditDef.getOperatesOn()) {
+                        case PARENT:
+                            creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population, removedSoln);
+                            break;
+                        default:
+                            throw new NullPointerException("Credit definition not "
+                                    + "recognized. Used " + creditDef.getType() + ".");
+                    }
                 }
                 archive.add(child);
-                heuristicSelector.update(new Reward(iteration, creditValue),heuristic);
+                operatorSelector.update(new Reward(iteration, creditValue), operator);
             }
-        } else if (creditDef.getType() == RewardDefinitionType.OFFSPRINGPOPULATION) {
+        } else if (creditDef.getType() == CreditFunctionType.NSI) {
             for (Solution child : children) {
                 evaluate(child);
-                double creditValue;
-                //credit definitions operating on population and archive will 
-                //modify the population by adding the child to the population/
-                //archive. For computational efficiency (e.g. don't have to 
-                //compute dominance for reward computation and for population update)
-                switch (creditDef.getOperatesOn()) {
-                    case POPULATION:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, population);
-                        archive.add(child);
-                        break;
-                    case PARETOFRONT:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
-                        archive.add(child);
-                        break;
-                    case ARCHIVE:
-                        creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive);
-                        break;
-                    default:
-                        throw new NullPointerException("Credit definition not "
-                                + "recognized. Used " + creditDef.getType() + ".");
+                double creditValue = 0.0;
+                Solution removedSoln = addToPopulation(child);
+                if (removedSoln != null) { //solution made it in population
+                    //credit definitions operating on PF and archive will 
+                    //modify the nondominated population by adding the child to the nondominated population.
+                    switch (creditDef.getOperatesOn()) {
+                        case PARETOFRONT:
+                            creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
+                            archive.add(child);
+                            break;
+                        case ARCHIVE:
+                            creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive);
+                            break;
+                        default:
+                            throw new NullPointerException("Credit definition not "
+                                    + "recognized. Used " + creditDef.getType() + ".");
+                    }
+                    operatorSelector.update(new Reward(iteration, creditValue), operator);
                 }
-                addToPopulation(child);
-                heuristicSelector.update(new Reward(iteration, creditValue),heuristic);
             }
-        } else if (creditDef.getType() == RewardDefinitionType.POPULATIONCONTRIBUTION){
+        } else if (creditDef.getType() == CreditFunctionType.NCI) {
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
-                child.setAttribute("heuristic", new SerializableVal(heuristic.toString()));
+                child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                 addToPopulation(child);
             }
             boolean archiveChanged = archive.addAll(children);
@@ -257,11 +290,11 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                             + "recognized. Used " + creditDef.getType() + ".");
             }
             Iterator<Variation> iter = popContRewards.keySet().iterator();
-            while(iter.hasNext()){
-                Variation operator = iter.next();
-                heuristicSelector.update(popContRewards.get(operator),operator);
+            while (iter.hasNext()) {
+                Variation operator_i = iter.next();
+                operatorSelector.update(popContRewards.get(operator_i), operator_i);
             }
-        }else{
+        } else {
             throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
         }
 //        heuristicSelectionHistory.add(heuristic);
@@ -269,6 +302,25 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         updateQualityHistory();
     }
 
+    /**
+     * This method is used when there is a stagnation in the epsilon progress.
+     * It clears out the population and injects a portion of the archive into
+     * the population. If there are more spaces remaining in the population
+     * after that, the injected solutions are mutated until the desired
+     * population size is reached
+     */
+    private void injectFromArchive() {
+        int size = population.size();
+        population.clear();
+        for (int i = 0; i < Math.floor(((double) size) * injectionRate); i++) {
+            ((NondominatedPopulation) population).forceAddWithoutCheck(archive.get(pprng.nextInt(archive.size())));
+        }
+        while (population.size() < size) {
+            Solution[] solution2Mutate = new Solution[]{population.get(pprng.nextInt(population.size()))};
+            Solution[] mutated = pm.evolve(solution2Mutate);
+            ((NondominatedPopulation) population).forceAddWithoutCheck(mutated[0]);
+        }
+    }
 
     /**
      * reuses the previous population contribution rewards. This method updates
@@ -290,7 +342,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * to the INextHeuristic class used
      */
     private void updateQualityHistory() {
-        HashMap<Variation, Double> currentQualities = heuristicSelector.getQualities();
+        HashMap<Variation, Double> currentQualities = operatorSelector.getQualities();
         for (Variation heuristic : heuristics) {
             qualityHistory.add(heuristic, currentQualities.get(heuristic));
 //            System.out.print(currentQualities.get(heuristic) + "\t");
@@ -307,6 +359,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public IHeuristicSelectionHistory getSelectionHistory() {
         return heuristicSelectionHistory;
     }
+
     /**
      * gets the quality history stored for each heuristic in the hyper-heuristic
      *
@@ -325,7 +378,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public void reset() {
         iteration = 0;
         heuristicSelectionHistory.clear();
-        heuristicSelector.reset();
+        operatorSelector.reset();
         numberOfEvaluations = 0;
         qualityHistory.clear();
     }
@@ -337,7 +390,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
     @Override
     public INextHeuristic getNextHeuristicSupplier() {
-        return heuristicSelector;
+        return operatorSelector;
     }
 
 }

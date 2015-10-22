@@ -70,7 +70,7 @@ public class FastHypervolume extends NormalizedIndicator{
 //    return hv ;
 //  }
 
-  public double computeHypervolume(Population population, Solution referencePoint) {
+  public double computeHypervolume(NondominatedPopulation population, Solution referencePoint) {
       //first filter out all the points that do no dominate the referencePoint
       Population pop = new Population();
       ParetoObjectiveComparator domComp = new ParetoObjectiveComparator();
@@ -80,12 +80,11 @@ public class FastHypervolume extends NormalizedIndicator{
       }
       
       
-    double hv = 0.0;
+    double hv;
     if (pop.isEmpty())
       hv = 0.0;
     else {
       numberOfObjectives_ = pop.get(0).getNumberOfObjectives();
-      referencePoint_ = referencePoint;
 
       if (numberOfObjectives_ == 2) {
         pop.sort(new JObjectiveComparator(numberOfObjectives_ - 1, true));
@@ -101,24 +100,13 @@ public class FastHypervolume extends NormalizedIndicator{
     return hv;
   }
 
-//
-//  /**
-//   * Updates the reference point
-//   */
-//  private void updateReferencePoint(Population pop) {
-//    double [] maxObjectives = new double[numberOfObjectives_] ;
-//    for (int i = 0; i < numberOfObjectives_; i++)
-//      maxObjectives[i] = 0 ;
-//
-//    for (int i = 0; i < pop.size(); i++)
-//      for (int j = 0 ; j < numberOfObjectives_; j++)
-//        if (maxObjectives[j] < pop.get(i).getObjective(j))
-//          maxObjectives[j] = pop.get(i).getObjective(j) ;
-//
-//    for (int i = 0; i < referencePoint_.getNumberOfObjectives(); i++) {
-//      referencePoint_.setObjective(i, maxObjectives[i]+ offset_) ;
-//    }
-//  }
+
+  /**
+   * Updates the reference point
+   */
+  public void updateReferencePoint(Solution refPt) {
+    this.referencePoint_ = refPt;
+  }
 
   /**
    * Computes the HV of a solution set.

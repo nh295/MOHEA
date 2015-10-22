@@ -19,7 +19,7 @@ public interface IRewardDefinition {
      * Gets the type of credit definition
      * @return 
      */
-    public RewardDefinitionType getType();
+    public CreditFunctionType getType();
     
     /**
      * Gets the type of credit definition

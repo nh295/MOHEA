@@ -7,7 +7,7 @@
 package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.AbstractRewardDefintion;
-import hh.rewarddefinition.RewardDefinitionType;
+import hh.rewarddefinition.CreditFunctionType;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -18,7 +18,7 @@ import org.moeaframework.core.Solution;
 public abstract class AbstractOffspringParent extends AbstractRewardDefintion{
 
     public AbstractOffspringParent(){
-        type = RewardDefinitionType.OFFSPRINGPARENT;
+        type = CreditFunctionType.OP;
     }
     
     
@@ -31,9 +31,9 @@ public abstract class AbstractOffspringParent extends AbstractRewardDefintion{
      * @param offspring offspring solutions that will receive credits
      * @param parent the parent solution to compare the offspring solutions with
      * @param pop population may be needed to calculate the fitness of the offspring and parent solutions
-     * @param removedSolution the solution index that was just removed from the population
+     * @param removedSolution the solution that was just removed from the population
      * @return the value of reward to resulting from the solution
      */
-    public abstract double compute(Solution offspring, Solution parent,Population pop, int removedSolution);
+    public abstract double compute(Solution offspring, Solution parent,Population pop, Solution removedSolution);
     
 }

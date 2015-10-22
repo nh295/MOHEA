@@ -5,6 +5,7 @@ function [vals,benchmark_names] = getBenchmarkVals(prob_name,indicator)
 %returns the indicator valsues for each benchmark for specified indicator
 %and the labels of the names of each benchmark algorithm
 
+% path2benchmark = '/Users/nozomihitomi/Dropbox/MOHEA/Benchmarks';
 path2benchmark = 'C:\Users\SEAK2\Nozomi\MOHEA\Benchmarks';
 benchmark_names = {'MOEAD', 'MOEADDRA', 'FRRMAB', 'eMOEA','Random'};
 
