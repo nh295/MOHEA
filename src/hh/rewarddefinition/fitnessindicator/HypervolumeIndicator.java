@@ -58,8 +58,11 @@ public class HypervolumeIndicator implements IIndicator {
 
     @Override
     public double compute(Solution solnA, Solution solnB, Solution refPt) {
-        if (domComparator.compare(solnA, solnB) == -1) {
+        int dom = domComparator.compare(solnA, solnB);
+        if (dom == -1) {
             return volume(solnB,refPt) - volume(solnA,refPt);
+        }else if (dom == 1) {
+            return volume(solnA,refPt) - volume(solnB,refPt);
         } else {
             return volume(new Solution[]{solnA, solnB},refPt) - volume(solnA,refPt);
         }
@@ -90,6 +93,7 @@ public class HypervolumeIndicator implements IIndicator {
      * @return
      */
     private double volume(Solution[] solutions,Solution refPt) {
+        FHV.updateReferencePoint(refPt);
         return FHV.evaluate(new NondominatedPopulation(Arrays.asList(solutions)));
     }
     

@@ -124,6 +124,18 @@ public class RewardDefFactory {
             case "CEA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
+            case "CHVPF": //Contribution to HV of Pareto front
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                break;
+            case "CHVEA": //Contribution to HV of epsilon archive
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                break;
+            case "CR2PF": //Contribution to R2 of Pareto front
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                break;
+            case "CR2EA": //Contribution to R2 of epsilon archive
+                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                break;
             default:
                 throw new IllegalArgumentException("No such credit defintion: " + name);
         }

@@ -198,14 +198,17 @@ public class SortedLinkedList<T> extends LinkedList<T> {
      * @param e
      * @return 
      */
-    private boolean flaggedAddFirst(T e){
-        int compare = comparator.compare(this.getFirst(), e);
-        if(compare!=-1){
+    private boolean flaggedAddFirst(T e) {
+        if(this.size()==0){
+            this.add(0, e);
+            return true;
+        }
+        int compare = comparator.compare(this.get(0), e);
+        if (compare != -1) {
             super.addFirst(e);
             return true;
         }
         return false;
     }
-    
-    
+
 }

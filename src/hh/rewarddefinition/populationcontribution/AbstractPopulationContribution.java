@@ -12,7 +12,6 @@ import hh.rewarddefinition.CreditFunctionType;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.NondominatedPopulation;
-import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
 /**

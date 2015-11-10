@@ -21,11 +21,11 @@
 % gets all the best, worst and mean values for each indicator
 % also finds the % past 90% attainment on hypervolume
 
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};%,'UF11','UF12','UF13'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};%,'UF11','UF12','UF13'};
 % problemName = {'UF11','UF12','UF13'};
 selectors = {'Probability','Adaptive'};
-% creditDef = { 'ParetoFrontContribution','EArchiveContribution'};
-creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
+creditDef = { 'OPa_BIHVPARENT','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIHVPARETOFRONT','OPop_BIR2ARCHIVE','OPop_BIHVARCHIVE'};
+% creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
 % selectors = {'eMOEA'};
 % creditDef = {'EArchiveContribution'};
 % problemName = {'UF10'};
@@ -39,7 +39,7 @@ for j=1:length(selectors)
 %         figure
         for k=1:length(problemName)
 %             [AEI,GD,HV,fHV,IGD] = getAllResults(strcat(path,filesep,'results6opsInjection'),selectors{j},creditDef{i},problemName{k});
-            [AEI,GD,Inj,fHV,IGD] = getAllResults(strcat(path,filesep,'resultsDEopsInjection'),selectors{j},creditDef{i},problemName{k});
+            [AEI,GD,Inj,fHV,IGD] = getAllResults(strcat(path,filesep,'results'),selectors{j},creditDef{i},problemName{k});
             res.GD = squeeze(GD(:,end));
             res.AEI = squeeze(AEI(:,end));
             res.Inj = squeeze(Inj(:,end));

@@ -372,7 +372,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
     /**
      * Reset the hyperheuristic. Clear all selection history and the credit
-     * repository
+     * repository. Clears the population and the archive
      */
     @Override
     public void reset() {
@@ -381,6 +381,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         operatorSelector.reset();
         numberOfEvaluations = 0;
         qualityHistory.clear();
+        population.clear();
+        archive.clear();
+        creditDef.clear();
     }
 
     @Override

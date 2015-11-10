@@ -6,8 +6,6 @@
 
 package hh.rewarddefinition;
 
-import org.moeaframework.core.Variation;
-
 /**
  * Use this to define what solutions are included in computing and what metrics 
  * should be used to compute credit.
@@ -26,4 +24,9 @@ public interface IRewardDefinition {
      * @return 
      */
     public RewardDefinedOn getOperatesOn();
+    
+    /**
+     * Clears all information stored in object. Try to reduce chance of memory leaks
+     */
+    public void clear();
 }

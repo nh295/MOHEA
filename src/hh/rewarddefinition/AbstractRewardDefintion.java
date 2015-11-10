@@ -118,5 +118,10 @@ public class AbstractRewardDefintion implements IRewardDefinition {
         updateBoundsRemove(oldSolution);
         updateBoundsInsert(newSolution);
     }
+    
+    @Override
+    public void clear(){
+        sortedObjs.clear();
+    }
 
 }

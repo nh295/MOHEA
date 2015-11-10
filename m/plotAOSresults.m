@@ -1,14 +1,15 @@
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
-creditShort = {'ODP','OPopF','OPopEA','CPF','CEA'};
+creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPa_BIHVPARENT','OPop_BIR2PARETOFRONT','OPop_BIHVPARETOFRONT','OPop_BIR2ARCHIVE','OPop_BIHVARCHIVE'};
+creditShort = {'ODP','OPopF','OPopEA','CPF','CEA','OPaR2','OPaHV','OPopR2','OPopHV','CR2','CHV'};
 
 % path ='/Users/nozomihitomi/Dropbox/MOHEA/mres';
-path = 'C:\Users\SEAK2\Nozomi\MOHEA\mResDEopsInjection';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\mRes6opsInjection';
 
 b = length(selectors)*length(creditDef);
 
