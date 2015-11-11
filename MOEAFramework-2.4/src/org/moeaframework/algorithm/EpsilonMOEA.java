@@ -18,6 +18,7 @@
 package org.moeaframework.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -137,9 +138,9 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 	 * solution or a non-dominated solution.
 	 * 
 	 * @param newSolution the new solution being added to the population
-         * @return the solution position that was removed. If the new solution does not replace any solution, return -1;
+         * @return the solution that was removed. If the new solution does not replace any solution, return null;
 	 */
-	protected int addToPopulation(Solution newSolution) {
+	protected Solution addToPopulation(Solution newSolution) {
 		List<Integer> dominates = new ArrayList<Integer>();
 		boolean dominated = false;
 
@@ -153,17 +154,19 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 				dominated = true;
 			}
 		}
-                int out;
+                Solution out;
 		if (!dominates.isEmpty()) {
-                        out = dominates.get(pprng.nextInt(dominates.size()));
-			population.remove(out);
+                        int ind = dominates.get(pprng.nextInt(dominates.size()));
+			out = population.get(ind);
+                        population.remove(ind);
 			population.add(newSolution);
 		} else if (!dominated) {
-                    out = pprng.nextInt(population.size());
-			population.remove(pprng.nextInt(population.size()));
+                    int ind = pprng.nextInt(population.size());
+                    out = population.get(ind);
+			population.remove(out);
 			population.add(newSolution);
 		} else 
-                    out = -1;
+                    out = null;
                 return out;
 	}
 

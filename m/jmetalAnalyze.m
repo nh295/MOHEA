@@ -35,8 +35,87 @@ for i=1:length(probs)
    resPath = cd;
     
     %compute MOEAD metrics
-    cd(strcat(resPath,filesep,'MOEAD'));
-    files = dir(strcat('MOEAD_CEC2009_',problem,'_FUN*'));
+%     cd(strcat(resPath,filesep,'MOEAD'));
+%     files = dir(strcat('MOEAD_CEC2009_',problem,'_FUN*'));
+%     res1 = zeros(length(files),5);
+%     for j=1:length(files)
+%         ndpop = loadObjs1(files(j).name,refPoint,prob);
+%         res1(j,1)=FastHVindicator.evaluate(ndpop);
+%         res1(j,2)=IGDIndicator.evaluate(ndpop);
+%         res1(j,3)=GDindicator.evaluate(ndpop);
+%         res1(j,4)=HVindicator.evaluate(ndpop);
+%         res1(j,5)=AEI.evaluate(ndpop);
+% %         set = loadObjs2(files(j).name);
+% %         res1(j,1) = computeHV(set,[2,2],'min');
+% %         res1(j,2) = computeIGD(set,ref);
+%     end
+% res.GD = res1(:,3);
+% res.AEI = res1(:,5);
+% res.HV = res1(:,4);
+% res.fHV = res1(:,1);
+% res.IGD = res1(:,2);
+% save(strcat(problem,'_MOEAD','.mat'),'res');
+    
+%     %compute MOEAD-DRA metrics
+%     cd(strcat(resPath,filesep,'MOEADDRA'));
+%     files = dir(strcat('MOEAD_DRA_CEC2009_',problem,'_FUN*'));
+%     res2 = zeros(length(files),5);
+%     for j=1:length(files)
+%         ndpop = loadObjs1(files(j).name,refPoint,prob);
+%         res2(j,1)=FastHVindicator.evaluate(ndpop);
+%         res2(j,2)=IGDIndicator.evaluate(ndpop);
+%         res2(j,3)=GDindicator.evaluate(ndpop);
+%         res2(j,4)=HVindicator.evaluate(ndpop);
+%         res2(j,5)=AEI.evaluate(ndpop);
+% %         set = loadObjs2(files(j).name);
+% %         res2(j,1) = computeHV(set,[2,2],'min');
+% %         res2(j,2) = computeIGD(set,ref);
+%     end
+% res.GD = res2(:,3);
+% res.AEI = res2(:,5);
+% res.HV = res2(:,4);
+% res.fHV = res2(:,1);
+% res.IGD = res2(:,2);
+% save(strcat(problem,'_MOEADDRA','.mat'),'res');
+%     
+% %     %compute Random selection metrics
+% % %     cd(strcat(resPath,filesep,'Random',filesep,problem));
+% %     files = dir(strcat('Rand_CEC2009_',problem,'_FUN*'));
+% %     res3 = zeros(length(files),2);
+% %     for j=1:length(files)
+% %         ndpop = loadObjs1(files(j).name);
+% %         res3(j,1)=FastHVindicator.evaluate(ndpop);
+% %         res3(j,2)=IGDIndicator.evaluate(ndpop);
+% % %         set = loadObjs2(files(j).name);
+% % %         res3(j,1) = computeHV(set,[2,2],'min');
+% % %         res3(j,2) = computeIGD(set,ref);
+% %     end
+%     
+%     %compute FRRMAB metrics
+%     cd(strcat(resPath,filesep,'FRRMAB'));
+%     files = dir(strcat('MOEADDRA_MAB_CEC2009_',problem,'_FUN*'));
+%     res4 = zeros(length(files),5);
+%     for j=1:length(files)
+%         ndpop = loadObjs1(files(j).name,refPoint,prob);
+%         res4(j,1)=FastHVindicator.evaluate(ndpop);
+%         res4(j,2)=IGDIndicator.evaluate(ndpop);
+%         res4(j,3)=GDindicator.evaluate(ndpop);
+%         res4(j,4)=HVindicator.evaluate(ndpop);
+%         res4(j,5)=AEI.evaluate(ndpop);
+% %         set = loadObjs2(files(j).name);
+% %         res4(j,1) = computeHV(set,[2,2],'min');
+% %         res4(j,2) = computeIGD(set,ref);
+%     end
+%         res.GD = res4(:,3);
+% res.AEI = res4(:,5);
+% res.HV = res4(:,4);
+% res.fHV = res4(:,1);
+% res.IGD = res4(:,2);
+% save(strcat(problem,'_FRRMAB','.mat'),'res');
+
+    %compute FRRPM metrics
+    cd(strcat(resPath,filesep,'MOEADPM'));
+    files = dir(strcat('MOEADDRA_PM_CEC2009_',problem,'_FUN*'));
     res1 = zeros(length(files),5);
     for j=1:length(files)
         ndpop = loadObjs1(files(j).name,refPoint,prob);
@@ -54,64 +133,7 @@ res.AEI = res1(:,5);
 res.HV = res1(:,4);
 res.fHV = res1(:,1);
 res.IGD = res1(:,2);
-save(strcat(problem,'_MOEAD','.mat'),'res');
-    
-    %compute MOEAD-DRA metrics
-    cd(strcat(resPath,filesep,'MOEADDRA'));
-    files = dir(strcat('MOEAD_DRA_CEC2009_',problem,'_FUN*'));
-    res2 = zeros(length(files),5);
-    for j=1:length(files)
-        ndpop = loadObjs1(files(j).name,refPoint,prob);
-        res2(j,1)=FastHVindicator.evaluate(ndpop);
-        res2(j,2)=IGDIndicator.evaluate(ndpop);
-        res2(j,3)=GDindicator.evaluate(ndpop);
-        res2(j,4)=HVindicator.evaluate(ndpop);
-        res2(j,5)=AEI.evaluate(ndpop);
-%         set = loadObjs2(files(j).name);
-%         res2(j,1) = computeHV(set,[2,2],'min');
-%         res2(j,2) = computeIGD(set,ref);
-    end
-res.GD = res2(:,3);
-res.AEI = res2(:,5);
-res.HV = res2(:,4);
-res.fHV = res2(:,1);
-res.IGD = res2(:,2);
-save(strcat(problem,'_MOEADDRA','.mat'),'res');
-    
-%     %compute Random selection metrics
-% %     cd(strcat(resPath,filesep,'Random',filesep,problem));
-%     files = dir(strcat('Rand_CEC2009_',problem,'_FUN*'));
-%     res3 = zeros(length(files),2);
-%     for j=1:length(files)
-%         ndpop = loadObjs1(files(j).name);
-%         res3(j,1)=FastHVindicator.evaluate(ndpop);
-%         res3(j,2)=IGDIndicator.evaluate(ndpop);
-% %         set = loadObjs2(files(j).name);
-% %         res3(j,1) = computeHV(set,[2,2],'min');
-% %         res3(j,2) = computeIGD(set,ref);
-%     end
-    
-    %compute FRRMAB metrics
-    cd(strcat(resPath,filesep,'FRRMAB'));
-    files = dir(strcat('MOEADDRA_MAB_CEC2009_',problem,'_FUN*'));
-    res4 = zeros(length(files),5);
-    for j=1:length(files)
-        ndpop = loadObjs1(files(j).name,refPoint,prob);
-        res4(j,1)=FastHVindicator.evaluate(ndpop);
-        res4(j,2)=IGDIndicator.evaluate(ndpop);
-        res4(j,3)=GDindicator.evaluate(ndpop);
-        res4(j,4)=HVindicator.evaluate(ndpop);
-        res4(j,5)=AEI.evaluate(ndpop);
-%         set = loadObjs2(files(j).name);
-%         res4(j,1) = computeHV(set,[2,2],'min');
-%         res4(j,2) = computeIGD(set,ref);
-    end
-        res.GD = res4(:,3);
-res.AEI = res4(:,5);
-res.HV = res4(:,4);
-res.fHV = res4(:,1);
-res.IGD = res4(:,2);
-save(strcat(problem,'_FRRMAB','.mat'),'res');
+save(strcat(problem,'_MOEADPM','.mat'),'res');
     
 %     %plot boxplot and mean for hypervolume
 %     figure(h1);

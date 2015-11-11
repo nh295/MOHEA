@@ -114,8 +114,8 @@ public class Population implements Iterable<Solution> {
 	public boolean add(Solution solution) {
 		return data.add(solution);
 	}
-
-	/**
+        
+        /**
 	 * Adds a collection of solutions to this population.
 	 * 
 	 * @param iterable the collection of solutions to be added

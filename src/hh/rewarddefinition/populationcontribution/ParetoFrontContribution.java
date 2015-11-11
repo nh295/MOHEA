@@ -12,6 +12,7 @@ import hh.rewarddefinition.RewardDefinedOn;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -86,7 +87,7 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(Iterable<Solution> population, Collection<Variation> heuristics, int iteration) {
+    public HashMap<Variation, Reward> compute(NondominatedPopulation population, Collection<Variation> heuristics, int iteration) {
         HashMap<Variation,Reward> rewards = new HashMap();
         for(Variation heuristic:heuristics){
             rewards.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));

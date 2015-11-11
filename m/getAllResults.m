@@ -1,4 +1,4 @@
-function [AEI,GD,HV,fHV,IGD] = getAllResults(path,selector,creditDef,problemName)
+function [AEI,GD,Inj,fHV,IGD] = getAllResults(path,selector,creditDef,problemName)
 %Given a path, the heuristic selector name, credit definition name, and
 %problem name this function will get all the results from the given path 
 %with files that include the selector name and the credit definition name. 
@@ -15,7 +15,7 @@ nfiles = length(files);
 npts = 9;
 AEI  = zeros(nfiles,npts);
 GD  = zeros(nfiles,npts);
-HV  = zeros(nfiles,npts);
+Inj  = zeros(nfiles,npts);
 fHV  = zeros(nfiles,npts);
 IGD  = zeros(nfiles,npts);
 yesFile = false(nfiles,1);
@@ -25,14 +25,14 @@ for i=1:nfiles
     c = strfind(files(i).name,problemName);
     if ~isempty(a) && ~isempty(b) && ~isempty(c)
         try
-            [tAEI,tGD,tHV,tfHV,tIGD] = getMOEAIndicators(strcat(path,filesep,files(i).name));       
+            [tAEI,tGD,tInj,tfHV,tIGD] = getMOEAIndicators(strcat(path,filesep,files(i).name));       
         catch exception
             disp(files(i).name)
             continue
         end
         AEI(i,:) = tAEI;
         GD(i,:) = tGD;
-        HV(i,:) = tHV;
+        Inj(i,:) = tInj;
         fHV(i,:) = tfHV;
         IGD(i,:) = tIGD;
         yesFile(i) = true;
@@ -42,7 +42,7 @@ end
 
 AEI = AEI(yesFile,:);
 GD = GD(yesFile,:);
-HV = HV(yesFile,:);
+Inj = Inj(yesFile,:);
 fHV = fHV(yesFile,:);
 IGD = IGD(yesFile,:);
 

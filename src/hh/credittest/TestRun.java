@@ -78,6 +78,10 @@ public class TestRun implements Callable {
     private IHyperHeuristic newHeMOEA() {
         
         int populationSize = (int) properties.getDouble("populationSize", 600);
+        
+        int injectionRate = (int) properties.getDouble("injectionRate", 0.25);
+        
+        int lagWindow = (int) properties.getDouble("lagWindow", 50);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -96,7 +100,7 @@ public class TestRun implements Callable {
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-            initialization, selector, rewardDef);
+            initialization, selector, rewardDef,injectionRate,lagWindow);
 
         return hemoea;
     }
@@ -154,10 +158,12 @@ public class TestRun implements Callable {
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeCollector()
+//                .attachHypervolumeCollector()
                 .attachHypervolumeJmetalCollector()
                 .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .attachEpsilonProgressCollector()
+                .attachInjectionCollector()
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);
