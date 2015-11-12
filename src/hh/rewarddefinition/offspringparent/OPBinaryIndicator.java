@@ -7,11 +7,13 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
-import hh.rewarddefinition.fitnessindicator.R2Indicator;
 import hh.rewarddefinition.fitnessindicator.IIndicator;
+import hh.rewarddefinition.fitnessindicator.R2Indicator;
 import java.util.Arrays;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.ParetoDominanceComparator;
 
 /**
  * These indicators take the form of the indicators used in IBEA. It uses the
@@ -31,28 +33,38 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
      * IBEA scaling factor
      */
     private final double kappa;
-    
+
     /**
      * The binary indicator to use
      */
     private final IIndicator indicator;
 
     /**
-     * Some indicators need a reference point like hypervolume and the R family
-     * indicators. Reference point is update with each iteration
+     * Reference point for indicators
      */
-    private Solution refPoint;
+    private final Solution refPoint;
 
     /**
      *
      * @param indicator The indicator to use
      * @param kappa the IBEA parameter to scale indicator values
      */
-    public OPBinaryIndicator(IIndicator indicator, double kappa) {
+    public OPBinaryIndicator(IIndicator indicator, double kappa, Problem prob) {
         this.indicator = indicator;
         this.kappa = kappa;
         //has to be the population because parent may not lie on PF or in archive
         this.operatesOn = RewardDefinedOn.PARENT;
+
+        if (indicator.getClass().equals(HypervolumeIndicator.class)) {
+            double[] hvRefPoint = new double[prob.getNumberOfObjectives()];
+            Arrays.fill(hvRefPoint, 2.0);
+            refPoint = new Solution(hvRefPoint);
+        }else if(indicator.getClass().equals(R2Indicator.class)){
+            double[] r2RefPoint = new double[prob.getNumberOfObjectives()];
+            Arrays.fill(r2RefPoint, 0.0); //since everything is normalized, utopia point is 0 vector
+            refPoint = new Solution(r2RefPoint);
+        }else
+            refPoint = null;
     }
 
     /**
@@ -60,8 +72,7 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
      * solution is not in population
      *
      * @param soln
-     * @param pop
-     * population
+     * @param pop population
      * @return
      */
     private double computeFitness(Solution soln, Population pop) {
@@ -83,15 +94,6 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
     private double indicatorVal(Solution soln1, Solution soln2) {
         Solution normSoln1 = new Solution(normalizeObjectives(soln1));
         Solution normSoln2 = new Solution(normalizeObjectives(soln2));
-        if (indicator.getClass().equals(HypervolumeIndicator.class)) {
-            double[] hvRefPoint = new double[soln1.getNumberOfObjectives()];
-            Arrays.fill(hvRefPoint, 2.0);
-            refPoint = new Solution(hvRefPoint);
-        }else if(indicator.getClass().equals(R2Indicator.class)){
-            double[] r2RefPoint = new double[soln1.getNumberOfObjectives()];
-            Arrays.fill(r2RefPoint, 0.0); //since everything is normalized, utopia point is 0 vector
-            refPoint = new Solution(r2RefPoint);;
-        }
         return indicator.compute(normSoln1, normSoln2, refPoint);
     }
 
@@ -122,10 +124,11 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
         }
 
         //compute fitness of parent and offspring
-        double parentFitness = computeFitness(parent, pop);
-        double offspringFitness = computeFitness(parent, pop);
-
-        double improvement = (offspringFitness - parentFitness) / parentFitness;
+//        double parentFitness = computeFitness(parent, pop);
+//        double offspringFitness = computeFitness(parent, pop);
+//
+//        double improvement = (offspringFitness - parentFitness) / parentFitness;
+        double improvement = indicatorVal(parent, offspring);
         if (improvement > 0) {
             return improvement;
         } else {

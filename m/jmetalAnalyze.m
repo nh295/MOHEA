@@ -3,8 +3,6 @@ function jmetalAnalyze
 javaaddpath(strcat('dist',filesep,'MOHEA.jar'));
 
 origin = cd;
-cd ..;
-
 % 
 % h1 = figure(1);
 % h2 = figure(2);
