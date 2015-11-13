@@ -1,7 +1,7 @@
-function [data,labels,p,avg1,avg2] = runKWsignificance(path,selector1,creditDef1,benchmark,problemName)
+function [data,p,avg1,avg2,better] = runKWsignificance(path,selector1,creditDef1,benchmark,problemName)
 %Given a path, the heuristic selector name, credit definition name, and
-%problem name this function will run a kruskal wallice significance test on
-%a specified metric
+%problem name this function will run a Mann Whitney U test (aka Wilcoxon
+%rank sum test) to compare a method to the benchmark
 
 origin = cd(strcat(path,filesep,'mRes'));
 file1 = dir(strcat(problemName,'_',selector1,'_',creditDef1,'.mat'));
@@ -21,8 +21,10 @@ end
 labels = [tmp(:,1);tmp(:,2)];
 
 data = [res1.res.fHV;res2.res.fHV];
+p = kruskalwallis(data,labels,'off');
 avg1 = mean(res1.res.IGD);
 avg2 = mean(res2.res.IGD);
+better = avg1<avg2;
 
 if isnan(avg1)
     error(sprintf('Avg1 is a nan: %s',file1.name));
@@ -30,4 +32,3 @@ end
 if isnan(avg2)
     error(sprintf('Avg2 is a nan: %s',file2.name));
 end
-p = kruskalwallis(data,labels,'off');

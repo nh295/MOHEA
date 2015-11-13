@@ -27,9 +27,7 @@ import org.moeaframework.core.indicator.jmetal.FastHypervolume;
  */
 public class HypervolumeIndicator implements IIndicator {
 
-    private DominanceComparator domComparator;
-    
-    private final Problem problem;
+    private final DominanceComparator domComparator;
     
     private final FastHypervolume FHV;
 
@@ -50,7 +48,6 @@ public class HypervolumeIndicator implements IIndicator {
             soln.setObjective(i,1.0);
             refPop.add(soln);
         }
-        this.problem = problem;
         this.domComparator = new ParetoDominanceComparator();
         this.FHV = new FastHypervolume(problem, refPop,null);
     }
@@ -60,10 +57,10 @@ public class HypervolumeIndicator implements IIndicator {
     public double compute(Solution solnA, Solution solnB, Solution refPt) {
         int dom = domComparator.compare(solnA, solnB);
         if (dom == -1) {
+            return 0;
+        }else if(dom ==1) {
             return volume(solnB,refPt) - volume(solnA,refPt);
-        }else if (dom == 1) {
-            return volume(solnA,refPt) - volume(solnB,refPt);
-        } else {
+        }else{
             return volume(new Solution[]{solnA, solnB},refPt) - volume(solnA,refPt);
         }
     }
@@ -75,7 +72,7 @@ public class HypervolumeIndicator implements IIndicator {
      * @return
      */
     private double volume(Solution soln,Solution refPt) {
-        double vol = 0.0;
+        double vol = 1.0;
         for (int i = 0; i < soln.getNumberOfObjectives(); i++) {
             vol *= refPt.getObjective(i) - soln.getObjective(i); //assume minimization problem
         }

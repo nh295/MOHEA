@@ -12,7 +12,7 @@ for i=1:numfile
     heuristicsJ = heuristicQual.getHeuristics;
     qualHistory = zeros(heuristicQual.getHistory(heuristicsJ.iterator.next).size,heuristicsJ.size);
     
-    iter_heuristics = heuristicsJ.iterator;
+    iter_heuristics = heuristicsJ.iterator;s
     heur_ind = 1;
     while iter_heuristics.hasNext
         qual_ind = 1;

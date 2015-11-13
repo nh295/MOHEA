@@ -75,13 +75,13 @@ public class RewardDefFactory {
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPIAE": //offspring parent additive epsilon indicator using pareto front
-                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa);
+                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa,problem);
                 break;
             case "OPIHV": //offspring parent hypervolume indicator using pareto front
-                credDef = new OPBinaryIndicator(new HypervolumeIndicator(problem), kappa);
+                credDef = new OPBinaryIndicator(new HypervolumeIndicator(problem), kappa,problem);
                 break;
             case "OPIR2": //offspring parent hypervolume indicator using pareto front
-                credDef = new OPBinaryIndicator(new R2Indicator(numObj,numVec), kappa);
+                credDef = new OPBinaryIndicator(new R2Indicator(numObj,numVec), kappa,problem);
                 break;
 //            case "OPIR3": //offspring parent hypervolume indicator using pareto front
 //                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));

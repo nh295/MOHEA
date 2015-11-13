@@ -6,7 +6,6 @@
 package hh.rewarddefinition.fitnessindicator;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,8 +79,9 @@ public class R2Indicator implements IIndicator {
         double valA = 0.0;
         double valB = 0.0;
         for (WtVector vec : wtVecs) {
-            valA += solnUtility(vec, solnA, refPt);
-            valB += Math.min(solnUtility(vec, solnA, refPt), solnUtility(vec, solnB, refPt));
+            double solnAUtil = solnUtility(vec, solnA, refPt);
+            valA += solnAUtil;
+            valB += Math.min(solnAUtil, solnUtility(vec, solnB, refPt));
         }
         return (valA / wtVecs.size()) - (valB / wtVecs.size());
     }
@@ -119,7 +119,7 @@ public class R2Indicator implements IIndicator {
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
             solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(solution.getObjective(i) - refPt.getObjective(i)));
         }
-        return 1.0 * solnUtil;
+        return solnUtil;
     }
 
     /**
