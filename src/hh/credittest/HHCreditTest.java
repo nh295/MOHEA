@@ -48,8 +48,8 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10","UF11","UF12","UF13"};
-//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF8", "UF9", "UF10"};
+        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF8", "UF9", "UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 //        pool = Executors.newFixedThreadPool(1);
@@ -57,7 +57,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -111,20 +112,20 @@ public class HHCreditTest {
                         ArrayList<Variation> heuristics = new ArrayList<>();
                         OperatorFactory of = OperatorFactory.getInstance();
                         Properties heuristicProp = new Properties();
-                        heuristics.add(of.getVariation("um", heuristicProp, prob));
-                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
-//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
-//                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
 //                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristicProp.setProperty("de.crossoverRate", "1.0");
+                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de2+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
+                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
                         //Choose credit aggregation method
 //                        IQualityEstimation creditAgg = new RankRewards(1.0);
