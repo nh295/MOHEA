@@ -62,7 +62,7 @@ public class WFGHV{
     maxNumberOfObjectives_ = dimension ;
     pointComparator_ = new PointComparator(true) ;
 
-    int maxd = maxNumberOfPoints_ - (OPT /2) ;
+    int maxd = maxNumberOfPoints_ - (OPT /2-1) ;
     fs_ = new Front[maxd] ;
     for (int i = 0; i < maxd; i++) {
       fs_[i] = new Front(maxNumberOfPoints, dimension) ;

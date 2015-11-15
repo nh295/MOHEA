@@ -48,11 +48,11 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10","UF11","UF12","UF13"};
-//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF8", "UF9", "UF10"};
+        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF8", "UF9", "UF10"};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(1);
+//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
