@@ -62,7 +62,7 @@ public class WFGHV{
     maxNumberOfObjectives_ = dimension ;
     pointComparator_ = new PointComparator(true) ;
 
-    int maxd = maxNumberOfPoints_ - (OPT /2 + 1) ;
+    int maxd = maxNumberOfPoints_ - (OPT /2) ;
     fs_ = new Front[maxd] ;
     for (int i = 0; i < maxd; i++) {
       fs_[i] = new Front(maxNumberOfPoints, dimension) ;
@@ -214,7 +214,11 @@ public class WFGHV{
 
     for (int i = 0 ; i < z ; i++)
       for (int j = 0 ; j < currentDimension_; j++) {
+          try{
         fs_[currentDeep_].getPoint(i).objectives_[j] = worse(front.points_[p].objectives_[j], front.points_[p+1+i].objectives_[j], false) ;
+          }catch(ArrayIndexOutOfBoundsException ex){
+              System.err.println("");
+          }
       }
 
 

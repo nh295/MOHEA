@@ -39,6 +39,19 @@ public interface IIndicator {
      * @return
      */
     public double computeContribution(NondominatedPopulation pop, NondominatedPopulation popWOSolution, Solution refPt);
+    
+    /**
+     * Computes the contributions of specified solution to the nondominated
+     * population if inserted. It is assumed that the solution has not already
+     * been inserted into the population Returns the contributions in the order
+     * of the population's Iterator
+     *
+     * @param oldPopIndicatorVal the indicator value for the population without the solution of interest (previous population)
+     * @param popWSolution the with the solution of interest
+     * @param refPt some indicators require a reference point
+     * @return
+     */
+    public double computeContribution( NondominatedPopulation popWSolution,double oldPopIndicatorVal, Solution refPt);
 
     /**
      * Computes the indicator value when comparing solution A to solution B.

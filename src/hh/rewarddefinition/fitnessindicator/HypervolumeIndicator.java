@@ -135,4 +135,13 @@ public class HypervolumeIndicator implements IIndicator {
         return volume(pop,refPt)-volume(popWOSolution,refPt);
     }
 
+    @Override
+    public double computeContribution(NondominatedPopulation pop,double oldPopIndicatorVal, Solution refPt) {
+        FHV.updateReferencePoint(refPt);
+        double indVal = volume(pop,refPt);
+        double out = indVal-oldPopIndicatorVal;
+        oldPopIndicatorVal = indVal;
+        return out;
+    }
+
 }

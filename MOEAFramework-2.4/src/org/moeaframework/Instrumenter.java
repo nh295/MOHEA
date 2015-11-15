@@ -161,8 +161,8 @@ public class Instrumenter extends ProblemBuilder {
 	 * otherwise.
 	 */
 	private boolean includePopulationSize;
-
-	/**
+        
+        /**
 	 * The frequency, in evaluations, that data is collected.
 	 */
 	private int frequency;
@@ -398,8 +398,8 @@ public class Instrumenter extends ProblemBuilder {
 		
 		return this;
 	}
-	
-	/**
+        
+        /**
 	 * Includes all collectors when instrumenting algorithms.
 	 * 
 	 * @return a reference to this instrumenter
