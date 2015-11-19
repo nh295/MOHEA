@@ -37,6 +37,11 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     private Solution refPt;
     
     /**
+     * Indicator value for previous population 
+     */
+    private double prevIValue;
+    
+    /**
      *
      * @param indicator Indicator to use to reward heuristics
      * @param operatesOn Enum to specify whether to compare the improvement on the population or the archive
@@ -44,6 +49,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     public OffspringPopulationIndicator(IIndicator indicator,RewardDefinedOn operatesOn) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
+        this.prevIValue=0;
         if(!this.operatesOn.equals(RewardDefinedOn.ARCHIVE)&&!this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
     }
@@ -92,10 +98,10 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
         for(Solution soln:ndpop){
             normNDpop.forceAddWithoutCheck(new Solution(normalizeObjectives(soln)));
         }
-        NondominatedPopulation normNDpopWOSoln = new NondominatedPopulation();
-        for(Solution soln:oldNDpop){
-            normNDpopWOSoln.forceAddWithoutCheck(new Solution(normalizeObjectives(soln)));
-        }
+//        NondominatedPopulation normNDpopWOSoln = new NondominatedPopulation();
+//        for(Solution soln:oldNDpop){
+//            normNDpopWOSoln.forceAddWithoutCheck(new Solution(normalizeObjectives(soln)));
+//        }
         
         if (indicator.getClass().equals(HypervolumeIndicator.class)) {
             double[] hvRefPoint = new double[offspring.getNumberOfObjectives()];
@@ -104,11 +110,11 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
         }else if(indicator.getClass().equals(R2Indicator.class)){
             double[] r2RefPoint = new double[offspring.getNumberOfObjectives()];
             Arrays.fill(r2RefPoint, 0.0); //since everything is normalized, utopia point is 0 vector
-            refPt = new Solution(r2RefPoint);;
+            refPt = new Solution(r2RefPoint);
         }
         
         //improvements over old population will result in a non negative value
-        double reward = indicator.computeContribution(normNDpop, normNDpopWOSoln, refPt);
+        double reward = indicator.computeContribution(normNDpop, prevIValue, refPt);
         //can use below to check monotonicity of reward function
         if (reward < 0) {
 //            System.err.println(reward);

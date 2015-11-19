@@ -1,0 +1,7 @@
+AdditiveEpsilonIndicator,0.27810834413427477
+Number of Injections,0
+GenerationalDistance,0.006158416617676913
+InvertedGenerationalDistance,0.13218508890353803
+NFE,300000
+Elapsed Time,178.910283066
+FastHypervolume,7.244641940481681

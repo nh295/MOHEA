@@ -3,23 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/RewardDefFactory.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/indicator/jmetal/WFGHV.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/indicator/jmetal/FastHypervolume.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/credittest/HHCreditTest.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/indicator/jmetal/Front.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/offspringparent/OPBinaryIndicator.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/fitnessindicator/HypervolumeIndicator.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/AbstractRewardDefintion.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/fitnessindicator/R2Indicator.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/offspringpopulation/OffspringParetoFront.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/fitnessindicator/SortedLinkedList.java</file>
-            <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/hyperheuristics/HeMOEA.java</file>
-=======
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/heuristicselectors/RouletteWheel.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/heuristicselectors/ProbabilityMatching.java</file>
->>>>>>> 518c88aae9748273b742dc76663cfbd2bbfd451d
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/fitnessindicator/R2Indicator.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/fitnessindicator/HypervolumeIndicator.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/HHCreditTest.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/offspringparent/OPBinaryIndicator.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/indicator/jmetal/WFGHV.java</file>
         </group>
     </open-files>
 </project-private>

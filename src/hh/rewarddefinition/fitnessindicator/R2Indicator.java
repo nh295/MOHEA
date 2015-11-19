@@ -62,6 +62,19 @@ public class R2Indicator implements IIndicator {
         }
         return (valWSoln - valWoSoln) / wtVecs.size();
     }
+    
+    
+    @Override
+    public double computeContribution(NondominatedPopulation pop, double oldPopIndicatorVal, Solution refPt) {
+        double valWSoln = 0;
+        for (WtVector vecs : wtVecs) {
+            valWSoln += popUtility(vecs, pop, refPt);
+        }
+        double indVal = (valWSoln / wtVecs.size());
+        double out = indVal -oldPopIndicatorVal;
+        oldPopIndicatorVal = indVal;
+        return out;
+    }
 
     /**
      * TODO this is really slow! In this implementation the order of the inputs

@@ -81,6 +81,7 @@ public class TestRun implements Callable {
         
         int injectionRate = (int) properties.getDouble("injectionRate", 0.25);
         
+        //for injection
         int lagWindow = (int) properties.getDouble("lagWindow", 50);
 
         Initialization initialization = new RandomInitialization(problem,
