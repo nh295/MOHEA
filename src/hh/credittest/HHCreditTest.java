@@ -48,25 +48,25 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10","UF11","UF12","UF13"};
-//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
-        String[] problems = new String[]{"UF7"};//, "UF9", "UF10"};
+        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF8", "UF9", "UF10"};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+//        pool = Executors.newFixedThreadPool(1);s
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
 //                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
-                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 1;
-            int maxEvaluations = 100000;
+            int numberOfSeeds = 30;
+            int maxEvaluations = 300010;
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"AP"};
@@ -75,8 +75,8 @@ public class HHCreditTest {
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA"};
-//            String[] creditDefs = new String[]{"OPIHV","OPIR2","OPopIPFHV","OPopIPFR2","OPopIEAHV","OPopIEAR2"};
-            String[] creditDefs = new String[]{"OPopIPFHV"};
+            String[] creditDefs = new String[]{"OPIHV","OPIR2","OPopIPFHV","OPopIPFR2","OPopIEAHV","OPopIEAR2","CHVPF","CR2PF","CHVEA","CR2EA"};
+//            String[] creditDefs = new String[]{"CHVPF","CR2PF","CHVEA","CR2EA"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
