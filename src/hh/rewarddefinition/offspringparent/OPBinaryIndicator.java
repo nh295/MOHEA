@@ -68,22 +68,6 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
     }
 
     /**
-     * Computes the solution's fitness like in IBEA. Like 'loss' in quality if
-     * solution is not in population
-     *
-     * @param soln
-     * @param pop population
-     * @return
-     */
-    private double computeFitness(Solution soln, Population pop) {
-        double fitness = 0.0;
-        for (Solution solution : pop) {
-            fitness += -Math.exp(-indicatorVal(solution, soln) / kappa);
-        }
-        return fitness;
-    }
-
-    /**
      * This method measures the fitness of a solution if soln2 is the solution
      * removed from the population
      *
