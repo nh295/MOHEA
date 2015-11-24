@@ -12,8 +12,6 @@ import hh.rewarddefinition.fitnessindicator.R2Indicator;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 
@@ -35,23 +33,25 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
      * Reference point. Some indicators require a reference point.
      */
     private Solution refPt;
-    
+
     /**
-     * Indicator value for previous population 
+     * Only maintain the min objectives and the max objectives
      */
-    private double prevIValue;
+    private Solution minObjs;
+    private Solution maxObjs;
     
     /**
      *
      * @param indicator Indicator to use to reward heuristics
-     * @param operatesOn Enum to specify whether to compare the improvement on the population or the archive
+     * @param operatesOn Enum to specify whether to compare the improvement on
+     * the population or the archive
      */
-    public OffspringPopulationIndicator(IIndicator indicator,RewardDefinedOn operatesOn) {
+    public OffspringPopulationIndicator(IIndicator indicator, RewardDefinedOn operatesOn) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
-        this.prevIValue=0;
-        if(!this.operatesOn.equals(RewardDefinedOn.ARCHIVE)&&!this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
+        if (!this.operatesOn.equals(RewardDefinedOn.ARCHIVE) && !this.operatesOn.equals(RewardDefinedOn.PARETOFRONT)) {
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
+        }
     }
 
     /**
@@ -59,62 +59,63 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
      * the population before the offspring solution is added to the population
      * with the offspring solution added
      *
-     * @param offspring  
-     * @param removedSolution
+     * @param offspring
      * @param ndpop nondominated population: pareto front or archive
      * @return the improvement in the indicator value. 0.0 if no improvement
      */
     @Override
-    public double compute(Solution offspring, NondominatedPopulation ndpop) {    
-        NondominatedPopulation oldNDpop = null;
-        try {
-            //create temporary nondominated population that maintains old nondominated population
-            oldNDpop = ndpop.clone();
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(OffspringPopulationIndicator.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    public double compute(Solution offspring, NondominatedPopulation ndpop) {
         //add offspring to ndpop to see if it entered
         Collection<Solution> removedSolns = ndpop.addAndReturnRemovedSolutions(offspring);
+
+        if (!ndpop.isChanged())  //if offspring doesn't improve the approximate set.
+            return 0.0;
         
         //only run on initial run.
+        boundUpdate:
         if (sortedObjs == null) {
-            computeBounds(ndpop);
+            updateMinMax(ndpop);
         } else {
-            if (removedSolns!=null) { //if this condition is met then the offspring replaced a solution in the population
+            if(removedSolns != null) {
                 Iterator<Solution> iter = removedSolns.iterator();
-                while(iter.hasNext()){
-                    //updates the bounds based on just the new incoming solution and the removed solution
+                while (iter.hasNext()) {
+                    //check to see if removing solution will change upperbound.
                     Solution soln = iter.next();
-                    updateBoundsRemove(soln);
+                    for (int i = 0; i < soln.getNumberOfObjectives(); i++) {
+                        if (soln.getObjective(i) == maxObjs.getObjective(i)) {
+                            updateMinMax(ndpop);
+                            break boundUpdate;
+                        }
+                    }
                 }
-                updateBoundsInsert(offspring);
-            }else //if offspring doesn't replace a solution in the nondominated set, it cannot improve the approximate set.
-                return 0.0;
+            }
+            for (int i = 0; i < offspring.getNumberOfObjectives(); i++) {
+                if (offspring.getObjective(i) < minObjs.getObjective(i)) {
+                    minObjs.setObjective(i, offspring.getObjective(i));
+                }
+            }
         }
-        
+
         //normalize solutions using max and min bounds of the ndpop with the new solution
         NondominatedPopulation normNDpop = new NondominatedPopulation();
-        for(Solution soln:ndpop){
-            normNDpop.forceAddWithoutCheck(new Solution(normalizeObjectives(soln)));
+        for (Solution soln : ndpop) {
+            Solution normSoln = new Solution(normalizeObjectives(soln));
+            normNDpop.forceAddWithoutCheck(normSoln);
         }
-//        NondominatedPopulation normNDpopWOSoln = new NondominatedPopulation();
-//        for(Solution soln:oldNDpop){
-//            normNDpopWOSoln.forceAddWithoutCheck(new Solution(normalizeObjectives(soln)));
-//        }
-        
+
         if (indicator.getClass().equals(HypervolumeIndicator.class)) {
             double[] hvRefPoint = new double[offspring.getNumberOfObjectives()];
             Arrays.fill(hvRefPoint, 2.0);
             refPt = new Solution(hvRefPoint);
-        }else if(indicator.getClass().equals(R2Indicator.class)){
+        } else if (indicator.getClass().equals(R2Indicator.class)) {
             double[] r2RefPoint = new double[offspring.getNumberOfObjectives()];
             Arrays.fill(r2RefPoint, 0.0); //since everything is normalized, utopia point is 0 vector
             refPt = new Solution(r2RefPoint);
         }
-        
+
         //improvements over old population will result in a non negative value
-        double reward = indicator.computeContribution(normNDpop, prevIValue, refPt);
+        Solution normOffspring = new Solution(normalizeObjectives(offspring));
+        double reward = indicator.computeContribution(normNDpop, normOffspring, refPt);
         //can use below to check monotonicity of reward function
         if (reward < 0) {
 //            System.err.println(reward);
@@ -123,11 +124,23 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
         }
         return reward;
     }
+    
+        private void updateMinMax(NondominatedPopulation population){
+        computeBounds(population);
+        int numObj = population.get(0).getNumberOfObjectives();
+        double[] minObjsArr = new double[numObj];
+        double[] maxObjsArr = new double[numObj];
+        for (int i = 0; i < numObj; i++) {
+            minObjsArr[i]=sortedObjs.get(i).getFirst();
+            maxObjsArr[i]=sortedObjs.get(i).getLast();
+        }
+        minObjs = new Solution(minObjsArr);
+        maxObjs = new Solution(maxObjsArr);
+    }
 
     @Override
     public String toString() {
         return "OPop_" + indicator.toString() + operatesOn;
     }
-    
-    
+
 }

@@ -5,6 +5,7 @@
  */
 package hh.rewarddefinition.fitnessindicator;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
@@ -28,32 +29,6 @@ public interface IIndicator {
     public List<Double> computeContributions(NondominatedPopulation popA, Solution refPt);
 
     /**
-     * Computes the contributions of specified solution to the nondominated
-     * population if inserted. It is assumed that the solution has not already
-     * been inserted into the population Returns the contributions in the order
-     * of the population's Iterator
-     *
-     * @param pop the population with the solution of interest
-     * @param popWOSolution the without the solution of interest
-     * @param refPt some indicators require a reference point
-     * @return
-     */
-    public double computeContribution(NondominatedPopulation pop, NondominatedPopulation popWOSolution, Solution refPt);
-    
-    /**
-     * Computes the contributions of specified solution to the nondominated
-     * population if inserted. It is assumed that the solution has not already
-     * been inserted into the population Returns the contributions in the order
-     * of the population's Iterator
-     *
-     * @param oldPopIndicatorVal the indicator value for the population without the solution of interest (previous population)
-     * @param popWSolution the with the solution of interest
-     * @param refPt some indicators require a reference point
-     * @return
-     */
-    public double computeContribution( NondominatedPopulation popWSolution,double oldPopIndicatorVal, Solution refPt);
-
-    /**
      * Computes the indicator value when comparing solution A to solution B.
      * Used in IBEA setting
      *
@@ -63,5 +38,20 @@ public interface IIndicator {
      * @return
      */
     public double compute(Solution solnA, Solution solnB, Solution refPt);
+
+    /**
+     * Computes the contributions of specified solution to the nondominated
+     * population if inserted. It is assumed that the solution has already been
+     * inserted into the population. Returns the contribution of the offspring
+     * to the indicator value
+     *
+     * @param pop the population with the solution of interest. objectives are
+     * normalized
+     * @param offspring the offspring just inserted into the population.
+     * objectives are normalized
+     * @param refPt some indicators require a reference point
+     * @return
+     */
+    public double computeContribution(NondominatedPopulation pop, Solution offspring, Solution refPt);
 
 }

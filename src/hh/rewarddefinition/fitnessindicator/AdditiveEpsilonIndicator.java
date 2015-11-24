@@ -75,12 +75,7 @@ public class AdditiveEpsilonIndicator implements IIndicator {
     }
 
     @Override
-    public double computeContribution(NondominatedPopulation pop, NondominatedPopulation popWOSoln, Solution refPt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public double computeContribution(NondominatedPopulation popWSolution, double oldPopIndicatorVal, Solution refPt) {
+    public double computeContribution(NondominatedPopulation pop, Solution offspring, Solution refPt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

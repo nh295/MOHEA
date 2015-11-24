@@ -75,12 +75,14 @@ public class EArchiveContribution extends AbstractPopulationContribution{
     /**
      * 
      * @param population the archive to check 
+     * @param enteringSolutions not used
+     * @param removedSolutions not used
      * @param heuristics
      * @param iteration
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(NondominatedPopulation population, Collection<Variation> heuristics, int iteration) {
+    public HashMap<Variation, Reward> compute(NondominatedPopulation population,Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> heuristics, int iteration) {
         HashMap<Variation,Reward> credits = new HashMap();
         for(Variation heuristic:heuristics){
             credits.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));

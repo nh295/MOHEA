@@ -37,6 +37,18 @@ public class NondominatedPopulation extends Population implements Cloneable {
      * The dominance comparator used by this non-dominated population.
      */
     private final DominanceComparator comparator;
+    
+    private boolean changedFlag;
+
+    /**
+     * Used after running add or addAndReturnRemovedSolutions to see if
+     * insertion of new solution changed population
+     *
+     * @return
+     */
+    public boolean isChanged() {
+        return changedFlag;
+    }
 
     /**
      * Constructs an empty non-dominated population using the Pareto dominance
@@ -93,7 +105,8 @@ public class NondominatedPopulation extends Population implements Cloneable {
      */
     @Override
     public boolean add(Solution newSolution) {
-        return addAndReturnRemovedSolutions(newSolution) != null;
+        addAndReturnRemovedSolutions(newSolution);
+        return changedFlag;
     }
 
     /**
@@ -123,7 +136,8 @@ public class NondominatedPopulation extends Population implements Cloneable {
                 return null;
             }
         }
-        super.add(newSolution);
+        int va = this.size();
+        changedFlag = super.add(newSolution);
         return removed;
     }
 

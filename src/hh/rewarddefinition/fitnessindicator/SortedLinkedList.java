@@ -17,7 +17,7 @@ import java.util.LinkedList;
  *
  * @author SEAK2
  */
-public class SortedLinkedList<T> extends LinkedList<T> {
+public class SortedLinkedList<T> extends LinkedList<T> implements Cloneable{
 
     private static final long serialVersionUID = -6089720372001116175L;
 
@@ -33,6 +33,15 @@ public class SortedLinkedList<T> extends LinkedList<T> {
     public SortedLinkedList(Collection<T> unSortedList, Comparator<T> comparator) {
         super(unSortedList);
         this.sort();
+        this.comparator = comparator;
+    }
+    
+    /**
+     * Constructor to create an empty list
+     * @param comparator 
+     */
+    private SortedLinkedList(Comparator<T> comparator) {
+        super();
         this.comparator = comparator;
     }
     
@@ -209,6 +218,19 @@ public class SortedLinkedList<T> extends LinkedList<T> {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Copies the elements within the list to a new list
+     * @return 
+     */
+    @Override
+    public SortedLinkedList<T> clone(){
+        SortedLinkedList<T> out = new SortedLinkedList(comparator);
+        for(int i=0;i<this.size();i++){
+            out.add(i, this.get(i));
+        }
+        return out;
     }
 
 }

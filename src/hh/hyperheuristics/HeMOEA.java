@@ -7,14 +7,16 @@ package hh.hyperheuristics;
 
 import hh.nextheuristic.INextHeuristic;
 import hh.qualityhistory.HeuristicQualityHistory;
+import hh.rewarddefinition.CreditFunctionType;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
-import hh.rewarddefinition.CreditFunctionType;
 import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
 import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
 import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
 import hh.selectionhistory.HeuristicSelectionHistory;
 import hh.selectionhistory.IHeuristicSelectionHistory;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -259,29 +261,48 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 }
             }
         } else if (creditDef.getType() == CreditFunctionType.NCI) {
+            ArrayList<Solution> removedFromArchive = new ArrayList();
+            ArrayList<Solution> childrenInArchive = new ArrayList();
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
-                addToPopulation(child);
+                Collection<Solution> removedA = archive.addAndReturnRemovedSolutions(child);
+                if(archive.isChanged()){
+                    childrenInArchive.add(child);
+                    if(removedA!=null)
+                        removedFromArchive.addAll(removedA);
+                }
             }
-            boolean archiveChanged = archive.addAll(children);
             HashMap<Variation, Reward> popContRewards;
             switch (creditDef.getOperatesOn()) {
                 case PARETOFRONT:
-                    boolean PFchanged = paretoFront.addAll(children); //updated only if reward def uses the PF
-                    if (!PFchanged) {
+                    ArrayList<Solution> removedFromPF = new ArrayList();
+                    ArrayList<Solution> childrenInPF = new ArrayList();
+                    int p = paretoFront.size();
+                    for (Solution child : children) {
+                        Collection<Solution> removedPF = paretoFront.addAndReturnRemovedSolutions(child);
+                        if(paretoFront.isChanged()){
+                            childrenInPF.add(child);
+                            if(removedPF!=null)
+                                removedFromPF.addAll(removedPF);
+                        }
+                    }
+                    //updated only if reward def uses the PF
+                    if (!paretoFront.isChanged()) {
                         popContRewards = reusePrevPopContRewards();
                     } else {
-                        popContRewards = ((AbstractPopulationContribution) creditDef).compute(paretoFront, heuristics, this.getNumberOfEvaluations());
+                        popContRewards = ((AbstractPopulationContribution) creditDef).
+                                compute(paretoFront,childrenInPF,removedFromPF, heuristics, this.getNumberOfEvaluations());
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;
                 case ARCHIVE:
-                    if (!archiveChanged) {
+                    if (!archive.isChanged()) {
                         popContRewards = reusePrevPopContRewards();
                     } else {
-                        popContRewards = ((AbstractPopulationContribution) creditDef).compute(archive, heuristics, this.getNumberOfEvaluations());
+                        popContRewards = ((AbstractPopulationContribution) creditDef).
+                                compute(archive,childrenInArchive,removedFromArchive, heuristics, this.getNumberOfEvaluations());
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;

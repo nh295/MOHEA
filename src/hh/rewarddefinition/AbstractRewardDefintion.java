@@ -80,8 +80,8 @@ public class AbstractRewardDefintion implements IRewardDefinition {
     protected double[] normalizeObjectives(Solution solution) {
         double[] normalizedObjs = new double[solution.getNumberOfObjectives()];
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
-            double lowBound = sortedObjs.get(i).get(0);
-            double upBound = sortedObjs.get(i).get(sortedObjs.get(i).size() - 1);
+            double lowBound = sortedObjs.get(i).getFirst();
+            double upBound = sortedObjs.get(i).getLast();
             normalizedObjs[i] = (solution.getObjective(i) - lowBound) / (upBound - lowBound);
         }
         return normalizedObjs;

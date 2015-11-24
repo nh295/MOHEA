@@ -82,12 +82,14 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
     /**
      * 
      * @param population for this implementation it should be the pareto front
+     * @param enteringSolutions not used
+     * * @param removedSolutions not used
      * @param heuristics
      * @param iteration
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(NondominatedPopulation population, Collection<Variation> heuristics, int iteration) {
+    public HashMap<Variation, Reward> compute(NondominatedPopulation population,Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> heuristics, int iteration) {
         HashMap<Variation,Reward> rewards = new HashMap();
         for(Variation heuristic:heuristics){
             rewards.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));

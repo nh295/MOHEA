@@ -14,6 +14,7 @@ import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
 import hh.rewarddefinition.offspringpopulation.OffspringPopulationIndicator;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
+import hh.rewarddefinition.populationcontribution.IndicatorContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
 import java.util.Arrays;
 import org.moeaframework.core.Problem;
@@ -125,16 +126,16 @@ public class RewardDefFactory {
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
             case "CHVPF": //Contribution to HV of Pareto front
-                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                credDef = new IndicatorContribution(new HypervolumeIndicator(problem), RewardDefinedOn.PARETOFRONT);
                 break;
             case "CHVEA": //Contribution to HV of epsilon archive
-                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                credDef = new IndicatorContribution(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
                 break;
             case "CR2PF": //Contribution to R2 of Pareto front
-                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), RewardDefinedOn.PARETOFRONT);
                 break;
             case "CR2EA": //Contribution to R2 of epsilon archive
-                credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), RewardDefinedOn.ARCHIVE);
+                credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), RewardDefinedOn.ARCHIVE);
                 break;
             default:
                 throw new IllegalArgumentException("No such credit defintion: " + name);
