@@ -6,10 +6,11 @@
 
 package hh.hyperheuristics;
 
-import hh.rewarddefinition.IRewardDefinition;
+import hh.history.CreditHistory;
+import hh.history.OperatorQualityHistory;
+import hh.history.OperatorSelectionHistory;
 import hh.nextheuristic.INextHeuristic;
-import hh.qualityhistory.HeuristicQualityHistory;
-import hh.selectionhistory.IHeuristicSelectionHistory;
+import hh.rewarddefinition.IRewardDefinition;
 import org.moeaframework.core.Algorithm;
 
 /**
@@ -22,7 +23,7 @@ public interface IHyperHeuristic extends Algorithm{
      * Returns the selection history stored in the hyper-heuristic
      * @return 
      */
-    public IHeuristicSelectionHistory getSelectionHistory();
+    public OperatorSelectionHistory getSelectionHistory();
     
     /**
      * Resets the hyperheuristic so that it can run again for another seed.
@@ -33,7 +34,14 @@ public interface IHyperHeuristic extends Algorithm{
      * gets the quality history stored for each heuristic in the hyper-heuristic
      * @return 
      */
-    public HeuristicQualityHistory getQualityHistory();
+    public OperatorQualityHistory getQualityHistory();
+    
+    /**
+     * gets the credit history stored for each operator in the hyper-heuristic
+     *
+     * @return
+     */
+    public CreditHistory getCreditHistory();
     
     /**
      * Gets the credit definition being used.

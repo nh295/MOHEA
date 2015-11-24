@@ -6,12 +6,12 @@
 package hh.hyperheuristics;
 
 
+import hh.history.CreditHistory;
 import hh.nextheuristic.INextHeuristic;
-import hh.qualityhistory.HeuristicQualityHistory;
+import hh.history.OperatorQualityHistory;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
-import hh.selectionhistory.HeuristicSelectionHistory;
-import hh.selectionhistory.IHeuristicSelectionHistory;
+import hh.history.OperatorSelectionHistory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * heuristics. History can be extracted by getSelectionHistory(). Used for
      * analyzing the results to see the dynamics of heuristics selected
      */
-    private IHeuristicSelectionHistory heuristicSelectionHistory;
+    private OperatorSelectionHistory heuristicSelectionHistory;
 
 
     /**
@@ -64,7 +64,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * The history of the heuristics' qualities over time. Used for analyzing
      * the results to see the dynamics of the heuristic qualities
      */
-    private HeuristicQualityHistory qualityHistory;
+    private OperatorQualityHistory qualityHistory;
 
     /**
      * parallel purpose random generator
@@ -118,8 +118,8 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         this.alpha = alpha;
         this.delta = delta;
         this.cr = crossoverRate;
-        this.heuristicSelectionHistory = new HeuristicSelectionHistory(heuristics);
-        this.qualityHistory = new HeuristicQualityHistory(heuristics);
+        this.heuristicSelectionHistory = new OperatorSelectionHistory(heuristics);
+        this.qualityHistory = new OperatorQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         this.iteration = 0;
 
@@ -232,7 +232,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * @return The ordered history of heuristics that were selected
      */
     @Override
-    public IHeuristicSelectionHistory getSelectionHistory() {
+    public OperatorSelectionHistory getSelectionHistory() {
         return heuristicSelectionHistory;
     }
 
@@ -243,7 +243,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * @return
      */
     @Override
-    public HeuristicQualityHistory getQualityHistory() {
+    public OperatorQualityHistory getQualityHistory() {
         return qualityHistory;
     }
 
@@ -265,6 +265,11 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public CreditHistory getCreditHistory() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

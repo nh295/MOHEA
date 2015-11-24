@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package hh.qualityhistory;
+package hh.history;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -17,46 +17,62 @@ import org.moeaframework.core.Variation;
  * Stores the history of qualities associated with each heuristic. Mostly for analysis purposes
  * @author nozomihitomi
  */
-public class HeuristicQualityHistory implements IHeuristicQualityHistory, Serializable{
+public class OperatorQualityHistory implements Serializable{
     private static final long serialVersionUID = -2323214225020219554L;
     
     protected HashMap<Variation,Stack<Double>> history;
     
-    public HeuristicQualityHistory(Collection<Variation> heuristics){
+    public OperatorQualityHistory(Collection<Variation> operators){
         history = new HashMap();
-        Iterator<Variation> iter = heuristics.iterator();
+        Iterator<Variation> iter = operators.iterator();
         while(iter.hasNext()){
             history.put(iter.next(),  new Stack());
         }
     }
 
-    @Override
-    public Collection<Variation> getHeuristics() {
+    /**
+     * Gets the heuristics involved in the selection process
+     * @return a collection containing the heuristics involved in the selection process
+     */
+    public Collection<Variation> getOperators() {
         return history.keySet();
     }
 
-    @Override
+    /**
+     * This adds the quality of a heuristic to the history
+     * @param heuristic the heuristic to add to the history
+     * @param quality the quality value to add
+     */
     public void add(Variation heuristic, double quality) {
         history.get(heuristic).push(quality);
     }
 
-    @Override
+    /**
+     * Gets the quality history of a particular heuristic
+     * @param heuristic of interest
+     * @return the quality history of the specified heuristic
+     */
     public Collection<Double> getHistory(Variation heuristic) {
         return history.get(heuristic);
     }
 
-    @Override
+    /**
+     * Gets the latest quality of each heuristic
+     * @return 
+     */
     public HashMap<Variation, Double> getLatest() {
         HashMap<Variation,Double> out = new HashMap<>();
-        for(Variation heuristic:getHeuristics()){
-            out.put(heuristic, this.getHistory(heuristic).iterator().next());
+        for(Variation operator:getOperators()){
+            out.put(operator, this.getHistory(operator).iterator().next());
         }
         return out;
     }
 
-    @Override
+    /**
+     * Clears the history
+     */
     public void clear() {
-        for(Variation heuristic:getHeuristics()){
+        for(Variation heuristic:getOperators()){
             history.get(heuristic).clear();
         }
     }

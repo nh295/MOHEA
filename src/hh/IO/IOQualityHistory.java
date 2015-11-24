@@ -6,7 +6,7 @@
 
 package hh.IO;
 
-import hh.qualityhistory.HeuristicQualityHistory;
+import hh.history.OperatorQualityHistory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,19 +26,19 @@ import org.moeaframework.core.Variation;
  */
 public class IOQualityHistory {
     /**
-     * Saves the credit history at the specified filename. The file will be a
-     * list of the credits received by each heuristic selected in order from 
+     * Saves the quality history at the specified filename. The file will be a
+     * list of the operator qualities at every iteration in order from 
      * beginning to end separated by the desired separator. Each row in the 
-     * file will contain the history of one heuristic, with the heuristic name 
+     * file will contain the history of one operator, with the operator name 
      * at the beginning of the row
      * @param qualityHistory The quality history  to save
      * @param filename filename including the path and the extension.
      * @param separator the type of separator desired
      * @return true if the save is successful
      */
-    public static boolean saveHistory(HeuristicQualityHistory qualityHistory,String filename,String separator) {
+    public static boolean saveHistory(OperatorQualityHistory qualityHistory,String filename,String separator) {
         try(FileWriter fw = new FileWriter(new File(filename))){
-            Iterator<Variation> heuristicIter = qualityHistory.getHeuristics().iterator();
+            Iterator<Variation> heuristicIter = qualityHistory.getOperators().iterator();
             while(heuristicIter.hasNext()){
                 Variation heuristic = heuristicIter.next();
                 Iterator<Double> historyIter= qualityHistory.getHistory(heuristic).iterator();
@@ -63,11 +63,11 @@ public class IOQualityHistory {
     
      /**
      * Saves the quality history at the specified filename as a java Object. The 
-     * file an instance of  HeuristicQualityHistory
+ file an instance of  OperatorQualityHistory
      * @param qualityHistory The quality history  to save
      * @param filename filename including the path and the extension.
      */
-    public static void saveHistory(HeuristicQualityHistory qualityHistory,String filename){
+    public static void saveHistory(OperatorQualityHistory qualityHistory,String filename){
         try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));){
             os.writeObject(qualityHistory);
             os.close();
@@ -77,14 +77,14 @@ public class IOQualityHistory {
     }
      
     /**
-     * Loads the HeuristicQualityHistory instance saved by using saveHistory() from the filename. 
+     * Loads the OperatorQualityHistory instance saved by using saveHistory() from the filename. 
      * @param filename the file name (path and extension included)
-     * @return the HeuristicQualityHistory instance saved by using saveHistory()
+     * @return the OperatorQualityHistory instance saved by using saveHistory()
      */
-    public static HeuristicQualityHistory loadHistory(String filename){
-        HeuristicQualityHistory hist = null;
+    public static OperatorQualityHistory loadHistory(String filename){
+        OperatorQualityHistory hist = null;
         try(ObjectInputStream is = new ObjectInputStream( new FileInputStream( filename ))){
-           hist = (HeuristicQualityHistory)is.readObject();
+           hist = (OperatorQualityHistory)is.readObject();
         } catch (IOException ex) {
             Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {

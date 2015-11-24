@@ -6,8 +6,8 @@
 
 package hh.IO;
 
-import hh.selectionhistory.HeuristicSelectionHistory;
-import hh.selectionhistory.IHeuristicSelectionHistory;
+
+import hh.history.OperatorSelectionHistory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,7 +37,7 @@ public class IOSelectionHistory {
      * @param separator the type of separator desired
      * @return true if the save is successful
      */
-    public static boolean saveHistory(IHeuristicSelectionHistory history,String filename,String separator) {
+    public static boolean saveHistory(OperatorSelectionHistory history,String filename,String separator) {
         try(FileWriter fw = new FileWriter(new File(filename))){
             Stack<Variation> orderedHistory = history.getOrderedHistory();
             while(!orderedHistory.empty()){
@@ -56,12 +56,12 @@ public class IOSelectionHistory {
     }
     
     /**
-     * Saves the HeuristicSelectionHistory  at the specified filename as a java Object. The 
-     * file an instance of  IHeuristicSelectionHistory
+     * Saves the OperatorSelectionHistory  at the specified filename as a java Object. The 
+ file an instance of  IOperatorSelectionHistory
      * @param history The credit repository to save
      * @param filename filename including the path and the extension.
      */
-    public static void saveHistory(IHeuristicSelectionHistory history,String filename){
+    public static void saveHistory(OperatorSelectionHistory history,String filename){
         try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));){
             os.writeObject(history);
             os.close();
@@ -71,14 +71,14 @@ public class IOSelectionHistory {
     }
      
     /**
-     * Loads the IHeuristicSelectionHistory instance saved by using saveHistory() from the filename. 
+     * Loads the IOperatorSelectionHistory instance saved by using saveHistory() from the filename. 
      * @param filename the file name (path and extension included)
      * @return the CreditRepository instance saved by using saveHistory()
      */
-    public static IHeuristicSelectionHistory loadHistory(String filename){
-        IHeuristicSelectionHistory history = null;
+    public static OperatorSelectionHistory loadHistory(String filename){
+        OperatorSelectionHistory history = null;
         try(ObjectInputStream is = new ObjectInputStream( new FileInputStream( filename ))){
-           history = (IHeuristicSelectionHistory)is.readObject();
+           history = (OperatorSelectionHistory)is.readObject();
         } catch (IOException ex) {
             Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -97,7 +97,7 @@ public class IOSelectionHistory {
      * @param separator the desired separator
      * @return True if save is successful, otherwise false
      */
-    public static boolean saveSelectionFrequency(IHeuristicSelectionHistory history,String filename,String separator) {
+    public static boolean saveSelectionFrequency(OperatorSelectionHistory history,String filename,String separator) {
         try(FileWriter fw = new FileWriter(new File(filename))){
             Iterator<Variation> iter = history.getHeuristics().iterator();
             while(iter.hasNext()){
