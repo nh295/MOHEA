@@ -275,7 +275,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             ArrayList<Solution> childrenInArchive = new ArrayList();
             for (Solution child : children) {
                 evaluate(child);
-                child.setAttribute("iteration", new SerializableVal(this.getNumberOfEvaluations()));
+                child.setAttribute("iteration", new SerializableVal(iteration));
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                 Collection<Solution> removedA = archive.addAndReturnRemovedSolutions(child);
                 if (archive.isChanged()) {
@@ -305,7 +305,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(paretoFront, childrenInPF, removedFromPF, heuristics, this.getNumberOfEvaluations());
+                                compute(paretoFront, childrenInPF, removedFromPF, heuristics, iteration);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;
@@ -314,7 +314,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(archive, childrenInArchive, removedFromArchive, heuristics, this.getNumberOfEvaluations());
+                                compute(archive, childrenInArchive, removedFromArchive, heuristics, iteration);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;

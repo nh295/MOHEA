@@ -38,7 +38,7 @@ public class NondominatedPopulation extends Population implements Cloneable {
      */
     private final DominanceComparator comparator;
     
-    private boolean changedFlag;
+    protected boolean changedFlag;
 
     /**
      * Used after running add or addAndReturnRemovedSolutions to see if
@@ -136,7 +136,6 @@ public class NondominatedPopulation extends Population implements Cloneable {
                 return null;
             }
         }
-        int va = this.size();
         changedFlag = super.add(newSolution);
         return removed;
     }

@@ -42,56 +42,100 @@ public class IOCreditHistory {
      * @return true if the save is successful
      */
     public static boolean saveHistory(CreditHistory creditHistory, String filename, String separator) {
-        int maxIter = creditHistory.getMaxIteration()+1;
-        
-        //Create matrix of data (rows are operators)(columns are credits)
-        double[][] data = new double[creditHistory.getOperators().size()][maxIter];
-        int operNum=0;
         Collection<Variation> operators = creditHistory.getOperators();
-        for(Variation operator: creditHistory.getOperators()){
-            Arrays.fill(data[operNum], -1.0);
-            Iterator<Reward> iter = creditHistory.getHistory(operator).iterator();
-            while(iter.hasNext()){
-                Reward reward = iter.next();
-                int iteration = reward.getIteration();
-                if(data[operNum][iteration]==-1){
-                    data[operNum][iteration]=reward.getValue();
-                }else{
-                    data[operNum][iteration]+=reward.getValue();
-                }
-            }
-            operNum++;
-        }
-        
         try (FileWriter fw = new FileWriter(new File(filename))) {
-            //write the header of the file
-            fw.append("iteration" + separator);
-            Iterator<Variation> iter = operators.iterator();
-            for(int i=0;i<operators.size()-1;i++){
-                Variation operator = iter.next();
-                String[] operatorName = operator.toString().split("operator.");
+            for(Variation oper:operators){
+                Collection<Reward> hist = creditHistory.getHistory(oper);
+                int[] iters = new int[hist.size()];
+                double[] vals = new double[hist.size()];
+                Iterator<Reward> iter = hist.iterator();
+                Reward reward = iter.next();
+                iters[0]=reward.getIteration();
+                vals[0]=reward.getValue();
+                int prevInteration=0;
+                while(iter.hasNext()){
+                    Reward nextReward = iter.next();
+                    int iteration = nextReward.getIteration();
+                    double rewardVal = nextReward.getValue();
+                    if(iters[prevInteration]==iteration){
+                        vals[prevInteration]+=rewardVal;
+                    }else{
+                        prevInteration++;
+                        iters[prevInteration] = iteration;
+                        vals[prevInteration] = rewardVal;
+                    }
+                }
+                
+                fw.append("iteration" + separator);
+                for(int i=0;i<prevInteration;i++){
+                    fw.append(Integer.toString(iters[i]) + separator);
+                }
+                fw.append(Integer.toString(iters[prevInteration]) + "\n");
+                
+                String[] operatorName = oper.toString().split("operator.");
                 String[] splitName = operatorName[operatorName.length - 1].split("@");
                 fw.append(splitName[0] + separator);
-            }//print out last operator name without separator
-            Variation operator = iter.next();
-            String[] operatorName = operator.toString().split("operator.");
-            String[] splitName = operatorName[operatorName.length - 1].split("@");
-            fw.append(splitName[0] + separator);
-            fw.append("\n");
-            
-            for (int i = 0; i < maxIter; i++) {//go over iterations
-                fw.append(Integer.toString(i)+ separator);
-                for (int j = 0; j < operators.size() - 1; j++) {//go over operators
-                    fw.append(Double.toString(data[j][i]) + separator);
+                for(int i=0;i<prevInteration;i++){
+                    fw.append(Double.toString(vals[i]) + separator);
                 }
-                fw.append(Double.toString(data[operators.size() - 1][i]));
-                fw.append("\n");
+                fw.append(Double.toString(vals[prevInteration]) + "\n");
+                
             }
             fw.flush();
         } catch (IOException ex) {
             Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+        
+//                int maxIter = creditHistory.getMaxIteration()+1;
+//        //Create matrix of data (rows are operators)(columns are credits)
+//        double[][] data = new double[creditHistory.getOperators().size()][maxIter];
+//        int operNum=0;
+//        Collection<Variation> operators = creditHistory.getOperators();
+//        for(Variation operator: creditHistory.getOperators()){
+//            Arrays.fill(data[operNum], -1.0);
+//            Iterator<Reward> iter = creditHistory.getHistory(operator).iterator();
+//            while(iter.hasNext()){
+//                Reward reward = iter.next();
+//                int iteration = reward.getIteration();
+//                if(data[operNum][iteration]==-1){
+//                    data[operNum][iteration]=reward.getValue();
+//                }else{
+//                    data[operNum][iteration]+=reward.getValue();
+//                }
+//            }
+//            operNum++;
+//        }
+//        
+//        try (FileWriter fw = new FileWriter(new File(filename))) {
+//            //write the header of the file
+//            fw.append("iteration" + separator);
+//            Iterator<Variation> iter = operators.iterator();
+//            for(int i=0;i<operators.size()-1;i++){
+//                Variation operator = iter.next();
+//                String[] operatorName = operator.toString().split("operator.");
+//                String[] splitName = operatorName[operatorName.length - 1].split("@");
+//                fw.append(splitName[0] + separator);
+//            }//print out last operator name without separator
+//            Variation operator = iter.next();
+//            String[] operatorName = operator.toString().split("operator.");
+//            String[] splitName = operatorName[operatorName.length - 1].split("@");
+//            fw.append(splitName[0] + separator);
+//            fw.append("\n");
+//            
+//            for (int i = 0; i < maxIter; i++) {//go over iterations
+//                fw.append(Integer.toString(i)+ separator);
+//                for (int j = 0; j < operators.size() - 1; j++) {//go over operators
+//                    fw.append(Double.toString(data[j][i]) + separator);
+//                }
+//                fw.append(Double.toString(data[operators.size() - 1][i]));
+//                fw.append("\n");
+//            }
+//            fw.flush();
+//        } catch (IOException ex) {
+//            Logger.getLogger(IOQualityHistory.class.getName()).log(Level.SEVERE, null, ex);
+//            return false;
+//        }
         return true;
     }
 

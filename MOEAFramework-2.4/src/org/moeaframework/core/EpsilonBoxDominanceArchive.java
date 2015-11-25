@@ -180,6 +180,8 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 			}
 		}
 		forceAddWithoutCheck(newSolution);
+                
+                changedFlag = true;
                 return removed;
     }
 
