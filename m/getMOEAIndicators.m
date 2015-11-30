@@ -1,4 +1,4 @@
-function [AEI,GD,Inj,fHV,IGD] = getMOEAIndicators(filename)
+function [AEI,GD,fHV,IGD] = getMOEAIndicators(filename)
 %reads the csv values starting from the 2nd column
 %filename must include path and extension
 %EI is the epsilon indicator
@@ -6,14 +6,39 @@ function [AEI,GD,Inj,fHV,IGD] = getMOEAIndicators(filename)
 %HV is the hypervolume
 %IGD is the inverted generational distance
 
-data = csvread(filename,0,1);
-
-%sometimes there are 0.0 values added to end, so get rid of them
-data = data(:,sum(data,1)>0);
-
+% data = csvread(filename,0,1);
+fid = fopen(filename,'r');
+while(~feof(fid))
+    line = strsplit(fgetl(fid),',');
+    switch line{1}
+        case{'AdditiveEpsilonIndicator'}
+            AEI = readLine(line);
+        case{'GenerationalDistance'}
+            GD = readLine(line);
+        case{'InvertedGenerationalDistance'}
+            IGD = readLine(line);
+%         case{'Number of Injections'}
+%             Inj = readLine(line);
+%         case{'NFE'}
+%         case{'Elapsed Time'}
+        case{'FastHypervolume'}
+            fHV = readLine(line);
+        otherwise
+            continue;
+    end
+end
+fclose(fid);
 %get end of run indicator values
-AEI = data(1,:);
-Inj = data(2,:);
-GD = data(3,:);
-IGD = data(4,:);
-fHV = data(7,:);
+% AEI = data(1,:);
+% Inj = data(2,:);
+% GD = data(3,:);
+% IGD = data(4,:);
+% fHV = data(7,:);
+end
+
+function [out] = readLine(line)
+out = zeros(length(line)-1,1);
+for i=1:length(line)-1
+       out(i)=str2double(line{i+1});
+end
+end

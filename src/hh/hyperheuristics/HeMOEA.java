@@ -209,6 +209,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
         //select next heuristic
         Variation operator = operatorSelector.nextHeuristic();
+//        operatorSelectionHistory.add(operator);
 
         Solution[] parents;
 
@@ -224,16 +225,16 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
         Solution[] children = operator.evolve(parents);
         if (creditDef.getType() == CreditFunctionType.OP) {
+            double creditValue = 0;
             for (Solution child : children) {
                 evaluate(child);
                 Solution removedSoln = addToPopulation(child);
-                double creditValue = 0;
                 if (removedSoln != null) {
                     //credit definitions operating on population and archive does 
                     //NOT modify the population by adding the child to the population/archive
                     switch (creditDef.getOperatesOn()) {
                         case PARENT:
-                            creditValue = ((AbstractOffspringParent) creditDef).compute(child, refParent, population, removedSoln);
+                            creditValue += ((AbstractOffspringParent) creditDef).compute(child, refParent, population, removedSoln);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
@@ -241,35 +242,35 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     }
                 }
                 archive.add(child);
-                Reward reward = new Reward(iteration, creditValue);
-                operatorSelector.update(reward, operator);
-                creditHistory.add(operator, reward);
             }
+            Reward reward = new Reward(this.numberOfEvaluations, creditValue);
+            operatorSelector.update(reward, operator);
+            creditHistory.add(operator, reward);
         } else if (creditDef.getType() == CreditFunctionType.NSI) {
+            double creditValue = 0.0;
             for (Solution child : children) {
                 evaluate(child);
-                double creditValue = 0.0;
                 Solution removedSoln = addToPopulation(child);
                 if (removedSoln != null) { //solution made it in population
                     //credit definitions operating on PF and archive will 
                     //modify the nondominated population by adding the child to the nondominated population.
                     switch (creditDef.getOperatesOn()) {
                         case PARETOFRONT:
-                            creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
+                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, paretoFront);
                             archive.add(child);
                             break;
                         case ARCHIVE:
-                            creditValue = ((AbstractOffspringPopulation) creditDef).compute(child, archive);
+                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, archive);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
                                     + "recognized. Used " + creditDef.getType() + ".");
                     }
-                    Reward reward = new Reward(iteration, creditValue);
-                    operatorSelector.update(reward, operator);
-                    creditHistory.add(operator, reward);
                 }
             }
+            Reward reward = new Reward(this.numberOfEvaluations, creditValue);
+            operatorSelector.update(reward, operator);
+            creditHistory.add(operator, reward);
         } else if (creditDef.getType() == CreditFunctionType.NCI) {
             ArrayList<Solution> removedFromArchive = new ArrayList();
             ArrayList<Solution> childrenInArchive = new ArrayList();
@@ -290,7 +291,6 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 case PARETOFRONT:
                     ArrayList<Solution> removedFromPF = new ArrayList();
                     ArrayList<Solution> childrenInPF = new ArrayList();
-                    int p = paretoFront.size();
                     for (Solution child : children) {
                         Collection<Solution> removedPF = paretoFront.addAndReturnRemovedSolutions(child);
                         if (paretoFront.isChanged()) {
@@ -305,7 +305,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(paretoFront, childrenInPF, removedFromPF, heuristics, iteration);
+                                compute(paretoFront, childrenInPF, removedFromPF, heuristics, this.numberOfEvaluations);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;
@@ -314,7 +314,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(archive, childrenInArchive, removedFromArchive, heuristics, iteration);
+                                compute(archive, childrenInArchive, removedFromArchive, heuristics, this.numberOfEvaluations);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;
@@ -331,8 +331,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         } else {
             throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
         }
-//        heuristicSelectionHistory.add(heuristic);
-        updateQualityHistory();
+//        updateQualityHistory();
     }
 
     /**

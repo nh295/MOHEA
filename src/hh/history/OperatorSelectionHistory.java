@@ -115,7 +115,7 @@ public class OperatorSelectionHistory implements Serializable {
      * @return a collection containing the heuristics involved in the selection
      * process
      */
-    public Collection<Variation> getHeuristics() {
+    public Collection<Variation> getOperators() {
         return history.keySet();
     }
 

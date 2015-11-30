@@ -52,33 +52,29 @@ public class IOCreditHistory {
                 Reward reward = iter.next();
                 iters[0]=reward.getIteration();
                 vals[0]=reward.getValue();
-                int prevInteration=0;
+                int index=0;
                 while(iter.hasNext()){
                     Reward nextReward = iter.next();
                     int iteration = nextReward.getIteration();
                     double rewardVal = nextReward.getValue();
-                    if(iters[prevInteration]==iteration){
-                        vals[prevInteration]+=rewardVal;
-                    }else{
-                        prevInteration++;
-                        iters[prevInteration] = iteration;
-                        vals[prevInteration] = rewardVal;
-                    }
+                    iters[index] = iteration;
+                    vals[index] = rewardVal;
+                    index++;
                 }
-                
+
                 fw.append("iteration" + separator);
-                for(int i=0;i<prevInteration;i++){
+                for(int i=0;i<index;i++){
                     fw.append(Integer.toString(iters[i]) + separator);
                 }
-                fw.append(Integer.toString(iters[prevInteration]) + "\n");
+                fw.append(Integer.toString(iters[index]) + "\n");
                 
                 String[] operatorName = oper.toString().split("operator.");
                 String[] splitName = operatorName[operatorName.length - 1].split("@");
                 fw.append(splitName[0] + separator);
-                for(int i=0;i<prevInteration;i++){
+                for(int i=0;i<index;i++){
                     fw.append(Double.toString(vals[i]) + separator);
                 }
-                fw.append(Double.toString(vals[prevInteration]) + "\n");
+                fw.append(Double.toString(vals[index]) + "\n");
                 
             }
             fw.flush();

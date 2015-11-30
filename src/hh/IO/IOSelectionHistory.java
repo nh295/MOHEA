@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -46,6 +47,32 @@ public class IOSelectionHistory {
                 fw.append(splitName[0]);
                 if(!orderedHistory.empty())
                     fw.append(separator);
+            }
+            fw.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(IOSelectionHistory.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Saves the number of times an operator is selected to the specified filename. The file will be a
+     * list of the heuristics selected in order from beginning to end separated
+     * by the desired separator
+     * @param history The history to save
+     * @param filename filename including the path and the extension.
+     * @param separator the type of separator desired
+     * @return true if the save is successful
+     */
+    public static boolean saveSelectionCount(OperatorSelectionHistory history,String filename,String separator) {
+        try(FileWriter fw = new FileWriter(new File(filename))){
+            Collection<Variation> operators = history.getOperators();
+            for(Variation operator:operators){
+                String[] heuristicName = operator.toString().split("operator.");
+                String[] splitName = heuristicName[heuristicName.length-1].split("@");
+                fw.append(splitName[0]+separator);
+                fw.append(Integer.toString(history.getSelectedTimes(operator))+"\n");
             }
             fw.flush();
         } catch (IOException ex) {
@@ -99,7 +126,7 @@ public class IOSelectionHistory {
      */
     public static boolean saveSelectionFrequency(OperatorSelectionHistory history,String filename,String separator) {
         try(FileWriter fw = new FileWriter(new File(filename))){
-            Iterator<Variation> iter = history.getHeuristics().iterator();
+            Iterator<Variation> iter = history.getOperators().iterator();
             while(iter.hasNext()){
                 Variation heuristic = iter.next();
                 fw.append(heuristic.toString()+separator+history.getSelectedTimes(heuristic));

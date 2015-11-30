@@ -154,7 +154,7 @@ public class TestRun implements Callable {
 //        IHyperHeuristic hh = newMOEADHH();
         IHyperHeuristic hh = newHeMOEA();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(3000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
@@ -186,7 +186,7 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");

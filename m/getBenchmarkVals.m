@@ -7,7 +7,7 @@ function [vals,benchmark_names] = getBenchmarkVals(prob_name,indicator)
 
 path2benchmark = '/Users/nozomihitomi/Dropbox/MOHEA/Benchmarks';
 % path2benchmark = 'C:\Users\SEAK2\Nozomi\MOHEA\Benchmarks';
-benchmark_names = {'MOEAD', 'MOEADDRA', 'FRRMAB','MOEADPM', 'eMOEA','Random'};
+benchmark_names = {'MOEADDRA','MOEADPM', 'eMOEA','Random'};
 
 vals = zeros(30,length(benchmark_names));
 

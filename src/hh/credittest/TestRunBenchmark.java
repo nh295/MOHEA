@@ -106,12 +106,12 @@ public class TestRunBenchmark extends TestRun{
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        NondominatedPopulation ndPop = instAlgorithm.getResult();
-        try {
-            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
-        } catch (IOException ex) {
-            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        NondominatedPopulation ndPop = instAlgorithm.getResult();
+//        try {
+//            PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+//        } catch (IOException ex) {
+//            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         //save selection history
 //        IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
