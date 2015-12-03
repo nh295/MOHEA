@@ -2,21 +2,23 @@
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
-% selectors = {'Probability','Adaptive'};
-selectors = {'eMOEA','MOEAD'};
-% selectorShort = {'PM','AP'};
-selectorShort = {'eMOEA','MOEAD'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
+% problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
+selectors = {'Probability','Adaptive'};
+% selectors = {'eMOEA','MOEAD'};
+selectorShort = {'PM','AP'};
+% selectorShort = {'eMOEA','MOEAD'};
 % creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
 % creditShort = {'ODP','OPopF','OPopEA','CPF','CEA','OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
-creditDef = {'_'};
-creditShort= {'_'};
+creditDef = { 'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+creditShort = {'OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
+% creditDef = {'_'};
+% creditShort= {'_'};
 
 % path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-% res_path =strcat(path,'mResDEopsInjection');
-res_path = '/Users/nozomihitomi/Desktop/untitled folder';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\mRes6opsInjection';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+res_path =strcat(path,'mRes6opsInjection');
+% res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
 b = length(selectors)*length(creditDef);
 
@@ -30,25 +32,19 @@ boxColors = 'rkcm';
 
 for i=1:length(problemName)
     probName = problemName{i};
-%     [benchmarkDataIGD,label_names] = getBenchmarkVals(probName,'IGD');
-%     [benchmarkDatafHV,~] = getBenchmarkVals(probName,'fHV');
-%     [benchmarkDataAEI,~] = getBenchmarkVals(probName,'AEI');
-%     [a,c] = size(benchmarkDataIGD);
-    a =30;c=0;
-%     dataIGD = cat(2,benchmarkDataIGD,zeros(a,b));
-%     datafHV = cat(2,benchmarkDatafHV,zeros(a,b));
-%     dataAEI = cat(2,benchmarkDataAEI,zeros(a,b));
-    dataIGD = zeros(a,b);
-    datafHV = zeros(a,b);
-    dataAEI = zeros(a,b);
+    [benchmarkDataIGD,label_names] = getBenchmarkVals(path,probName,'IGD');
+    [benchmarkDatafHV,~] = getBenchmarkVals(path,probName,'fHV');
+    [benchmarkDataAEI,~] = getBenchmarkVals(path,probName,'AEI');
+    [a,c] = size(benchmarkDataIGD);
+
+    dataIGD = cat(2,benchmarkDataIGD,zeros(a,b));
+    datafHV = cat(2,benchmarkDatafHV,zeros(a,b));
+    dataAEI = cat(2,benchmarkDataAEI,zeros(a,b));
 %     dataInj = zeros(a,b);
     
-%     label_names_IGD=label_names;
-%     label_names_fHV=label_names;
-%     label_names_AEI=label_names;
-    label_names_IGD={};
-    label_names_fHV={};
-    label_names_AEI={};
+    label_names_IGD=label_names;
+    label_names_fHV=label_names;
+    label_names_AEI=label_names;
     
     for j=1:length(selectors)
         for k=1:length(creditDef)
@@ -59,27 +55,27 @@ for i=1:length(problemName)
             datafHV(:,c) = res.fHV;
             dataAEI(:,c) = res.AEI;
 %             dataInj(:,c-size(benchmarkDataIGD,2)) = res.Inj;
-%             [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'FRRMAB',probName);
+            [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'FRRMAB',probName);
             extra = '';
-%             if sig.IGD==1
-%                 extra = '+';
-%             elseif sig.IGD==-1
-%                 extra = '-'; 
-%             end
+            if sig.IGD==1
+                extra = '+';
+            elseif sig.IGD==-1
+                extra = '-'; 
+            end
             label_names_IGD = [label_names_IGD,strcat(selectorShort{j},'_',creditShort{k},extra)]; %concats the labels
-%             extra = '';
-%             if sig.fHV==1
-%                 extra = '+';
-%             elseif sig.fHV==-1
-%                 extra = '-'; 
-%             end
+            extra = '';
+            if sig.fHV==1
+                extra = '+';
+            elseif sig.fHV==-1
+                extra = '-'; 
+            end
             label_names_fHV = {label_names_fHV{:},strcat(selectorShort{j},'_',creditShort{k},extra)}; %concats the labels
-%             extra = '';
-%             if sig.AEI==1
-%                 extra = '+';
-%             elseif sig.AEI==-1
-%                 extra = '-'; 
-%             end
+            extra = '';
+            if sig.AEI==1
+                extra = '+';
+            elseif sig.AEI==-1
+                extra = '-'; 
+            end
             label_names_AEI = {label_names_AEI{:},strcat(selectorShort{j},'_',creditShort{k},extra)}; %concats the labels
             boxColors = [boxColors,'b'];
         end

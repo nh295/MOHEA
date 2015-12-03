@@ -154,7 +154,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             IRewardDefinition creditDef, double injectionRate, int lagWindow) {
         super(problem, population, archive, selection, null, initialization);
 
-        this.heuristics = heuristicSelector.getHeuristics();
+        this.heuristics = heuristicSelector.getOperators();
         this.selection = selection;
         this.operatorSelector = heuristicSelector;
         this.creditDef = creditDef;
@@ -419,7 +419,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     @Override
     public void reset() {
         iteration = 0;
-        operatorSelectionHistory.clear();
+        operatorSelectionHistory.reset();
         operatorSelector.reset();
         numberOfEvaluations = 0;
         qualityHistory.clear();

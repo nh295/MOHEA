@@ -6,8 +6,10 @@
 
 package hh.nextheuristic;
 
+import hh.rewarddefinition.Reward;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -20,7 +22,7 @@ import org.moeaframework.core.Variation;
  * extend this abstract class are required to have some credit repository
  * @author nozomihitomi
  */
-public abstract class AbstractHeuristicSelector implements INextHeuristic{
+public abstract class AbstractOperatorSelector implements INextHeuristic{
     
     /**
      * Random number generator for selecting heuristics.
@@ -40,16 +42,17 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
     /**
      * The heuristics from which the selector can choose from
      */
-    protected Collection<Variation> heuristics;
+    protected Collection<Variation> operators;
     
     /**
      * Constructor requires a credit repository that stores credits earned by 
      * heuristics.
+     * @param operators the collection of operators used to conduct search
      */
-    public AbstractHeuristicSelector(Collection<Variation> heuristics){
+    public AbstractOperatorSelector(Collection<Variation> operators){
         this.iterations = 0;
         this.qualities = new HashMap<>();
-        this.heuristics = heuristics;
+        this.operators = operators;
         resetQualities();
     }
     
@@ -59,62 +62,62 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      * credits. If there are two or more heuristics that maximize the function 
      * (i.e. there is a tie) a random heuristic will be selected from the tied 
      * maximizing heuristics
-     * @param heuristics the set of heuristics to maximize over
+     * @param operators the set of heuristics to maximize over
      * @return the heuristic that maximizes the function2maximize
      */
-    protected Variation argMax(Collection<Variation> heuristics){
-        Iterator<Variation> iter = heuristics.iterator();
+    protected Variation argMax(Collection<Variation> operators){
+        Iterator<Variation> iter = operators.iterator();
         ArrayList<Variation> ties = new ArrayList();
-        Variation leadHeuristic = null;
+        Variation leadOperator = null;
         double maxVal = Double.NEGATIVE_INFINITY;
         try{
         while(iter.hasNext()){
-            Variation heuristic_i = iter.next();
-            if(leadHeuristic==null){
-                leadHeuristic = heuristic_i;
-                maxVal = function2maximize(heuristic_i);
+            Variation operator_i = iter.next();
+            if(leadOperator==null){
+                leadOperator = operator_i;
+                maxVal = function2maximize(operator_i);
                 continue;
             }
-            if(function2maximize(heuristic_i)>maxVal){
-                maxVal = function2maximize(heuristic_i);
-                leadHeuristic = heuristic_i;
+            if(function2maximize(operator_i)>maxVal){
+                maxVal = function2maximize(operator_i);
+                leadOperator = operator_i;
                 ties.clear();
-            }else if(function2maximize(heuristic_i)==maxVal){
-                ties.add(heuristic_i);
+            }else if(function2maximize(operator_i)==maxVal){
+                ties.add(operator_i);
             }
         }
         //if there are any ties in the credit score, select randomly (uniform 
         //probability)from the heuristics that tied at lead
         if(!ties.isEmpty()){
-            leadHeuristic = getRandomHeuristic(ties);
+            leadOperator = getRandomOperator(ties);
         }
         }catch(NoSuchMethodException ex){
-            Logger.getLogger(AbstractHeuristicSelector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AbstractOperatorSelector.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return leadHeuristic;
+        return leadOperator;
     }
     
     /**
      * The function to be maximized by argMax(). The function to be maximized 
      * may be related to credits or a function of credits. If an 
      * IHeuristicSeletor uses this method, it should be overridden
-     * @param heuristic input to the function
+     * @param operator input to the function
      * @return the value of the function with the given input
      * @throws java.lang.NoSuchMethodException If this method is used without 
      * being overridden, then it throws a NoSuchMethodException
      */
-    protected double function2maximize(Variation heuristic) throws NoSuchMethodException{
+    protected double function2maximize(Variation operator) throws NoSuchMethodException{
         throw new NoSuchMethodException("Need to override this method");
     }
     
     /**
      * Selects a random heuristic from a collection of heuristics with uniform 
      * probability
-     * @param heuristics the collection to draw a random heuristic from 
+     * @param operators the collection to draw a random heuristic from 
      * @return the randomly selected heuristic
      */
-    protected Variation getRandomHeuristic(Collection<Variation> heuristics){
-        return pprng.nextItem(new ArrayList<>(heuristics));
+    protected Variation getRandomOperator(Collection<Variation> operators){
+        return pprng.nextItem(new ArrayList<>(operators));
     }
     
     /**
@@ -146,7 +149,7 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      * Clears qualities and resets them to 0.
      */
     public final void resetQualities(){
-        Iterator<Variation> iter = heuristics.iterator();
+        Iterator<Variation> iter = operators.iterator();
         while(iter.hasNext()){
             //all heuristics have 0 quality at the beginning
             qualities.put(iter.next(), 0.0);
@@ -163,8 +166,8 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
      * @return 
      */
     @Override
-    public Collection<Variation> getHeuristics(){
-        return heuristics;
+    public Collection<Variation> getOperators(){
+        return operators;
     }
     
     /**
@@ -181,6 +184,4 @@ public abstract class AbstractHeuristicSelector implements INextHeuristic{
         }
     }
     
-
-//    
 }

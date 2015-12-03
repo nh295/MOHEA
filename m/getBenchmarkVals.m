@@ -1,12 +1,12 @@
-function [vals,benchmark_names] = getBenchmarkVals(prob_name,indicator)
+function [vals,benchmark_names] = getBenchmarkVals(path,prob_name,indicator)
 %plots MOEA/D, MOEA/D-DRA, FRRMAB, eMOEA on one figure for all UF 1-10
 %problems. problemm name should be like 'UF11' with no underscores.
 %indicator should be something like 'HV' to define which indicator to plot.
 %returns the indicator valsues for each benchmark for specified indicator
 %and the labels of the names of each benchmark algorithm
 
-path2benchmark = '/Users/nozomihitomi/Dropbox/MOHEA/Benchmarks';
-% path2benchmark = 'C:\Users\SEAK2\Nozomi\MOHEA\Benchmarks';
+% path2benchmark = '/Users/nozomihitomi/Dropbox/MOHEA/Benchmarks';
+path2benchmark = strcat(path,'Benchmarks');
 benchmark_names = {'MOEADDRA','MOEADPM', 'eMOEA','Random'};
 
 vals = zeros(30,length(benchmark_names));

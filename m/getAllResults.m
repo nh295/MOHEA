@@ -12,7 +12,7 @@ origin = cd(path);
 files = dir('*.res');
 cd(origin)
 nfiles = length(files);
-npts = 9;
+npts = 99;
 AEI  = zeros(nfiles,npts);
 GD  = zeros(nfiles,npts);
 fHV  = zeros(nfiles,npts);

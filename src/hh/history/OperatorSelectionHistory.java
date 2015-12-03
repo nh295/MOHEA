@@ -91,7 +91,7 @@ public class OperatorSelectionHistory implements Serializable {
     /**
      * Clears all selection history
      */
-    public void clear() {
+    public void reset() {
         Iterator<Variation> iter = history.keySet().iterator();
         while (iter.hasNext()) {
             history.get(iter.next()).clear();

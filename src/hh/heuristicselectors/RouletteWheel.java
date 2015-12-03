@@ -5,7 +5,7 @@
  */
 package hh.heuristicselectors;
 
-import hh.nextheuristic.AbstractHeuristicSelector;
+import hh.nextheuristic.AbstractOperatorSelector;
 import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import org.moeaframework.core.Variation;
  *
  * @author nozomihitomi
  */
-public class RouletteWheel extends AbstractHeuristicSelector {
+public class RouletteWheel extends AbstractOperatorSelector {
 
     /**
      * Hashmap to store the selection probabilities of each heuristic
@@ -96,10 +96,10 @@ public class RouletteWheel extends AbstractHeuristicSelector {
         super.resetQualities();
         super.reset();
         probabilities.clear();
-        Iterator<Variation> iter = heuristics.iterator();
+        Iterator<Variation> iter = operators.iterator();
         while (iter.hasNext()) {
             //all heuristics get uniform selection probability at beginning
-            probabilities.put(iter.next(), 1.0 / (double) heuristics.size());
+            probabilities.put(iter.next(), 1.0 / (double) operators.size());
         }
     }
 
@@ -116,11 +116,11 @@ public class RouletteWheel extends AbstractHeuristicSelector {
         double sum = sumQualities();
 
         // if the credits sum up to zero, apply uniform probabilty to  heuristics
-        Iterator<Variation> iter = heuristics.iterator();
+        Iterator<Variation> iter = operators.iterator();
         if (Math.abs(sum) < Math.pow(10.0, -14)) {
             while (iter.hasNext()) {
                 Variation heuristic_i = iter.next();
-                probabilities.put(heuristic_i, 1.0 / (double) heuristics.size());
+                probabilities.put(heuristic_i, 1.0 / (double) operators.size());
             }
         } else { //else update probabilities proportional to quality
             while (iter.hasNext()) {

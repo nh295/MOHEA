@@ -18,14 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import org.moeaframework.algorithm.MOEAD;
 import org.moeaframework.core.Initialization;
-import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
 /**
- *
+ * Implements MOEA/D-DRA.
  * @author SEAK2
  */
 public class MOEADHH extends MOEAD implements IHyperHeuristic {
@@ -82,11 +81,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     private String name;
 
     /**
-     * Pareto Front
-     */
-    private NondominatedPopulation paretoFront;
-
-    /**
      * The population contribution rewards from the previous iteration
      */
     private HashMap<Variation, Reward> prevPopContRewards;
@@ -94,38 +88,30 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     /**
      * Probability that an offspring will mate with neighbors
      */
-    private double delta;
+    private final double delta;
     
      /**
      * Indices for the population
      */
     private final List<Integer> popIndices;
 
-    
-    /**
-     * crossover rate
-     */
-    private final double cr;
 
     public MOEADHH(Problem problem, int neighborhoodSize,
             Initialization initialization, double delta, double eta, int updateUtility,
             INextHeuristic heuristicSelector, IRewardDefinition creditDef,
             double alpha, double crossoverRate) {
-        super(problem, neighborhoodSize, initialization, heuristicSelector.getHeuristics().iterator().next(), delta, eta, updateUtility);
-        this.heuristics = heuristicSelector.getHeuristics();
+        super(problem, neighborhoodSize, initialization, heuristicSelector.getOperators().iterator().next(), delta, eta, updateUtility);
+        this.heuristics = heuristicSelector.getOperators();
         this.heuristicSelector = heuristicSelector;
         this.creditDef = creditDef;
         this.alpha = alpha;
         this.delta = delta;
-        this.cr = crossoverRate;
         this.heuristicSelectionHistory = new OperatorSelectionHistory(heuristics);
         this.qualityHistory = new OperatorQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         this.iteration = 0;
 
-        //Initialize the stored pareto front
         super.initialize();
-        this.paretoFront = new NondominatedPopulation(getResult());
 
         //initialize the previous population contribution rewards to all zero for each heuristic
         prevPopContRewards = new HashMap<>();
@@ -220,7 +206,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     @Override
     public void reset() {
         iteration = 0;
-        heuristicSelectionHistory.clear();
+        heuristicSelectionHistory.reset();
         heuristicSelector.reset();
         numberOfEvaluations = 0;
         qualityHistory.clear();

@@ -97,7 +97,10 @@ public class TestRun implements Callable {
                 2, comparator);
         
         //Use default values for selectors
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
+        TypedProperties selectorProp = new TypedProperties();
+        selectorProp.setInt("windowSize", (int)0.5*populationSize);
+        //all other properties use default parameters
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), selectorProp,heuristics);
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,

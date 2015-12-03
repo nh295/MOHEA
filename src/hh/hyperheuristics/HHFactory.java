@@ -6,10 +6,11 @@
 package hh.hyperheuristics;
 
 import hh.heuristicselectors.AdaptivePursuit;
+import hh.heuristicselectors.FRRMAB;
 import hh.heuristicselectors.ProbabilityMatching;
 import hh.heuristicselectors.RouletteWheel;
 import hh.heuristicselectors.RandomSelect;
-import hh.nextheuristic.AbstractHeuristicSelector;
+import hh.nextheuristic.AbstractOperatorSelector;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
 import org.moeaframework.util.TypedProperties;
@@ -43,8 +44,8 @@ public class HHFactory {
             return instance;
     }
     
-    public AbstractHeuristicSelector getHeuristicSelector(String name, TypedProperties properties,Collection<Variation> heuristics){
-        AbstractHeuristicSelector heuristicSelector = null;
+    public AbstractOperatorSelector getHeuristicSelector(String name, TypedProperties properties,Collection<Variation> heuristics){
+        AbstractOperatorSelector heuristicSelector = null;
         
         switch(name){
             case "Random": //uniform random selection
@@ -64,6 +65,13 @@ public class HHFactory {
                 heuristicSelector = new AdaptivePursuit(heuristics, alpha, beta,pmin);
                 }
                 break;
+            case "FRRMAB":{
+                double c = properties.getDouble("c", 0.5);
+                int windowSize = properties.getInt("windowSize",100);
+                double d = properties.getDouble("d", 1);
+                heuristicSelector = new FRRMAB(heuristics, c, windowSize,d);
+            }
+            break;
             default: throw new IllegalArgumentException("Invalid heuristic selector specified:" + name);
         }
         

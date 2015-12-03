@@ -19,8 +19,6 @@ import org.moeaframework.algorithm.StandardAlgorithms;
 import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.InstrumentedAlgorithm;
 import org.moeaframework.core.Algorithm;
-import org.moeaframework.core.NondominatedPopulation;
-import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.util.TypedProperties;
 

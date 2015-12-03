@@ -54,5 +54,5 @@ public interface INextHeuristic{
      * Gets the heuristics available to the hyper-heuristic.
      * @return 
      */
-    public Collection<Variation> getHeuristics();
+    public Collection<Variation> getOperators();
 }

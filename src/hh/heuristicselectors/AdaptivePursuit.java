@@ -83,7 +83,7 @@ public class AdaptivePursuit extends ProbabilityMatching {
 
         Variation leadHeuristic = argMax(qualities.keySet());
 
-        Iterator<Variation> iter = heuristics.iterator();
+        Iterator<Variation> iter = operators.iterator();
         while (iter.hasNext()) {
             Variation heuristic_i = iter.next();
             double prevProb = probabilities.get(heuristic_i);

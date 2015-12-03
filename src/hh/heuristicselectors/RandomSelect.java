@@ -6,7 +6,7 @@
 
 package hh.heuristicselectors;
 
-import hh.nextheuristic.AbstractHeuristicSelector;
+import hh.nextheuristic.AbstractOperatorSelector;
 import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
@@ -16,7 +16,7 @@ import org.moeaframework.core.Variation;
  * given set of heuristics
  * @author nozomihitomi
  */
-public class RandomSelect extends AbstractHeuristicSelector{
+public class RandomSelect extends AbstractOperatorSelector{
     
     /**
      * RandomSelect does not really utilize the credit repository so any 
@@ -35,7 +35,7 @@ public class RandomSelect extends AbstractHeuristicSelector{
     @Override
     public Variation nextHeuristic() {
         incrementIterations();
-        return super.getRandomHeuristic(heuristics);
+        return super.getRandomOperator(operators);
     }
 
     @Override

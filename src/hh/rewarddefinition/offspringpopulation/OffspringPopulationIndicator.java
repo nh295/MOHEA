@@ -109,7 +109,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
             refPt = new Solution(hvRefPoint);
         } else if (indicator.getClass().equals(R2Indicator.class)) {
             double[] r2RefPoint = new double[offspring.getNumberOfObjectives()];
-            Arrays.fill(r2RefPoint, 0.0); //since everything is normalized, utopia point is 0 vector
+            Arrays.fill(r2RefPoint, -1.0); //since everything is normalized, utopia point is 0 vector
             refPt = new Solution(r2RefPoint);
         }
 
