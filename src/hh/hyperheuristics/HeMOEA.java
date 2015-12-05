@@ -246,7 +246,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             Reward reward = new Reward(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getType() == CreditFunctionType.NSI) {
+        } else if (creditDef.getType() == CreditFunctionType.SI) {
             double creditValue = 0.0;
             for (Solution child : children) {
                 evaluate(child);
@@ -271,7 +271,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             Reward reward = new Reward(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getType() == CreditFunctionType.NCI) {
+        } else if (creditDef.getType() == CreditFunctionType.CS) {
             ArrayList<Solution> removedFromArchive = new ArrayList();
             ArrayList<Solution> childrenInArchive = new ArrayList();
             for (Solution child : children) {

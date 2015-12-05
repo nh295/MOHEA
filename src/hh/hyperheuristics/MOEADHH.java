@@ -5,16 +5,18 @@
  */
 package hh.hyperheuristics;
 
-
 import hh.history.CreditHistory;
-import hh.nextheuristic.INextHeuristic;
 import hh.history.OperatorQualityHistory;
+import hh.history.OperatorSelectionHistory;
+import hh.nextheuristic.INextHeuristic;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.rewarddefinition.Reward;
-import hh.history.OperatorSelectionHistory;
+import hh.rewarddefinition.offspringparent.ParentDecomposition;
+import hh.rewarddefinition.populationcontribution.DecompositionContribution;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import org.moeaframework.algorithm.MOEAD;
 import org.moeaframework.core.Initialization;
@@ -25,6 +27,7 @@ import org.moeaframework.core.Variation;
 
 /**
  * Implements MOEA/D-DRA.
+ *
  * @author SEAK2
  */
 public class MOEADHH extends MOEAD implements IHyperHeuristic {
@@ -32,14 +35,13 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     /**
      * The type of heuristic selection method
      */
-    private final INextHeuristic heuristicSelector;
+    private final INextHeuristic operatorSelector;
 
     /**
      * The Credit definition to be used that defines how much credit to receive
      * for certain types of solutions
      */
     private final IRewardDefinition creditDef;
-
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -48,16 +50,10 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      */
     private OperatorSelectionHistory heuristicSelectionHistory;
 
-
     /**
      * The set of heuristics that the hyper heuristic is able to work with
      */
     private final Collection<Variation> heuristics;
-
-    /**
-     * The learning rate for the decaying credit value
-     */
-    private final double alpha;
 
     /**
      * The history of the heuristics' qualities over time. Used for analyzing
@@ -84,29 +80,39 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * The population contribution rewards from the previous iteration
      */
     private HashMap<Variation, Reward> prevPopContRewards;
-    
+
     /**
      * Probability that an offspring will mate with neighbors
      */
     private final double delta;
-    
-     /**
+
+    /**
      * Indices for the population
      */
     private final List<Integer> popIndices;
-
+    
+    /**
+     * History of credits received by each operator
+     */
+    private final CreditHistory creditHistory;
+    
+    /**
+     * crossover rate
+     */
+    private final double crossoverRate;
 
     public MOEADHH(Problem problem, int neighborhoodSize,
             Initialization initialization, double delta, double eta, int updateUtility,
-            INextHeuristic heuristicSelector, IRewardDefinition creditDef,
-            double alpha, double crossoverRate) {
-        super(problem, neighborhoodSize, initialization, heuristicSelector.getOperators().iterator().next(), delta, eta, updateUtility);
-        this.heuristics = heuristicSelector.getOperators();
-        this.heuristicSelector = heuristicSelector;
+            INextHeuristic operatorSelector, IRewardDefinition creditDef,
+            double crossoverRate) {
+        super(problem, neighborhoodSize, initialization, operatorSelector.getOperators().iterator().next(), delta, eta, updateUtility);
+        this.heuristics = operatorSelector.getOperators();
+        this.operatorSelector = operatorSelector;
         this.creditDef = creditDef;
-        this.alpha = alpha;
         this.delta = delta;
+        this.crossoverRate = crossoverRate;
         this.heuristicSelectionHistory = new OperatorSelectionHistory(heuristics);
+        this.creditHistory = new CreditHistory(heuristics);
         this.qualityHistory = new OperatorQualityHistory(heuristics);
         this.pprng = new ParallelPRNG();
         this.iteration = 0;
@@ -118,11 +124,19 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         for (Variation heur : heuristics) {
             prevPopContRewards.put(heur, new Reward(0, 0.0));
         }
-        
-        popIndices = new ArrayList<Integer>();
-        for(int i=0;i<population.size();i++)
-            popIndices.add(i);
 
+        popIndices = new ArrayList<>();
+        for (int i = 0; i < population.size(); i++) {
+            popIndices.add(i);
+        }
+
+    }
+    
+    public List<Solution> getPopulation(){
+        ArrayList<Solution> out = new ArrayList<>();
+        for(Individual ind:population)
+            out.add(ind.getSolution());
+        return out;
     }
 
     @Override
@@ -133,67 +147,116 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
         for (Integer index : indices) {
             iteration++;
             //select next heuristic
-            Variation heuristic = heuristicSelector.nextHeuristic();
+            Variation operator = operatorSelector.nextHeuristic();
 
             List<Integer> matingIndices = getMatingIndices(index);
 
-            Solution[] parents = new Solution[heuristic.getArity()];
-            parents[0] = population.get(index).getSolution();
+            Solution[] parents = new Solution[operator.getArity()];
+            Individual parent = population.get(index);
+            parents[0] = parent.getSolution();
+            
+            //decide mating pool
+            boolean useNeighborhood = pprng.nextDouble() < delta;
+            if(!useNeighborhood)
+                matingIndices = new ArrayList(popIndices);
 
-            if (heuristic.getArity() > 2) {
+            if (operator.getArity() > 2) {
                 // mimic MOEA/D parent selection for differential evolution
                 pprng.shuffle(matingIndices);
 
-                for (int i = 1; i < heuristic.getArity() - 1; i++) {
+                for (int i = 1; i < operator.getArity() - 1; i++) {
                     parents[i] = population.get(
                             matingIndices.get(i - 1)).getSolution();
                 }
 
-                parents[heuristic.getArity() - 1]
+                parents[operator.getArity() - 1]
                         = population.get(index).getSolution();
             } else {
-                for (int i = 1; i < heuristic.getArity(); i++) {
+                for (int i = 1; i < operator.getArity(); i++) {
                     parents[i] = population.get(
                             pprng.nextItem(matingIndices)).getSolution();
                 }
             }
+            //create new offspring
+            Solution[] offspring= operator.evolve(parents);
             
-            Solution[] offspring;
-            boolean inNeighborhood = pprng.nextDouble()<delta;
-            if(inNeighborhood)
-                offspring = heuristic.evolve(parents);
-            else{
-                offspring = new Solution[]{population.get(index).getSolution()};
-                matingIndices = popIndices;
-            }
-            double reward = 0.0;
-            for (Solution child : offspring) {
-                evaluate(child);
-                updateIdealPoint(child);
-                List<Double> improvements = updateSolution(child, matingIndices);
-                for(Double improv:improvements){
-                    reward+= improv;
+            //do crossover with binomial distribution at each element
+            for(Solution soln:offspring){
+                for(int i=0;i<soln.getNumberOfObjectives();i++){
+                    if(!(pprng.nextDouble() < crossoverRate))
+                        soln.setObjective(i, population.get(index).getSolution().getObjective(i));
                 }
             }
-            heuristicSelector.update(new Reward(iteration, reward), heuristic);
-            heuristicSelectionHistory.add(heuristic);
-            updateQualityHistory();
+
+            //compute the credit assignment specific rewards
+            switch (creditDef.getType()) {
+                case OP:
+                    double reward = 0;
+                    for (Solution child : offspring) {
+                        evaluate(child);
+                        updateIdealPoint(child);
+                        updateSolution(child, matingIndices);
+
+                        ParentDecomposition OPDe = ((ParentDecomposition) creditDef);
+                        OPDe.setWeights(parent.getWeights());
+                        OPDe.setIdealPoint(getIdealPoint());
+                        reward += OPDe.compute(child, parents[0], null, null);
+                    }
+                    Reward operatorReward = new Reward(iteration, reward);
+                    operatorSelector.update(operatorReward, operator);
+                    creditHistory.add(operator, operatorReward);
+                    break;
+                case SI:
+                    double rewardSi = 0;
+                    for (Solution child : offspring) {
+                        evaluate(child);
+                        updateIdealPoint(child);
+                        updateSolution(child, matingIndices);
+                        rewardSi += updateSolution(child, matingIndices);
+                    }
+                    Reward operatorRewardSi = new Reward(iteration, rewardSi);
+                    operatorSelector.update(operatorRewardSi, operator);
+                    creditHistory.add(operator, operatorRewardSi);
+                    break;
+                case CS:
+                    for (Solution child : offspring) {
+                        evaluate(child);
+                        updateIdealPoint(child);
+                        updateSolution(child, matingIndices);
+                        child.setAttribute("iteration", new SerializableVal(iteration));
+                        child.setAttribute("heuristic", new SerializableVal(operator.toString()));
+                    }
+                    DecompositionContribution CDe = ((DecompositionContribution) creditDef);
+                    HashMap<Variation, Reward> contRewards = CDe.compute(getNeighborhoodSolutions(index), null, null, heuristics, iteration);
+                    Iterator<Variation> iter = contRewards.keySet().iterator();
+                    while (iter.hasNext()) {
+                        Variation operator_i = iter.next();
+                        operatorSelector.update(contRewards.get(operator_i), operator_i);
+                        creditHistory.add(operator_i, contRewards.get(operator_i));
+                    }
+                    break;
+                default:
+                    throw new NullPointerException("Credit definition not "
+                            + "recognized. Used " + creditDef.getType() + ".");
+            }
+
+            heuristicSelectionHistory.add(operator);
+                    updateQualityHistory();
+            }
+
+            generation++;
+
+            if ((updateUtility >= 0) && (generation % updateUtility == 0)) {
+                updateUtility();
+            }
+
         }
-
-        generation++;
-
-        if ((updateUtility >= 0) && (generation % updateUtility == 0)) {
-            updateUtility();
-        }
-
-    }
-
-    /**
-     * Updates the quality history every iteration for each heuristic according
-     * to the INextHeuristic class used
-     */
+        /**
+         * Updates the quality history every iteration for each heuristic
+         * according to the INextHeuristic class used
+         */
     private void updateQualityHistory() {
-        HashMap<Variation, Double> currentQualities = heuristicSelector.getQualities();
+        HashMap<Variation, Double> currentQualities = operatorSelector.getQualities();
         for (Variation heuristic : heuristics) {
             qualityHistory.add(heuristic, currentQualities.get(heuristic));
         }
@@ -207,7 +270,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     public void reset() {
         iteration = 0;
         heuristicSelectionHistory.reset();
-        heuristicSelector.reset();
+        operatorSelector.reset();
         numberOfEvaluations = 0;
         qualityHistory.clear();
     }
@@ -221,7 +284,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     public OperatorSelectionHistory getSelectionHistory() {
         return heuristicSelectionHistory;
     }
-
 
     /**
      * gets the quality history stored for each heuristic in the hyper-heuristic
@@ -240,7 +302,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
 
     @Override
     public INextHeuristic getNextHeuristicSupplier() {
-        return heuristicSelector;
+        return operatorSelector;
     }
 
     @Override
@@ -255,7 +317,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
 
     @Override
     public CreditHistory getCreditHistory() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return creditHistory;
     }
 
 }

@@ -193,8 +193,9 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		final TournamentSelection selection = new TournamentSelection(
 				2, comparator);
 		
-		Variation variation = OperatorFactory.getInstance().getVariation(null, 
-				properties, problem);
+		String operator = properties.getString("operator", "sbx+pm");
+		Variation variation = OperatorFactory.getInstance().getVariation(
+				operator, properties, problem);
 
 		EpsilonMOEA emoea = new EpsilonMOEA(problem, population, archive,
 				selection, variation, initialization, comparator);
@@ -296,8 +297,9 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		Initialization initialization = new RandomInitialization(problem,
 				populationSize);
 
+                String operator = properties.getString("operator", "de+pm");
 		Variation variation = OperatorFactory.getInstance().getVariation(
-				"de+pm", properties, problem);
+				operator, properties, problem);
 		
 		int neighborhoodSize = 20;
 		int eta = 2;

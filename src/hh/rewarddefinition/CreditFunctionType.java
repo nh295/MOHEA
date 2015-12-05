@@ -13,14 +13,20 @@ package hh.rewarddefinition;
 public enum CreditFunctionType {
     /**
      * If the reward is assigned based on the solution quality improvement of the offspring over the parent solution
+     *//**
+     * If the reward is assigned based on the solution quality improvement of the offspring over the parent solution
+     *//**
+     * If the reward is assigned based on the solution quality improvement of the offspring over the parent solution
+     *//**
+     * If the reward is assigned based on the solution quality improvement of the offspring over the parent solution
      */
     OP,
     /**
      * If the reward is assigned based on the quality improvement of the nondominated set with the insertion of a single offspring solution
      */
-    NSI,
+    SI,
     /**
      * If the reward is assigned based on the contribution of an operator to a nondominated set
      */
-    NCI
+    CS
 }

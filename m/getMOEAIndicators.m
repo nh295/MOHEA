@@ -29,11 +29,11 @@ while(~feof(fid))
 end
 fclose(fid);
 %get end of run indicator values
-% AEI = data(1,:);
-% Inj = data(2,:);
-% GD = data(3,:);
-% IGD = data(4,:);
-% fHV = data(7,:);
+AEI = AEI(end);
+% Inj = Inj(end);
+GD = GD(end);
+IGD = IGD(end);
+fHV = fHV(end);
 end
 
 function [out] = readLine(line)

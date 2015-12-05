@@ -8,7 +8,7 @@ package hh.rewarddefinition.offspringpopulation;
 
 import hh.rewarddefinition.AbstractRewardDefintion;
 import hh.rewarddefinition.CreditFunctionType;
-import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -18,7 +18,7 @@ import org.moeaframework.core.Solution;
 public abstract class AbstractOffspringPopulation extends AbstractRewardDefintion{
 
     public AbstractOffspringPopulation(){
-        type = CreditFunctionType.NSI;
+        type = CreditFunctionType.SI;
     }
     
     /**
@@ -27,5 +27,5 @@ public abstract class AbstractOffspringPopulation extends AbstractRewardDefintio
      * @param population the population to compare the offspring solutions with
      * @return the value of credit to resulting from the solution
      */
-    public abstract double compute(Solution offspring, NondominatedPopulation population);
+    public abstract double compute(Solution offspring, Population population);
 }

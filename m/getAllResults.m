@@ -9,33 +9,19 @@ function [AEI,GD,fHV,IGD] = getAllResults(path,selector,creditDef,problemName)
 %number of values collected per file.
 
 origin = cd(path);
-files = dir('*.res');
+files = dir(strcat(problemName,'*',selector,'*',creditDef,'*.res'));
 cd(origin)
 nfiles = length(files);
-npts = 99;
+npts = 1;
 AEI  = zeros(nfiles,npts);
 GD  = zeros(nfiles,npts);
 fHV  = zeros(nfiles,npts);
 IGD  = zeros(nfiles,npts);
-yesFile = false(nfiles,1);
 for i=1:nfiles
-    a = strfind(files(i).name,selector);
-    b = strfind(files(i).name,creditDef);
-    c = strfind(files(i).name,problemName);
-    if ~isempty(a) && ~isempty(b) && ~isempty(c)
-        [tAEI,tGD,tfHV,tIGD] = getMOEAIndicators(strcat(path,filesep,files(i).name));      
-        AEI(i,:) = tAEI;
-        GD(i,:) = tGD;
-        fHV(i,:) = tfHV;
-        IGD(i,:) = tIGD;
-        yesFile(i) = true;
-    end
+    [tAEI,tGD,tfHV,tIGD] = getMOEAIndicators(strcat(path,filesep,files(i).name));
+    AEI(i,:) = tAEI;
+    GD(i,:) = tGD;
+    fHV(i,:) = tfHV;
+    IGD(i,:) = tIGD;
 end
-
-
-AEI = AEI(yesFile,:);
-GD = GD(yesFile,:);
-fHV = fHV(yesFile,:);
-IGD = IGD(yesFile,:);
-
 end

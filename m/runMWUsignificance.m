@@ -17,9 +17,8 @@ p = struct;
 sig = struct;
 for i=1:length(f_names)
     f_name = f_names{i};
-    
     if strcmp(f_name,'Inj')
-        continue;
+        continue
     end
     data1 = getfield(res1.res,f_name);
     data2 = getfield(res2.res,f_name);

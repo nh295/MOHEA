@@ -1,13 +1,13 @@
 function creditAnalysis(mode)
 
 
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'UF1_'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
 selectors = {'Random'};
-selectorShort = {'AP'};
-creditDef = { 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditShort = {'ODP','OPopF','OPopEA','CPF','CEA','OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
-path = '/Users/nozomihitomi/Desktop/untitled folder';
+creditDef = {'ParentDec','Neighbor','DecompositionContribution', 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+creditShort = {'ODeP','SiDe','CsDe'};
+% path = '/Users/nozomihitomi/Desktop/untitled folder';
+path = 'C:\Users\SEAK1\Dropbox\MOHEA\results';
 origin = cd(path);
 nops = 6;
 
@@ -16,7 +16,7 @@ switch mode
         for a=1:length(problemName)
             for b=1:length(selectors)
                 for c=1:length(creditDef)
-                    fileType =strcat(problemName{a},selectors{b},'*', creditDef{c},'*.creditcsv');
+                    fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
                     files = dir(fileType);
                     allcredits  = cell(length(files),1);
                     for i=1:length(files)
@@ -51,40 +51,112 @@ switch mode
             for b=1:length(selectors)
                 for c=1:length(creditDef)
                     load(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'));
-                    eraCredits = java.util.HashMap;
+                    eraCreditsAllOp = java.util.HashMap;
+                    eraCreditVel = java.util.HashMap;
+                    eraSelectionFreq = java.util.HashMap;
                     for i=1:length(allcredits)
                         iter = allcredits{i}.keySet.iterator;
+                        totalEpochSelection = zeros(nepochs,1);
+                        epochSelectionFreq = java.util.HashMap;
                         while iter.hasNext
                             operator = iter.next;
                             data = allcredits{i}.get(operator);
-                            era = zeros(nepochs,1);
+                            eraCreditOneOp = zeros(nepochs,1);
+                            eraSelectionOneOp = zeros(nepochs,1);
                             for j=1:nepochs
+                                %find indices that lie within epoch
                                 ind1 = epochLength*(j-1)<data(:,1);
                                 ind2 = data(:,1)<epochLength*j;
-                                credits = data(and(ind1,ind2),2);
-                                era(j)=sum(credits);
+                                epoch = data(and(ind1,ind2),:);
+                                epochCredits = epoch(:,2);
+                                eraCreditOneOp(j)=mean(epochCredits);
+                                %count the unique iterations for which the
+                                %operator gets a reward. This corresponds
+                                %to when it was selected
+                                iters = unique(epoch(:,1));
+                                eraSelectionOneOp(j) = length(iters);
+                                totalEpochSelection(j) = totalEpochSelection(j) + eraSelectionOneOp(j);
                             end
-                            if isempty(eraCredits.get(operator))
-                                eraCredits.put(operator,era);
+                            epochSelectionFreq.put(operator,eraSelectionOneOp);
+                            if isempty(eraCreditsAllOp.get(operator))
+                                eraCreditsAllOp.put(operator,eraCreditOneOp);
+                                eraCreditVel.put(operator,diff(eraCreditOneOp));
                             else
-                                eraCredits.put(operator,eraCredits.get(operator)+era);
+                                eraCreditsAllOp.put(operator,eraCreditsAllOp.get(operator)+eraCreditOneOp);
+                                eraCreditVel.put(operator,eraCreditVel.get(operator)+diff(eraCreditOneOp));
+                            end
+                        end
+                        %normalize seleciton to be ratio
+                        iter = allcredits{i}.keySet.iterator;
+                        while iter.hasNext
+                            operator = iter.next;
+                            freqOperatorSelected = epochSelectionFreq.get(operator)./totalEpochSelection;
+                            if isempty(eraSelectionFreq.get(operator))
+                                eraSelectionFreq.put(operator,freqOperatorSelected);
+                            else
+                                eraSelectionFreq.put(operator,eraSelectionFreq.get(operator)+freqOperatorSelected);
                             end
                         end
                     end
+                    
                     %take the average over the number of trials
                     iter2 = allcredits{i}.keySet.iterator;
-                    figure
                     labels = cell(nops,1);
                     ind = 1;
+                    subtitle = 'Selection rate = \n';
+                    cred = zeros(nepochs,allcredits{i}.keySet.size);
+                    credVel = zeros(nepochs-1,allcredits{i}.keySet.size);
+                    sel = zeros(nepochs,allcredits{i}.keySet.size);
                     while iter2.hasNext
                         operator = iter2.next;
-                        eraCredits.put(operator,eraCredits.get(operator)/length(allcredits));
+                        %take the average over the trials
+                        eraCreditsAllOp.put(operator,eraCreditsAllOp.get(operator)/length(allcredits));
+                        eraCreditVel.put(operator,eraCreditVel.get(operator)/length(allcredits));
+                        eraSelectionFreq.put(operator,eraSelectionFreq.get(operator)/length(allcredits));
+                        
                         labels{ind}=operator;
-                        plot(eraCredits.get(operator))
-                        hold on
+                        subtitle = strcat(subtitle,operator,':\t',sprintf('%.4f',mean(eraSelectionFreq.get(operator))),'\n');
+                        cred(:,ind) = eraCreditsAllOp.get(operator);
+                        credVel(:,ind) = eraCreditVel.get(operator);
+                        sel(:,ind) = eraSelectionFreq.get(operator);
                         ind = ind +1;
                     end
+                    plotName = strcat(problemName{a},'_',creditDef{c});
+                    h1=figure(1);
+                    plot(cred);
                     legend(labels)
+                    xlabel('Epoch')
+                    ylabel('Average credits earned in epoch')
+                    title(strcat(problemName{a},'_',creditDef{c},'_credit'))
+                    saveas(h1,strcat(plotName,'_credit'),'fig');
+                    saveas(h1,strcat(plotName,'_credit'),'jpeg');
+                    
+                    h2=figure(2);
+                    plot(abs(credVel));
+                    xlabel('Epoch')
+                    ylabel('Speed in the change of the average credits earned in epoch')
+                    legend(labels)
+                    title(strcat(problemName{a},'_',creditDef{c},'_velocity'))
+                    saveas(h2,strcat(plotName,'_velocity'),'fig');
+                    saveas(h2,strcat(plotName,'_velocity'),'jpeg');
+                    
+                    h3=figure(3);
+                    area(sel);
+                    axis([0,nepochs,0,1.5])
+                    xlabel('Epoch')
+                    ylabel('Average rate of selection in epoch')
+                    legend(labels)
+                    title(strcat(problemName{a},'_',creditDef{c},'_select'))
+                    %create textbox that shows selection frequency
+                    t = annotation('textbox');
+                    t.String = sprintf(subtitle);
+                    t.Position=[0.1500    0.67    0.3589    0.2333];
+                    t.HorizontalAlignment = 'right';
+                    saveas(h3,strcat(plotName,'_select'),'fig');
+                    saveas(h3,strcat(plotName,'_select'),'jpeg');
+                    clf(h1)
+                    clf(h2)
+                    clf(h3)
                 end
             end
         end

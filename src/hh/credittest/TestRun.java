@@ -29,6 +29,7 @@ import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
@@ -120,9 +121,6 @@ public class TestRun implements Callable {
     private IHyperHeuristic newMOEADHH() {
         
         int populationSize = (int) properties.getDouble("populationSize", 600);
-        double crediMemory = properties.getDouble("creditMemory", 1.0);
-
-        System.out.println("alpha:" + crediMemory);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
@@ -142,7 +140,7 @@ public class TestRun implements Callable {
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization, 
-            delta, eta, updateUtility, selector, rewardDef, crediMemory,cr);
+            delta, eta, updateUtility, selector, rewardDef,cr);
 
         return moeadhh;
     }
@@ -176,10 +174,11 @@ public class TestRun implements Callable {
         System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
+        int k=0;
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
                 instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
-//                System.out.printf("%02.4f",(double)instAlgorithm.getNumberOfEvaluations()/(double)maxEvaluations);
+//                PopulationIO.writeObjectives(new File(path+ File.separator+"SIDe"+Integer.toString(k)+".pop"),((MOEADHH)hh).getPopulation());
             }
             
         hh.terminate();

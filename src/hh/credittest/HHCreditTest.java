@@ -48,9 +48,9 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10","UF11","UF12","UF13"};
-        String[] problems = new String[]{ "UF8", "UF9", "UF10"};
-//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
+//        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};//,"UF11","UF12","UF13"};
+        String[] problems = new String[]{"UF10"};
+//        String[] problems = new String[]{ "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 //        pool = Executors.newFixedThreadPool(1);
@@ -58,8 +58,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -71,14 +71,17 @@ public class HHCreditTest {
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"Random"};
-            //setup credit definitions
+//            setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA"};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
-//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
-            String[] creditDefs = new String[]{"OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe","ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+            String[] creditDefs = new String[]{"OPopIEAR2","CR2PF","CR2EA"};
+            
+            //for single operator MOEA
+//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -88,6 +91,7 @@ public class HHCreditTest {
                     futures.clear();
                     for (int k = 0; k < numberOfSeeds; k++) {
 
+//                    for (String op : ops) {
                         Problem prob = ProblemFactory.getInstance().getProblem(probName);
                         double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
                         for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
@@ -129,25 +133,28 @@ public class HHCreditTest {
 //                        heuristics.add(of.getVariation("de3+pm", heuristicProp, prob));
 //                        heuristics.add(of.getVariation("de4+pm", heuristicProp, prob));
 
-                        //Choose credit aggregation method
-//                        IQualityEstimation creditAgg = new RankRewards(1.0);
-
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
                         TestRun test = new TestRun(path, prob, probName,
                                 typeProp, heuristics, maxEvaluations);
+                        futures.add(pool.submit(test));
 
                         //benchmark built-in MOEA
-//                      TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, 
-//                            typeProp, "MOEAD", maxEvaluations);
-                        futures.add(pool.submit(test));
+//                            System.out.println(op);
+//                            prop.put("operator", op);
+//                            typeProp = new TypedProperties(prop);
+//                            TestRunBenchmark test = new TestRunBenchmark(path, prob, probName,
+//                                    typeProp, "eMOEA", maxEvaluations);
+//
+//                            futures.add(pool.submit(test));
+//                        }
                     }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
 //                            
-                            String name = path + File.separator + "results" + File.separator + probName + "_"
-                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//                            String name = path + File.separator + "results" + File.separator + probName + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //
 //                            //save the approximation set
 //                            NondominatedPopulation ndPop = hh.getResult();
@@ -163,7 +170,7 @@ public class HHCreditTest {
 //                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
 //                          path + File.separator + "results" + File.separator + probName + "_"
 //                          + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".credit");
-                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
+//                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
 //                            save quality history
 //                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
 //                                    name + ".qual");
