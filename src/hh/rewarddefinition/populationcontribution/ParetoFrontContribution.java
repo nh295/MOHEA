@@ -6,13 +6,12 @@
 
 package hh.rewarddefinition.populationcontribution;
 
-import hh.rewarddefinition.Reward;
 import hh.hyperheuristics.SerializableVal;
+import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinedOn;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -46,35 +45,6 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
         this.rewardInPF = rewardInPF;
     }
     
-    /**
-     * This method counts the number of solutions the heuristic is responsible 
-     * for in the given population. For each solution it finds, it calculates the 
-     * discounted reward based on the DecayingRewards. The sum total is the 
-     * reward to be assigned
-     * @param population pareto front for this implementation
-     * @param heuristic
-     * @param iteration
-     * @return 
-     */
-    protected double compute(Iterable<Solution> population,Variation heuristic,int iteration){
-        double sumReward=0;
-        Iterator<Solution> iter = population.iterator();
-        while(iter.hasNext()){
-            Solution soln = iter.next();
-            if(soln.hasAttribute("heuristic")){
-                if(((SerializableVal)soln.getAttribute("heuristic")).getSval().equalsIgnoreCase(heuristic.toString())){
-                    int createdIteration = ((SerializableVal)soln.getAttribute("iteration")).getIval();
-                    Reward r = new Reward(createdIteration,1);
-                    sumReward+=rewardInPF*r.fractionOriginalVal(iteration);
-                }
-            }
-        }
-        if(sumReward>0){
-            return sumReward;
-        }else 
-            return rewardNotInPF;
-    }
-    
     @Override
     public String toString() {
         return "ParetoFrontContribution";
@@ -84,16 +54,35 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
      * @param population for this implementation it should be the pareto front
      * @param enteringSolutions not used
      * * @param removedSolutions not used
-     * @param heuristics
+     * @param operators
      * @param iteration
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(NondominatedPopulation population,Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> heuristics, int iteration) {
-        HashMap<Variation,Reward> rewards = new HashMap();
-        for(Variation heuristic:heuristics){
-            rewards.put(heuristic, new Reward(iteration,compute(population,heuristic, iteration)));
+    public HashMap<Variation, Reward> compute(Population population,Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> operators, int iteration) {
+        HashMap<String,Double> rewards = new HashMap();
+        //give all operators 0 credits first
+        for(Variation op:operators){
+            rewards.put(op.toString(), 0.0);
         }
-        return rewards;
+        //iterate through solutions in neighborhood
+        for(Solution soln:population){
+            if(soln.hasAttribute("heuristic")){
+                String opName = ((SerializableVal)soln.getAttribute("heuristic")).getSval();
+                int createdIteration = ((SerializableVal)soln.getAttribute("iteration")).getIval();
+                Reward r = new Reward(createdIteration,1);
+                rewards.put(opName,rewards.get(opName) + rewardInPF*r.fractionOriginalVal(iteration));
+            }
+        }
+        
+        HashMap<Variation,Reward> out = new HashMap();
+        for(Variation op:operators){
+            double r = rewards.get(op.toString());
+            if(r>0)
+                out.put(op,new Reward(iteration, r));
+            else
+                out.put(op, new Reward(iteration, rewardNotInPF));
+        }
+        return out;
     }
 }

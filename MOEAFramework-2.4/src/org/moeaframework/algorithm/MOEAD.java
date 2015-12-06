@@ -29,12 +29,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.util.MathArrays;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PRNG;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
@@ -242,7 +242,7 @@ public class MOEAD extends AbstractAlgorithm {
      * The probability of mating with a solution in the neighborhood rather than
      * the entire population.
      */
-    public final double delta;
+    private final double delta;
 
     /**
      * The maximum number of population slots a solution can replace.
@@ -657,12 +657,12 @@ public class MOEAD extends AbstractAlgorithm {
      * @return Nozomi added for hyper-heuristic. Returns the indices that were
      * replaced by offspring solution
      */
-    protected List<Double> updateSolution(Solution solution,
+    protected double updateSolution(Solution solution,
             List<Integer> matingIndices) {
         int c = 0;
         PRNG.shuffle(matingIndices);
 
-        ArrayList<Double> out = new ArrayList();
+        double out = 0;
         for (int i = 0; i < matingIndices.size(); i++) {
             Individual individual = population.get(matingIndices.get(i));
             double fitness1 = fitness(solution, individual.getWeights());
@@ -670,7 +670,7 @@ public class MOEAD extends AbstractAlgorithm {
             if (fitness1 < fitness2) {
                 individual.setSolution(solution);
                 c = c + 1;
-                out.add((fitness2 - fitness1) / fitness2);
+                out+=(fitness2 - fitness1) / fitness2;
             }
 
             if (c >= eta) {
@@ -743,6 +743,20 @@ public class MOEAD extends AbstractAlgorithm {
         if ((updateUtility >= 0) && (generation % updateUtility == 0)) {
             updateUtility();
         }
+    }
+    
+    /**
+     * Gets the solutions in the neighborhood of the ith subproblem
+     * @param index of the ith subproblem
+     * @return 
+     */
+    protected Population getNeighborhoodSolutions(int index){
+        Population neighbors = new Population();
+        List<Integer> matingIndices = getMatingIndices(index);
+        for(Integer mateIndex:matingIndices){
+            neighbors.add(population.get(mateIndex).getSolution());
+        }
+        return neighbors;
     }
 
     /**
@@ -857,6 +871,14 @@ public class MOEAD extends AbstractAlgorithm {
         idealPoint = state.getIdealPoint();
         numberOfEvaluations = state.getNumberOfEvaluations();
         generation = state.getGeneration();
+    }
+    
+    /**
+     * Gets the current ideal point
+     * @return the current ideal point
+     */
+    public double[] getIdealPoint() {
+        return idealPoint;
     }
 
 }

@@ -5,18 +5,16 @@
 problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
 % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
 selectors = {'Probability','Adaptive'};
-% selectors = {'eMOEA','MOEAD'};
 selectorShort = {'PM','AP'};
-% selectorShort = {'eMOEA','MOEAD'};
-% creditDef = { 'Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-% creditShort = {'ODP','OPopF','OPopEA','CPF','CEA','OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
-creditDef = { 'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditShort = {'OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
+creditDef = {'ParentDec','Neighbor','DecompositionContribution','Parent','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+creditShort = {'OP-De','SI-R2','CS-R2','OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
+% creditDef = { 'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+% creditShort = {'OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
 % creditDef = {'_'};
 % creditShort= {'_'};
 
-% path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 res_path =strcat(path,'mRes6opsInjection');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
@@ -28,7 +26,7 @@ h3 = figure(3); %AEI
 % h4 = figure(4); %# injections
 
 %box plot colors for benchmarks
-boxColors = 'rkcm';
+boxColors = 'rkm';
 
 for i=1:length(problemName)
     probName = problemName{i};
@@ -55,7 +53,7 @@ for i=1:length(problemName)
             datafHV(:,c) = res.fHV;
             dataAEI(:,c) = res.AEI;
 %             dataInj(:,c-size(benchmarkDataIGD,2)) = res.Inj;
-            [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'FRRMAB',probName);
+            [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'Random',probName);
             extra = '';
             if sig.IGD==1
                 extra = '+';

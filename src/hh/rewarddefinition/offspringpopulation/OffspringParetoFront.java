@@ -8,6 +8,7 @@ package hh.rewarddefinition.offspringpopulation;
 
 import hh.rewarddefinition.RewardDefinedOn;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -47,7 +48,7 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
      * @return the value of credit to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, NondominatedPopulation population) {
+    public double compute(Solution offspring, Population population) {
         if(population.getClass()!=NondominatedPopulation.class)
             throw new ClassCastException("Need to be NondominatedPopulation: " + population.getClass());
         NondominatedPopulation ndpop = (NondominatedPopulation)population;

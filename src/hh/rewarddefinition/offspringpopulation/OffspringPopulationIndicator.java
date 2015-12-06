@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -60,12 +61,13 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
      * with the offspring solution added
      *
      * @param offspring
-     * @param ndpop nondominated population: pareto front or archive
+     * @param pop nondominated population: pareto front or archive
      * @return the improvement in the indicator value. 0.0 if no improvement
      */
     @Override
-    public double compute(Solution offspring, NondominatedPopulation ndpop) {
+    public double compute(Solution offspring, Population pop) {
         //add offspring to ndpop to see if it entered
+        NondominatedPopulation ndpop = (NondominatedPopulation)pop;
         Collection<Solution> removedSolns = ndpop.addAndReturnRemovedSolutions(offspring);
 
         if (!ndpop.isChanged())  //if offspring doesn't improve the approximate set.

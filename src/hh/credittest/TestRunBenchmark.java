@@ -50,12 +50,12 @@ public class TestRunBenchmark extends TestRun{
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
         
-        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(3000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeCollector()
+//                .attachHypervolumeCollector()
                 .attachHypervolumeJmetalCollector()
                 .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
@@ -64,7 +64,8 @@ public class TestRunBenchmark extends TestRun{
         Algorithm instAlgorithm = instrumenter.instrument(alg);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting "+ algorithm +" on " + problem.getName());
+        String operatorName = prop.getProperties().getProperty("operator");
+        System.out.println("Starting "+ algorithm +" on " + problem.getName() + " with " + operatorName);
         long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
@@ -78,8 +79,8 @@ public class TestRunBenchmark extends TestRun{
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
         String name = String.valueOf(System.nanoTime());
         
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_"
-                + algorithm + "_" + name;
+        String filename = path + File.separator + "res" + File.separator + problem.getName() + "_"
+                + algorithm + "_" + operatorName + "_" + name;
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 

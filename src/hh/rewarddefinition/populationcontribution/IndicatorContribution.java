@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -63,12 +64,13 @@ public class IndicatorContribution extends AbstractPopulationContribution{
      * @return 
      */
     @Override
-    public HashMap<Variation, Reward> compute(NondominatedPopulation population,
+    public HashMap<Variation, Reward> compute(Population population,
             Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> heuristics, int iteration) {
+        NondominatedPopulation ndpop = (NondominatedPopulation)population;
         //only run on initial run.
         boundUpdate:
         if (sortedObjs == null) {
-            updateMinMax(population);
+            updateMinMax(ndpop);
         } else {
             Iterator<Solution> iter = removedSolutions.iterator();
             while (iter.hasNext()) {
@@ -76,7 +78,7 @@ public class IndicatorContribution extends AbstractPopulationContribution{
                 Solution soln = iter.next();
                 for(int i =0; i<soln.getNumberOfObjectives();i++){
                     if(soln.getObjective(i)==maxObjs.getObjective(i)){
-                        updateMinMax(population);
+                        updateMinMax(ndpop);
                         break boundUpdate;
                     }
                 }
@@ -92,7 +94,7 @@ public class IndicatorContribution extends AbstractPopulationContribution{
        
         //normalize solutions using max and min bounds of the ndpop with the new solution
         NondominatedPopulation normNDpop = new NondominatedPopulation();
-        for(Solution soln:population){ 
+        for(Solution soln:ndpop){ 
             Solution normSoln = new Solution(normalizeObjectives(soln));
             if (soln.hasAttribute("heuristic")) {
                 normSoln.setAttribute("heuristic", new SerializableVal(((SerializableVal) soln.getAttribute("heuristic")).getSval()));

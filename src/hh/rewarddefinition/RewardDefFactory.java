@@ -9,10 +9,13 @@ import hh.rewarddefinition.fitnessindicator.AdditiveEpsilonIndicator;
 import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
 import hh.rewarddefinition.fitnessindicator.R2Indicator;
 import hh.rewarddefinition.offspringparent.OPBinaryIndicator;
+import hh.rewarddefinition.offspringparent.ParentDecomposition;
 import hh.rewarddefinition.offspringparent.ParentDomination;
 import hh.rewarddefinition.offspringpopulation.OffspringEArchive;
+import hh.rewarddefinition.offspringpopulation.OffspringNeighborhood;
 import hh.rewarddefinition.offspringpopulation.OffspringParetoFront;
 import hh.rewarddefinition.offspringpopulation.OffspringPopulationIndicator;
+import hh.rewarddefinition.populationcontribution.DecompositionContribution;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
 import hh.rewarddefinition.populationcontribution.IndicatorContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
@@ -72,6 +75,9 @@ public class RewardDefFactory {
         double kappa = prop.getDouble("kappa", 0.05);
         int numObj = problem.getNumberOfObjectives();
         switch (name) {
+            case "OPDe": //offspring improves parent in subproblem
+                credDef = new ParentDecomposition();
+                break;
             case "ODP": //offspring dominates parent
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
@@ -87,6 +93,9 @@ public class RewardDefFactory {
 //            case "OPIR3": //offspring parent hypervolume indicator using pareto front
 //                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
 //                break;
+            case "SIDe": //
+                credDef = new OffspringNeighborhood();
+                break;
             case "OPopPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);
                 break;
@@ -119,6 +128,9 @@ public class RewardDefFactory {
 //            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
 //                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj, numVec),RewardDefinedOn.ARCHIVE,new Solution(idealPoint));
 //                break;
+            case "CSDe": //contribution to the subproblem's neighborhood
+                credDef = new DecompositionContribution(satisfy, disatisfy);
+                break;
             case "CPF": //contribution to pareto front
                 credDef = new ParetoFrontContribution(satisfy, disatisfy);
                 break;

@@ -11,7 +11,7 @@ import hh.rewarddefinition.CreditFunctionType;
 import hh.rewarddefinition.Reward;
 import java.util.Collection;
 import java.util.HashMap;
-import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
@@ -22,7 +22,7 @@ import org.moeaframework.core.Variation;
 public abstract class AbstractPopulationContribution extends AbstractRewardDefintion{
     
     public AbstractPopulationContribution(){
-        type = CreditFunctionType.NCI;
+        type = CreditFunctionType.CS;
     }
     
     /**
@@ -34,6 +34,6 @@ public abstract class AbstractPopulationContribution extends AbstractRewardDefin
      * @param iteration
      * @return 
      */
-    public abstract HashMap<Variation, Reward> compute(NondominatedPopulation population,
+    public abstract HashMap<Variation, Reward> compute(Population population,
             Collection<Solution> enteringÏSolutions,Collection<Solution> removedSolutions,Collection<Variation> heuristics,int iteration);
 }

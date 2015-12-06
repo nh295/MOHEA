@@ -9,6 +9,7 @@ package hh.rewarddefinition.offspringpopulation;
 import hh.rewarddefinition.RewardDefinedOn;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -46,7 +47,7 @@ public class OffspringEArchive extends AbstractOffspringPopulation{
      * @return the value of credit to resulting from the solution
      */
     @Override
-    public double compute(Solution offspring, NondominatedPopulation archive) {
+    public double compute(Solution offspring, Population archive) {
         if(!archive.getClass().equals(EpsilonBoxDominanceArchive.class))
             throw new ClassCastException("Need to be NondominatedPopulation: " + archive.getClass());
         EpsilonBoxDominanceArchive ndpop = (EpsilonBoxDominanceArchive)archive;
