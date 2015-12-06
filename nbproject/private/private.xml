@@ -5,10 +5,9 @@
         <group>
             <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRun.java</file>
             <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/hyperheuristics/HeMOEA.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRunBenchmark.java</file>
             <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/algorithm/StandardAlgorithms.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/algorithm/MOEAD.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/RewardDefFactory.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRunBenchmark.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/Instrumenter.java</file>
             <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/HHCreditTest.java</file>
             <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/hyperheuristics/MOEADHH.java</file>
         </group>

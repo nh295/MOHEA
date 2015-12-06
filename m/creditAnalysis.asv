@@ -1,13 +1,13 @@
 function creditAnalysis(mode)
 
 
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'UF1_'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+problemName = {'UF6','UF7'};
 selectors = {'Random'};
-creditDef = {'ParentDec','Neighbor','DecompositionContribution', 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditShort = {'ODP','OPopF','OPopEA','CPF','CEA','OPaR2','OPopPFR2','OPopEAR2','CPFR2','CEAR2'};
-path = '/Users/nozomihitomi/Desktop/untitled folder';
-% path = 'C:\Users\SEAK1\Dropbox\MOHEA\results';
+creditDef = {'ParentDec','Neighbor','DecompositionContribution'};% 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+creditShort = {'ODeP','SiDe','CsDe'};
+% path = '/Users/nozomihitomi/Desktop/untitled folder';
+path = 'C:\Users\SEAK1\Dropbox\MOHEA\resultsCredits';
 origin = cd(path);
 nops = 6;
 
@@ -16,7 +16,7 @@ switch mode
         for a=1:length(problemName)
             for b=1:length(selectors)
                 for c=1:length(creditDef)
-                    fileType =strcat(problemName{a},selectors{b},'*', creditDef{c},'*.creditcsv');
+                    fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
                     files = dir(fileType);
                     allcredits  = cell(length(files),1);
                     for i=1:length(files)

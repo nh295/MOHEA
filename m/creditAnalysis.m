@@ -2,13 +2,15 @@ function creditAnalysis(mode)
 
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
+problemName = {'UF8'};
 selectors = {'Random'};
-creditDef = {'ParentDec','Neighbor','DecompositionContribution', 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditShort = {'ODeP','SiDe','CsDe'};
-% path = '/Users/nozomihitomi/Desktop/untitled folder';
-path = 'C:\Users\SEAK1\Dropbox\MOHEA\results';
-origin = cd(path);
+creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
+    'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
+    'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+% path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
+respath = strcat(path,'mResCredits');
+origin = cd(respath);
 nops = 6;
 
 switch mode

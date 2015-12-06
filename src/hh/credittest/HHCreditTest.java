@@ -49,7 +49,7 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF1","UF2", "UF3", "UF4", "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};//,"UF11","UF12","UF13"};
-        String[] problems = new String[]{"UF10"};
+        String[] problems = new String[]{"UF9"};
 //        String[] problems = new String[]{ "UF5", "UF6", "UF7", "UF8", "UF9", "UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
@@ -70,15 +70,15 @@ public class HHCreditTest {
             int maxEvaluations = 300010;
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
-//            String[] selectors = new String[]{"Random"};
+//            String[] selectors = new String[]{"PM"};
 //            setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA"};
-//            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+            String[] creditDefs = new String[]{"OPIR2"};
 //            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe","ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
-            String[] creditDefs = new String[]{"OPopIEAR2","CR2PF","CR2EA"};
+//            String[] creditDefs = new String[]{"OPopIEAR2","CR2PF","CR2EA"};
             
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};

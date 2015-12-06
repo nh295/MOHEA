@@ -179,7 +179,7 @@ public class TestRun implements Callable {
                 instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
 //                PopulationIO.writeObjectives(new File(path+ File.separator+"SIDe"+Integer.toString(k)+".pop"),((MOEADHH)hh).getPopulation());
-            }
+                }
             
         hh.terminate();
         long finishTime = System.currentTimeMillis();

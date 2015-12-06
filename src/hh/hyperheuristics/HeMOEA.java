@@ -178,7 +178,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             prevPopContRewards.put(heur, new Reward(0, 0.0));
         }
     }
-
+    
     @Override
     public String getName() {
         return name;
