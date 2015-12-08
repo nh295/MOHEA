@@ -202,7 +202,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                         OPDe.setIdealPoint(getIdealPoint());
                         reward += OPDe.compute(child, parents[0], null, null);
                     }
-                    Reward operatorReward = new Reward(iteration, reward);
+                    Reward operatorReward = new Reward(this.numberOfEvaluations, reward);
                     operatorSelector.update(operatorReward, operator);
                     creditHistory.add(operator, operatorReward);
                     break;
@@ -214,7 +214,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                         updateSolution(child, matingIndices);
                         rewardSi += updateSolution(child, matingIndices);
                     }
-                    Reward operatorRewardSi = new Reward(iteration, rewardSi);
+                    Reward operatorRewardSi = new Reward(this.numberOfEvaluations, rewardSi);
                     operatorSelector.update(operatorRewardSi, operator);
                     creditHistory.add(operator, operatorRewardSi);
                     break;
@@ -232,7 +232,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                     while (iter.hasNext()) {
                         Variation operator_i = iter.next();
                         operatorSelector.update(contRewards.get(operator_i), operator_i);
-                        creditHistory.add(operator_i, contRewards.get(operator_i));
+                        creditHistory.add(operator_i, new Reward(this.numberOfEvaluations,contRewards.get(operator_i).getValue()));
                     }
                     break;
                 default:

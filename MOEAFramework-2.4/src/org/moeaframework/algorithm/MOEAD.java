@@ -323,7 +323,7 @@ public class MOEAD extends AbstractAlgorithm {
         this(problem, neighborhoodSize, initialization, variation, delta, eta,
                 -1);
     }
-
+    
     @Override
     public void initialize() {
         super.initialize();
