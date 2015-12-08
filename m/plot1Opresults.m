@@ -8,7 +8,7 @@ problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % MOEA =  {'MOEAD'};
 MOEA =  {'eMOEA'};
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
-operatorName = {'sbx','de','um','pcx','undx','spx'};
+operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
 path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 % path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
@@ -18,12 +18,19 @@ a = 30; %number of trials
 b = length(MOEA)*length(operator);
 
 h1 = figure(1); %IGD
-h1.Position=[128 253 1401 328];
-clf(h1)
-
+set(h1,'Position',[150, 500, 600,420]);
 h2 = figure(2); %fHV
-h2.Position=[128 253 1401 328];
+set(h2,'Position',[150, 100, 600,420]);
+h1 = figure(1); %IGD
+clf(h1)
 clf(h2)
+
+leftPos = 0.075;
+topPos = 0.65;
+bottomPos = 0.15;
+intervalPos = (1-leftPos)/5;
+width = 0.115;
+height = 0.3;
 
 for i=1:length(problemName)
     probName = problemName{i};
@@ -58,9 +65,9 @@ for i=1:length(problemName)
             end
             extra = '';
             if sig.IGD==1
-                extra = '(+)';
+                extra = '(-)';
             elseif sig.IGD==-1
-                extra = '(-)'; 
+                extra = '(+)'; 
             end
             label_names_IGD = [label_names_IGD,strcat(operatorName{k},extra)]; %concats the labels
             extra = '';
@@ -73,21 +80,62 @@ for i=1:length(problemName)
         end
     end
     
+    
+    if strcmp(probName,'UF1_')
+        probName = 'UF1';
+    end
+    
     figure(h1)
+    pause(0.2)
     subplot(2,5,i);
-    fprintf('%s: %s does best in IGD\n',probName,operator{minIGDind});
-    boxplot(dataIGD,label_names_IGD)
+    [~,ind]=min(mean(dataIGD,1));
+    label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
+    boxplot(dataIGD,label_names_IGD,'boxstyle','filled','medianstyle','target','symbol','o')
     set(findobj(gca,'Type','text'),'FontSize',16)
     title(probName)
-    pause(0.1)
+    set(gca,'TickLabelInterpreter','tex');
+    set(gca,'XTickLabelRotation',90);
+    set(gca,'FontSize',12)
+    %ensures all boxplot axes are the same size and aligned.
+    if i==1
+        fig1Pos = get(gca,'Position');
+        set(gca,'Position',[leftPos,topPos,width,height]);
+    elseif i<6
+        figPos = get(gca,'Position');
+        set(gca,'Position',[leftPos+intervalPos*(i-1),topPos,width,height]);
+    elseif i==6
+        fig6Pos = get(gca,'Position');
+        set(gca,'Position',[leftPos,bottomPos,width,height]);
+    else
+        figPos = get(gca,'Position');
+        set(gca,'Position',[leftPos+intervalPos*(i-6),bottomPos,width,height]);
+    end
     
     figure(h2)
+    pause(0.2)
     subplot(2,5,i);
-    fprintf('%s: %s does best in HV\n',probName,operator{maxHVind});
-    boxplot(datafHV,label_names_fHV)
+    [~,ind]=max(mean(datafHV,1));
+    label_names_fHV{ind} = strcat('\bf{',label_names_fHV{ind},'}');
+    boxplot(datafHV,label_names_fHV,'boxstyle','filled','medianstyle','target','symbol','o')
     set(findobj(gca,'Type','text'),'FontSize',16)
     title(probName)
-    pause(0.1)
+    set(gca,'TickLabelInterpreter','tex');
+    set(gca,'XTickLabelRotation',90);
+    set(gca,'FontSize',12)
+    %ensures all boxplot axes are the same size and aligned.
+    if i==1
+        fig1Pos = get(gca,'Position');
+        set(gca,'Position',[leftPos,topPos,width,height]);
+    elseif i<6
+        figPos = get(gca,'Position');
+        set(gca,'Position',[leftPos+intervalPos*(i-1),topPos,width,height]);
+    elseif i==6
+        fig6Pos = get(gca,'Position');
+        set(gca,'Position',[leftPos,bottomPos,width,height]);
+    else
+        figPos = get(gca,'Position');
+        set(gca,'Position',[leftPos+intervalPos*(i-6),bottomPos,width,height]);
+    end
 end
 saveas(h1,strcat(MOEA{1},'1opIGD'),'fig');
 saveas(h2,strcat(MOEA{1},'1opHV'),'fig');

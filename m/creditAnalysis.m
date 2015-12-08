@@ -1,21 +1,34 @@
 function creditAnalysis(mode)
 
 
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-problemName = {'UF8'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
+problemName = {'UF9','UF10','UF8'};
 selectors = {'Random'};
-creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
-    'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
-    'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-% path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-respath = strcat(path,'mResCredits');
+% creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
+%     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
+%     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+creditDef = {
+ 'ParetoFrontContribution','EArchiveContribution',...
+     'CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+shortCreditName = {'OP-Do','SI-Do-PF','SI-Do-A'...
+    'OP-R2','SI-R2-PF','SI-R2-A'};
+% path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+% path = '/Users/nozomihitomi/Desktop/';
+path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
+% respath = strcat(path,'mResNewCredits');
+respath = strcat(path,'newresultsCredits');
 origin = cd(respath);
 nops = 6;
 
 switch mode
     case 1 %read in the credit csv files
+        nFiles = length(problemName)*length(selectors)*length(creditDef);
+        filesProcessed = 0;
+        h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
+            filesProcessed = filesProcessed + 1;
+            waitbar(filesProcessed/nFiles);
             for b=1:length(selectors)
                 for c=1:length(creditDef)
                     fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
@@ -38,10 +51,11 @@ switch mode
                         allcredits{i} = expData;
                     end
                     %save files
-                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'),'expData');
+                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'),'allcredits');
                 end
             end
         end
+        close(h)
         cd(origin);
         
         
@@ -49,7 +63,12 @@ switch mode
         nepochs = 100;
         maxEval = 300000;
         epochLength = maxEval/nepochs;
+        nFiles = length(problemName)*length(selectors)*length(creditDef);
+        filesProcessed = 0;
+        h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
+            filesProcessed = filesProcessed + 1;
+            waitbar(filesProcessed/nFiles);
             for b=1:length(selectors)
                 for c=1:length(creditDef)
                     load(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'));
@@ -60,9 +79,14 @@ switch mode
                         iter = allcredits{i}.keySet.iterator;
                         totalEpochSelection = zeros(nepochs,1);
                         epochSelectionFreq = java.util.HashMap;
+                        maxCredit = -inf;
+                        minCredit = inf;
+                        rawEraCredits = java.util.HashMap;
                         while iter.hasNext
                             operator = iter.next;
                             data = allcredits{i}.get(operator);
+                            maxCredit = max([maxCredit;data(:,2)]);
+                            minCredit = min([minCredit;data(:,2)]);
                             eraCreditOneOp = zeros(nepochs,1);
                             eraSelectionOneOp = zeros(nepochs,1);
                             for j=1:nepochs
@@ -79,19 +103,24 @@ switch mode
                                 eraSelectionOneOp(j) = length(iters);
                                 totalEpochSelection(j) = totalEpochSelection(j) + eraSelectionOneOp(j);
                             end
+                            rawEraCredits.put(operator,eraCreditOneOp);
                             epochSelectionFreq.put(operator,eraSelectionOneOp);
-                            if isempty(eraCreditsAllOp.get(operator))
-                                eraCreditsAllOp.put(operator,eraCreditOneOp);
-                                eraCreditVel.put(operator,diff(eraCreditOneOp));
-                            else
-                                eraCreditsAllOp.put(operator,eraCreditsAllOp.get(operator)+eraCreditOneOp);
-                                eraCreditVel.put(operator,eraCreditVel.get(operator)+diff(eraCreditOneOp));
-                            end
+
                         end
-                        %normalize seleciton to be ratio
+                        
                         iter = allcredits{i}.keySet.iterator;
                         while iter.hasNext
                             operator = iter.next;
+                            %normalize credits
+                            normEraCreditOneOp = (rawEraCredits.get(operator)-minCredit)/(maxCredit-minCredit);
+                            if isempty(eraCreditsAllOp.get(operator))
+                                eraCreditsAllOp.put(operator,normEraCreditOneOp);
+                                eraCreditVel.put(operator,diff(normEraCreditOneOp));
+                            else
+                                eraCreditsAllOp.put(operator,eraCreditsAllOp.get(operator)+normEraCreditOneOp);
+                                eraCreditVel.put(operator,eraCreditVel.get(operator)+diff(normEraCreditOneOp));
+                            end
+                            %normalize seleciton to be ratio
                             freqOperatorSelected = epochSelectionFreq.get(operator)./totalEpochSelection;
                             if isempty(eraSelectionFreq.get(operator))
                                 eraSelectionFreq.put(operator,freqOperatorSelected);
@@ -123,32 +152,36 @@ switch mode
                         sel(:,ind) = eraSelectionFreq.get(operator);
                         ind = ind +1;
                     end
-                    plotName = strcat(problemName{a},'_',creditDef{c});
+                    
+                    plotName = strcat(problemName{a},'_',shortCreditName{c});
                     h1=figure(1);
                     plot(cred);
+                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit','.mat'),'cred');
                     legend(labels)
                     xlabel('Epoch')
                     ylabel('Average credits earned in epoch')
-                    title(strcat(problemName{a},'_',creditDef{c},'_credit'))
+                    title(strcat(problemName{a},'  ',shortCreditName{c},' credit'))
                     saveas(h1,strcat(plotName,'_credit'),'fig');
                     saveas(h1,strcat(plotName,'_credit'),'jpeg');
                     
                     h2=figure(2);
                     plot(abs(credVel));
+                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_creditVel','.mat'),'credVel');
                     xlabel('Epoch')
                     ylabel('Speed in the change of the average credits earned in epoch')
                     legend(labels)
-                    title(strcat(problemName{a},'_',creditDef{c},'_velocity'))
+                    title(strcat(problemName{a},'  ',shortCreditName{c},' velocity'))
                     saveas(h2,strcat(plotName,'_velocity'),'fig');
                     saveas(h2,strcat(plotName,'_velocity'),'jpeg');
                     
                     h3=figure(3);
                     area(sel);
+                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_sel','.mat'),'sel');
                     axis([0,nepochs,0,1.5])
                     xlabel('Epoch')
                     ylabel('Average rate of selection in epoch')
                     legend(labels)
-                    title(strcat(problemName{a},'_',creditDef{c},'_select'))
+                    title(strcat(problemName{a},'  ',shortCreditName{c},' select'))
                     %create textbox that shows selection frequency
                     t = annotation('textbox');
                     t.String = sprintf(subtitle);
@@ -159,7 +192,9 @@ switch mode
                     clf(h1)
                     clf(h2)
                     clf(h3)
+                    clear allcredits;
                 end
             end
         end
+        close(h)
 end

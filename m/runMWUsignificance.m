@@ -8,7 +8,7 @@ file1 = dir(strcat(problemName,'_',selector1,'_',creditDef1,'.mat'));
 res1 = load(file1.name,'res');
 
 cd(strcat(path,filesep,'Benchmarks',filesep,benchmark))
-file2 = dir(strcat(problemName,'_',benchmark,'*.mat'));
+file2 = dir(strcat(problemName,'*.mat'));
 res2 = load(file2.name,'res');
 cd(origin)
 

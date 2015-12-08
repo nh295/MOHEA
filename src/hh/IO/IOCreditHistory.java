@@ -41,7 +41,7 @@ public class IOCreditHistory {
      * @param separator the type of separator desired
      * @return true if the save is successful
      */
-    public static boolean saveHistory(CreditHistory creditHistory, String filename, String separator) {
+    public boolean saveHistory(CreditHistory creditHistory, String filename, String separator) {
         Collection<Variation> operators = creditHistory.getOperators();
         try (FileWriter fw = new FileWriter(new File(filename))) {
             for(Variation oper:operators){
@@ -142,7 +142,7 @@ public class IOCreditHistory {
      * @param creditHistory The quality history to save
      * @param filename filename including the path and the extension.
      */
-    public static void saveHistory(CreditHistory creditHistory, String filename) {
+    public void saveHistory(CreditHistory creditHistory, String filename) {
         try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));) {
             os.writeObject(creditHistory);
             os.close();

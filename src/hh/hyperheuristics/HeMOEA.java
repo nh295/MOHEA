@@ -326,7 +326,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             while (iter.hasNext()) {
                 Variation operator_i = iter.next();
                 operatorSelector.update(popContRewards.get(operator_i), operator_i);
-                creditHistory.add(operator_i, popContRewards.get(operator_i));
+                creditHistory.add(operator_i, new Reward(this.numberOfEvaluations,popContRewards.get(operator_i).getValue()));
             }
         } else {
             throw new UnsupportedOperationException("RewardDefinitionType not recognized ");

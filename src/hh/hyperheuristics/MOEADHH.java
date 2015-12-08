@@ -232,7 +232,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                     while (iter.hasNext()) {
                         Variation operator_i = iter.next();
                         operatorSelector.update(contRewards.get(operator_i), operator_i);
-                        creditHistory.add(operator_i, contRewards.get(operator_i));
+                        creditHistory.add(operator_i, new Reward(this.numberOfEvaluations,contRewards.get(operator_i).getValue()));
                     }
                     break;
                 default:
