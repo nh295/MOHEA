@@ -1,10 +1,10 @@
 %runs the post-run analysis
 %reads .res file and puts all results data into one mfile
 
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};%,'UF11','UF12','UF13'};
-problemName = {'UF1_'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};%,'UF11','UF12','UF13'};
+% problemName = {'UF1_'};
 % selectors = {'Probability','Adaptive'};
-selectors = {'eMOEA'};
+selectors = {'MOEAD'};
 % creditDef = { 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE','ParentDec','Neighbor','DecompositionContribution'};
 % creditDef = {'OPa_BIR2PARENT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
 % creditDef = {'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution','OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE','ParentDec','Neighbor','DecompositionContribution'};
@@ -24,9 +24,9 @@ for j=1:length(selectors)
 %         figure
         for k=1:length(problemName)
 %             [AEI,GD,fHV,IGD] = getAllResults(strcat(path),selectors{j},creditDef{i},problemName{k});
-            [AEI,GD,fHV,IGD] = getAllResults(strcat(path,filesep,'results'),selectors{j},creditDef{i},problemName{k});
+            [AEI,GD,fHV,IGD] = getAllResults(strcat(path,filesep,'results1opNew'),selectors{j},creditDef{i},problemName{k});
             if(isempty(AEI))
-                disp(strcat(selectors{j},creditDef{i},problemName{k}))
+                disp(strcat(problemName{k},selectors{j},creditDef{i}))
             end
             res.GD = squeeze(GD(:,end));
             res.AEI = squeeze(AEI(:,end));

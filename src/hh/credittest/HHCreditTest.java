@@ -58,8 +58,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -79,10 +79,10 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
-            String[] creditDefs = new String[]{"OPDe"};
+            String[] creditDefs = new String[]{"ODP"};
            
             //for single operator MOEA
-            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
+//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -92,7 +92,7 @@ public class HHCreditTest {
                     futures.clear();
                     for (int k = 0; k < numberOfSeeds; k++) {
 
-                    for (String op : ops) {
+//                    for (String op : ops) {
                         Problem prob = ProblemFactory.getInstance().getProblem(probName);
                         double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
                         for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
@@ -141,14 +141,7 @@ public class HHCreditTest {
                         heuristicProp.put("pm.rate", 1.0 / prob.getNumberOfVariables()); 
 			heuristicProp.put("pm.distributionIndex", 20.0);
                         
-//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
-                        
-                        heuristics.add(of.getVariation(op, heuristicProp, prob));
+//                        heuristics.add(of.getVariation(op, heuristicProp, prob));
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
@@ -164,7 +157,7 @@ public class HHCreditTest {
 //                                    typeProp, "eMOEA", maxEvaluations);
 
 //                            futures.add(pool.submit(test));
-                        }
+//                        }
                     }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {

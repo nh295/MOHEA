@@ -151,8 +151,8 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-        IHyperHeuristic hh = newMOEADHH();
-//        IHyperHeuristic hh = newHeMOEA();
+//        IHyperHeuristic hh = newMOEADHH();
+        IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
@@ -187,10 +187,10 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-//        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+//                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
