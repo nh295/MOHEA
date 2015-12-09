@@ -28,8 +28,8 @@ end
 %     'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A',...
 %     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 
-path = '/Users/nozomihitomi/Dropbox/MOHEA';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+% path = '/Users/nozomihitomi/Dropbox/MOHEA';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 res_path =strcat(path,filesep,'mRes6opsInjection');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
@@ -39,10 +39,10 @@ h1 = figure(1); %IGD
 set(h1,'Position',[150, 500, 1500,600]);
 h2 = figure(2); %fHV
 set(h2,'Position',[150, 100, 1500,600]);
-% h3 = figure(3); %AEI
+h3 = figure(3); %AEI
 clf(h1)
 clf(h2)
-% clf(h3)
+clf(h3)
 % h4 = figure(4); %# injections
 
 leftPos = 0.03;
@@ -65,7 +65,7 @@ for i=1:length(problemName)
     dataIGD = cat(2,benchmarkDataIGD,zeros(a,b));
     datafHV = cat(2,benchmarkDatafHV,zeros(a,b));
     dataAEI = cat(2,benchmarkDataAEI,zeros(a,b));
-    %     dataInj = zeros(a,b);
+%         dataInj = zeros(a,b);
     
     label_names_IGD=label_names;
     label_names_fHV=label_names;
@@ -153,14 +153,14 @@ for i=1:length(problemName)
         set(gca,'Position',[leftPos+intervalPos*(i-6),bottomPos,width,height]);
     end
     
-%     pause(0.2)
-%     figure(h3)
-%     subplot(2,5,i);
-%     boxplot(datafHV,label_names_AEI,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
-%     set(gca,'TickLabelInterpreter','tex');
-%     set(gca,'XTickLabelRotation',90);
-%     set(gca,'FontSize',12)
-%     title(probName)
+    pause(0.2)
+    figure(h3)
+    subplot(2,5,i);
+    boxplot(datafHV,label_names_AEI,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
+    set(gca,'TickLabelInterpreter','tex');
+    set(gca,'XTickLabelRotation',90);
+    set(gca,'FontSize',12)
+    title(probName)
     
     %     figure(h4)
     %     subplot(2,5,i);

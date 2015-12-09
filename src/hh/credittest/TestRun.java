@@ -157,16 +157,16 @@ public class TestRun implements Callable {
         IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(3000)
-//                .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-////                .attachHypervolumeCollector()
-//                .attachHypervolumeJmetalCollector()
-//                .withEpsilon(epsilonDouble)
-////                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
-////                .attachEpsilonProgressCollector()
-//                .attachInjectionCollector()
+                .withProblem(probName)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+//                .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
+                .withEpsilon(epsilonDouble)
+//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .attachEpsilonProgressCollector()
+                .attachInjectionCollector()
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);
@@ -194,26 +194,21 @@ public class TestRun implements Callable {
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
-//        try (FileWriter writer = new FileWriter(results)) {
-//            Set<String> keys = accum.keySet();
-//            Iterator<String> keyIter = keys.iterator();
-//            while (keyIter.hasNext()) {
-//                String key = keyIter.next();
-//                int dataSize = accum.size(key);
-//                writer.append(key).append(",");
-//                for (int i = 0; i < dataSize; i++) {
-//                    writer.append(accum.get(key, i).toString());
-//                    if (i + 1 < dataSize) {
-//                        writer.append(",");
-//                    }
-//                }
-//                writer.append("\n");
-//            }
-//
-//            writer.flush();
-//        } catch (IOException ex) {
-//            Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try (FileWriter writer = new FileWriter(results)) {
+            Set<String> keys = accum.keySet();
+            Iterator<String> keyIter = keys.iterator();
+            while (keyIter.hasNext()) {
+                String key = keyIter.next();
+                int dataSize = accum.size(key);
+                writer.append(key).append(",");
+                for (int i = 0; i < dataSize; i++) {
+                    writer.append(accum.get(key, i).toString());
+                    if (i + 1 < dataSize) {
+                        writer.append(",");
+                    }
+                }
+                writer.append("\n");
+            }
         
          String name = path + File.separator + "results" + File.separator + probName + "_"
                                     + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
@@ -222,5 +217,5 @@ public class TestRun implements Callable {
 
         return hh;
     }
-
+    }
 }
