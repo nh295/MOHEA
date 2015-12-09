@@ -200,12 +200,12 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         iteration++;
 //        System.out.println(paretoFront.size() + " iteration " + iteration);
         //Check epsilon progress (if the epsilon domination count increases in archive)
-        if (prevEpsilonProgressCount == getArchive().getNumberOfDominatingImprovements()) {
-            epsilonProgressCounter++;
-            if (epsilonProgressCounter > lagWindow) {
-                injectFromArchive();
-            }
-        }
+//        if (prevEpsilonProgressCount == getArchive().getNumberOfDominatingImprovements()) {
+//            epsilonProgressCounter++;
+//            if (epsilonProgressCounter > lagWindow) {
+//                injectFromArchive();
+//            }
+//        }
 
         //select next heuristic
         Variation operator = operatorSelector.nextHeuristic();

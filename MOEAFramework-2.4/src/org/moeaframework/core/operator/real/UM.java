@@ -104,7 +104,8 @@ public class UM implements Variation,Serializable{
 
     @Override
     public String toString() {
-        return "UM{" + "prob=" + probability + '}';
+//        return "UM{" + "prob=" + probability + '}';
+        return "UM";
     }
 
 }

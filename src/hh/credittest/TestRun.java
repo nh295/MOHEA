@@ -126,8 +126,6 @@ public class TestRun implements Callable {
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
         
-        double cr = properties.getDouble("crossoverRate", 1.0);
-       
         int neighborhoodSize = properties.getInt("neighborhood", 20);
         
         double delta = properties.getDouble("delta", 0.9);
@@ -141,7 +139,7 @@ public class TestRun implements Callable {
         rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
                 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization, 
-            delta, eta, updateUtility, selector, rewardDef,cr);
+            delta, eta, updateUtility, selector, rewardDef);
 
         return moeadhh;
     }
@@ -156,16 +154,16 @@ public class TestRun implements Callable {
 //        IHyperHeuristic hh = newMOEADHH();
         IHyperHeuristic hh = newHeMOEA();
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(3000)
-//                .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-////                .attachHypervolumeCollector()
-//                .attachHypervolumeJmetalCollector()
-//                .withEpsilon(epsilonDouble)
-////                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
-////                .attachEpsilonProgressCollector()
+        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
+                .withProblem(probName)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+//                .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
+                .withEpsilon(epsilonDouble)
+//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+//                .attachEpsilonProgressCollector()
 //                .attachInjectionCollector()
                 .attachElapsedTimeCollector();
 
@@ -175,7 +173,7 @@ public class TestRun implements Callable {
         System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
-        int k=0;
+//        int k=0;
             while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
                 instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
@@ -189,36 +187,38 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+                +  "eMOEA_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
-//        try (FileWriter writer = new FileWriter(results)) {
-//            Set<String> keys = accum.keySet();
-//            Iterator<String> keyIter = keys.iterator();
-//            while (keyIter.hasNext()) {
-//                String key = keyIter.next();
-//                int dataSize = accum.size(key);
-//                writer.append(key).append(",");
-//                for (int i = 0; i < dataSize; i++) {
-//                    writer.append(accum.get(key, i).toString());
-//                    if (i + 1 < dataSize) {
-//                        writer.append(",");
-//                    }
-//                }
-//                writer.append("\n");
-//            }
-//
-//            writer.flush();
-//        } catch (IOException ex) {
-//            Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
-         String name = path + File.separator + "results" + File.separator + probName + "_"
-                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-         IOCreditHistory ioch = new IOCreditHistory();
-                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
+        try (FileWriter writer = new FileWriter(results)) {
+            Set<String> keys = accum.keySet();
+            Iterator<String> keyIter = keys.iterator();
+            while (keyIter.hasNext()) {
+                String key = keyIter.next();
+                int dataSize = accum.size(key);
+                writer.append(key).append(",");
+                for (int i = 0; i < dataSize; i++) {
+                    writer.append(accum.get(key, i).toString());
+                    if (i + 1 < dataSize) {
+                        writer.append(",");
+                    }
+                }
+                writer.append("\n");
+            }
+
+            writer.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+//        
+//         String name = path + File.separator + "results" + File.separator + probName + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         IOCreditHistory ioch = new IOCreditHistory();
+//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
 
         return hh;
     }

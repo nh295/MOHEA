@@ -96,21 +96,15 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      */
     private final CreditHistory creditHistory;
     
-    /**
-     * crossover rate
-     */
-    private final double crossoverRate;
 
     public MOEADHH(Problem problem, int neighborhoodSize,
             Initialization initialization, double delta, double eta, int updateUtility,
-            INextHeuristic operatorSelector, IRewardDefinition creditDef,
-            double crossoverRate) {
+            INextHeuristic operatorSelector, IRewardDefinition creditDef) {
         super(problem, neighborhoodSize, initialization, operatorSelector.getOperators().iterator().next(), delta, eta, updateUtility);
         this.heuristics = operatorSelector.getOperators();
         this.operatorSelector = operatorSelector;
         this.creditDef = creditDef;
         this.delta = delta;
-        this.crossoverRate = crossoverRate;
         this.heuristicSelectionHistory = new OperatorSelectionHistory(heuristics);
         this.creditHistory = new CreditHistory(heuristics);
         this.qualityHistory = new OperatorQualityHistory(heuristics);
@@ -179,14 +173,6 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             }
             //create new offspring
             Solution[] offspring= operator.evolve(parents);
-            
-            //do crossover with binomial distribution at each element
-            for(Solution soln:offspring){
-                for(int i=0;i<soln.getNumberOfObjectives();i++){
-                    if(!(pprng.nextDouble() < crossoverRate))
-                        soln.setObjective(i, population.get(index).getSolution().getObjective(i));
-                }
-            }
 
             //compute the credit assignment specific rewards
             switch (creditDef.getType()) {
