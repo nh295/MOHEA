@@ -8,9 +8,9 @@ function [vals,out] = getBenchmarkVals(path,prob_name,indicator,mode)
 % path2benchmark = '/Users/nozomihitomi/Dropbox/MOHEA/Benchmarks';
 path2benchmark = strcat(path,filesep,'Benchmarks');
 if strcmp(mode,'MOEAD')
-    benchmark_names = {'best1opMOEAD','RandomMOEAD'};
+    benchmark_names = {'MOEADDRA','best1opMOEAD','RandomMOEAD'};
 elseif strcmp(mode,'eMOEA')
-    benchmark_names = {'best1opeMOEA','RandomeMOEA'};
+    benchmark_names = {'eMOEA','best1opeMOEA','RandomeMOEA'};
 end
 
 % benchmark_names = {'best1opMOEAD','RandomMOEAD'};
@@ -29,9 +29,9 @@ for i=1:length(benchmark_names)
         str = strsplit(str{1},'+');
         str = strsplit(str{1},'_');
         if strcmp(algorithm,'best1opeMOEA')
-            str{end-1} = '\epsilonMOEA';
+            str{end-1} = '\epsilonMOEA*';
         elseif strcmp(algorithm,'best1opMOEAD')
-            str{end-1} = 'DRA';
+            str{end-1} = 'DRA*';
         end
         out{i} = strcat('{',str{end-1},'-',upper(str{end}),'}');
     elseif strcmp(algorithm,'MOEADDRA') || strcmp(algorithm,'eMOEA')
@@ -49,7 +49,7 @@ for i=1:length(benchmark_names)
         elseif strcmp(algorithm,'RandomMOEAD')
             str{end} = 'DRA';
         end
-        out{i} = strcat(str{end},'-Rand');
+        out{i} = strcat('Rand-',str{end});
     end
     load(mfilename)
     %assumes that mat file was saved with variable results containing all

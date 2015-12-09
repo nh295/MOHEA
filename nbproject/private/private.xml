@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/RewardDefFactory.java</file>
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/credittest/TestRun.java</file>
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/credittest/HHCreditTest.java</file>
@@ -14,6 +15,17 @@
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/offspringpopulation/OffspringParetoFront.java</file>
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/rewarddefinition/fitnessindicator/SortedLinkedList.java</file>
             <file>file:/C:/Users/SEAK2/Nozomi/MOHEA/src/hh/hyperheuristics/HeMOEA.java</file>
+=======
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRun.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/hyperheuristics/HeMOEA.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/operator/real/SPX.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/algorithm/StandardAlgorithms.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRunBenchmark.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/Instrumenter.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/HHCreditTest.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/hyperheuristics/MOEADHH.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/IO/IOCreditHistory.java</file>
+>>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
         </group>
     </open-files>
 </project-private>
