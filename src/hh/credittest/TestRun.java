@@ -151,14 +151,10 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-//        IHyperHeuristic hh = newMOEADHH();
-        IHyperHeuristic hh = newHeMOEA();
+        IHyperHeuristic hh = newMOEADHH();
+//        IHyperHeuristic hh = newHeMOEA();
 
-<<<<<<< HEAD
-        Instrumenter instrumenter = new Instrumenter().withFrequency(3000)
-=======
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
->>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
@@ -168,11 +164,7 @@ public class TestRun implements Callable {
                 .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
 //                .attachEpsilonProgressCollector()
-<<<<<<< HEAD
-                .attachInjectionCollector()
-=======
 //                .attachInjectionCollector()
->>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);
@@ -195,10 +187,10 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-//        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-                +  "eMOEA_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+//                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
@@ -217,13 +209,11 @@ public class TestRun implements Callable {
                 }
                 writer.append("\n");
             }
-<<<<<<< HEAD
-        
-         String name = path + File.separator + "results" + File.separator + probName + "_"
-                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-         IOCreditHistory ioch = new IOCreditHistory();
-                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
-=======
+//        
+//         String name = path + File.separator + "results" + File.separator + probName + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         IOCreditHistory ioch = new IOCreditHistory();
+//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
 
             writer.flush();
         } catch (IOException ex) {
@@ -234,9 +224,7 @@ public class TestRun implements Callable {
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //         IOCreditHistory ioch = new IOCreditHistory();
 //                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
->>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
 
         return hh;
-    }
     }
 }
