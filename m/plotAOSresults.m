@@ -32,14 +32,21 @@ end
 %     'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A',...
 %     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 
-path = '/Users/nozomihitomi/Dropbox/MOHEA';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+% path = '/Users/nozomihitomi/Dropbox/MOHEA';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 res_path =strcat(path,filesep,'mRes6opsInjection');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
 b = length(selectors)*length(creditDef);
 
 h1 = figure(1); %IGD
+<<<<<<< HEAD
+set(h1,'Position',[150, 500, 1500,600]);
+h2 = figure(2); %fHV
+set(h2,'Position',[150, 100, 1500,600]);
+h3 = figure(3); %AEI
+=======
+>>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
 clf(h1)
 set(h1,'Position',[150, 300, 1200,600]);
 hsubplot1 = cell(length(problemName),1);
@@ -48,11 +55,16 @@ for i=1:length(problemName)
 end
 h2 = figure(2); %fHV
 clf(h2)
+<<<<<<< HEAD
+clf(h3)
+% h4 = figure(4); %# injections
+=======
 set(h2,'Position',[150, 100, 1200,600]);
 hsubplot2 = cell(length(problemName),1);
 for i=1:length(problemName)
     hsubplot2{i}=subplot(2,5,i);
 end
+>>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
 
 leftPos = 0.03;
 topPos = 0.7;
@@ -73,7 +85,12 @@ for i=1:length(problemName)
     
     dataIGD = cat(2,benchmarkDataIGD,zeros(a,b));
     datafHV = cat(2,benchmarkDatafHV,zeros(a,b));
+<<<<<<< HEAD
+    dataAEI = cat(2,benchmarkDataAEI,zeros(a,b));
+%         dataInj = zeros(a,b);
+=======
     %     dataInj = zeros(a,b);
+>>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860
     
     label_names_IGD=label_names;
     label_names_fHV=label_names;
@@ -153,6 +170,24 @@ for i=1:length(problemName)
     else
         set(hsubplot2{i},'Position',[leftPos+intervalPos*(i-6),bottomPos,width,height]);
     end
+<<<<<<< HEAD
+    
+    pause(0.2)
+    figure(h3)
+    subplot(2,5,i);
+    boxplot(datafHV,label_names_AEI,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
+    set(gca,'TickLabelInterpreter','tex');
+    set(gca,'XTickLabelRotation',90);
+    set(gca,'FontSize',12)
+    title(probName)
+    
+    %     figure(h4)
+    %     subplot(2,5,i);
+    %     boxplot(dataInj,{label_names{size(benchmarkDataIGD,2)+1:end}},'labelorientation','inline','colors',boxColors,'plotstyle','compact')
+    %     title(probName)
+    hold off
+end
+=======
 end
 
 statsIGD = squeeze(sum(statsIGD,1));
@@ -162,3 +197,4 @@ statsfHV = squeeze(sum(statsfHV,1));
 
 % saveas(h1,strcat(base,'_IGD'),'fig');
 % saveas(h2,strcat(base,'_HV'),'fig');
+>>>>>>> d6d6a51d384f6e748939252132948bb74c3a9860

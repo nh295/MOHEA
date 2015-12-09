@@ -50,7 +50,7 @@ public class HHCreditTest {
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF9", "UF10"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
-        String[] problems = new String[]{"UF2","UF3"};
+        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 //        pool = Executors.newFixedThreadPool(1);
@@ -58,8 +58,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -79,7 +79,7 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
-            String[] creditDefs = new String[]{"ODP"};
+            String[] creditDefs = new String[]{"OPDe"};
            
             //for single operator MOEA
             String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
@@ -170,9 +170,9 @@ public class HHCreditTest {
                         try {
                             IHyperHeuristic hh = run.get();
 //                            
-//                            String name = path + File.separator + "results" + File.separator + probName + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-//
+                            String name = path + File.separator + "results" + File.separator + probName + "_"
+                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+
 //                            //save the approximation set
 //                            NondominatedPopulation ndPop = hh.getResult();
 //                            try {

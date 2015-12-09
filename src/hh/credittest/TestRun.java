@@ -151,8 +151,8 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-//        IHyperHeuristic hh = newMOEADHH();
-        IHyperHeuristic hh = newHeMOEA();
+        IHyperHeuristic hh = newMOEADHH();
+//        IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
@@ -190,7 +190,7 @@ public class TestRun implements Callable {
 //        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
 //                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
          String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-                +  "eMOEA_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
+                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
@@ -209,6 +209,11 @@ public class TestRun implements Callable {
                 }
                 writer.append("\n");
             }
+//        
+//         String name = path + File.separator + "results" + File.separator + probName + "_"
+//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         IOCreditHistory ioch = new IOCreditHistory();
+//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
 
             writer.flush();
         } catch (IOException ex) {
@@ -222,5 +227,4 @@ public class TestRun implements Callable {
 
         return hh;
     }
-
 }
