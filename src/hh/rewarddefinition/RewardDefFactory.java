@@ -19,6 +19,7 @@ import hh.rewarddefinition.populationcontribution.DecompositionContribution;
 import hh.rewarddefinition.populationcontribution.EArchiveContribution;
 import hh.rewarddefinition.populationcontribution.IndicatorContribution;
 import hh.rewarddefinition.populationcontribution.ParetoFrontContribution;
+import java.io.IOException;
 import java.util.Arrays;
 import org.moeaframework.core.Problem;
 import org.moeaframework.util.TypedProperties;
@@ -55,7 +56,7 @@ public class RewardDefFactory {
         }
     }
 
-    public IRewardDefinition getCreditDef(String name, TypedProperties prop, Problem problem) {
+    public IRewardDefinition getCreditDef(String name, TypedProperties prop, Problem problem) throws IOException {
         IRewardDefinition credDef = null;
         //Get values from properties or use default values
         double satisfy = prop.getDouble("satisfy", 1.0);
@@ -70,7 +71,13 @@ public class RewardDefFactory {
         double[] defIdeal = new double[problem.getNumberOfObjectives()];
         Arrays.fill(defIdeal, 0.0);
         double[] idealPoint = prop.getDoubleArray("ref point", defIdeal);
-        int numVec = prop.getInt("numVec", 100);
+        
+        int numVec=0;
+        if(problem.getNumberOfObjectives()==2){
+            numVec = prop.getInt("numVec", 50);
+        }else if(problem.getNumberOfObjectives()==3){
+            numVec = prop.getInt("numVec", 91);
+        }
         //kappa parameter used in IBEA
         double kappa = prop.getDouble("kappa", 0.05);
         int numObj = problem.getNumberOfObjectives();
