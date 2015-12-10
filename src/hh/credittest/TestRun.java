@@ -151,8 +151,8 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-        IHyperHeuristic hh = newMOEADHH();
-//        IHyperHeuristic hh = newHeMOEA();
+//        IHyperHeuristic hh = newMOEADHH();
+        IHyperHeuristic hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)

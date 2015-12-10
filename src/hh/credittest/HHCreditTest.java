@@ -48,7 +48,7 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF9", "UF10"};//,"UF11","UF12","UF13"};
+//        String[] problems = new String[]{"UF8", "UF10"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
         String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
@@ -76,10 +76,10 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
-//            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
+            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
-//            String[] creditDefs = new String[]{"OPDe"};
+//            String[] creditDefs = new String[]{"OPopIPFR2"};
            
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};

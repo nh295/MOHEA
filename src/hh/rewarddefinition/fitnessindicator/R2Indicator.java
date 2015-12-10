@@ -5,9 +5,17 @@
  */
 package hh.rewarddefinition.fitnessindicator;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 
@@ -45,7 +53,7 @@ public class R2Indicator implements IIndicator {
      * @param numObjs number of objectives
      * @param numVecs number of vectors
      */
-    public R2Indicator(int numObjs, int numVecs) {
+    public R2Indicator(int numObjs, int numVecs) throws IOException {
         wtVecs = new ArrayList<>();
         initializeWts(numObjs, numVecs);
     }
@@ -208,53 +216,49 @@ public class R2Indicator implements IIndicator {
     }
 
     /**
-     * Used when want weights for more than 2 dimensions
+     * Method from jmetal to load the weights for problems meeting certain
+     * criteria such as number of objectives and population size. Returns true
+     * if the weights can be loaded and false if the weights data is
+     * unavailable.
      *
      * @param numObj
      * @param numVecs
      */
-    private void initializeWts(int numObj, int numVecs) {
-        // creates full factorial matrix. Code is based on 2013a Matlab 
-        //fullfact(levels). Eliminate rows with sum != the number of vectors.
-        int numExp = (int) Math.pow(numVecs, numObj);
-        int[][] experiments = new int[numExp][numObj];
+    private void initializeWts(int numObj,int numVecs) throws IOException {
+        
+        String dataFileName;
+        dataFileName = "W" + numObj + "D_"
+                + numVecs + ".dat";
 
-        int ncycles = numExp;
+        try {
+            // Open the file
+            FileInputStream fis = new FileInputStream("weight" + File.separator
+                    + dataFileName);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
 
-        for (int k = 0; k < numObj; k++) {
-            int numLevels4kthFactor = numVecs;
-            int nreps = numExp / ncycles;
-            ncycles = ncycles / numLevels4kthFactor;
-            int[] settingReps = new int[nreps * numLevels4kthFactor];
-            int index = 0;
-            for (int j = 0; j < numLevels4kthFactor; j++) {
-                for (int i = 0; i < nreps; i++) {
-                    settingReps[index] = j;
-                    index++;
-                }
-            }
-            index = 0;
-            for (int j = 0; j < ncycles; j++) {
-                for (int i = 0; i < settingReps.length; i++) {
-                    experiments[index][k] = settingReps[i];
-                    index++;
-                }
-            }
-        }
-
-        //Find valid row vectors (ones that add up to numVecs) 
-        for (int i = 0; i < numExp; i++) {
-            double sum = 0.0;
-            for (int j = 0; j < numObj; j++) {
-                sum += experiments[i][j];
-            }
-            if (sum == numVecs - 1) {
+            wtVecs = new ArrayList<>(numVecs);
+            int j = 0;
+            String aux = br.readLine();
+            while (aux != null) {
+                StringTokenizer st = new StringTokenizer(aux);
+                j = 0;
                 double[] wts = new double[numObj];
-                for (int k = 0; k < numObj; k++) {
-                    wts[k] = ((double) experiments[i][k]) / ((double) (numVecs - 1));
+                while (st.hasMoreTokens()) {
+                    double value = (new Double(st.nextToken())).doubleValue();
+                    wts[j] = value;
+                    j++;
                 }
                 wtVecs.add(new WtVector(wts));
+                aux = br.readLine();
             }
+            br.close();
+        } catch (IOException | NumberFormatException e) {
+            System.out
+                    .println("initUniformWeight: failed when reading for file: "
+                            + "weight" + File.separator + dataFileName);
+            Logger.getLogger(R2Indicator.class.getName()).log(Level.SEVERE, null, e);
+            throw e;
         }
     }
 

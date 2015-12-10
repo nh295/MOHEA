@@ -70,7 +70,13 @@ public class RewardDefFactory {
         double[] defIdeal = new double[problem.getNumberOfObjectives()];
         Arrays.fill(defIdeal, 0.0);
         double[] idealPoint = prop.getDoubleArray("ref point", defIdeal);
-        int numVec = prop.getInt("numVec", 100);
+        
+        int numVec=0;
+        if(problem.getNumberOfObjectives()==2){
+            numVec = prop.getInt("numVec", 50);
+        }else if(problem.getNumberOfObjectives()==3){
+            numVec = prop.getInt("numVec", 91);
+        }
         //kappa parameter used in IBEA
         double kappa = prop.getDouble("kappa", 0.05);
         int numObj = problem.getNumberOfObjectives();
