@@ -32,17 +32,14 @@ end
 %     'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A',...
 %     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 
-% path = '/Users/nozomihitomi/Dropbox/MOHEA';
-path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
-res_path =strcat(path,filesep,'mRes6opsInjection');
+path = '/Users/nozomihitomi/Dropbox/MOHEA';
+% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+mres_path =strcat(path,filesep,'mRes6opsInjectionNew');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
 b = length(selectors)*length(creditDef);
 
 h1 = figure(1); %IGD
-set(h1,'Position',[150, 500, 1500,600]);
-h2 = figure(2); %fHV
-set(h2,'Position',[150, 100, 1500,600]);
 clf(h1)
 set(h1,'Position',[150, 300, 1200,600]);
 hsubplot1 = cell(length(problemName),1);
@@ -66,6 +63,9 @@ height = 0.2;
 
 statsIGD = zeros(length(problemName),b,3);
 statsfHV = zeros(length(problemName),b,3);
+
+dataET = zeros(30,6,length(problemName));
+
 for i=1:length(problemName)
     probName = problemName{i};
     [benchmarkDataIGD,label_names] = getBenchmarkVals(path,probName,'IGD',mode);
@@ -80,21 +80,82 @@ for i=1:length(problemName)
     label_names_IGD=label_names;
     label_names_fHV=label_names;
     
+    %check significance between best and default
+    if strcmp(mode,'MOEAD')
+        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'MOEADDRA'),'','','best1opMOEAD',probName);
+    else
+        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'eMOEA'),'','','best1opeMOEA',probName);
+    end
+    extra = '';
+    if sig.IGD==1
+        extra = '(-)';
+        statsIGD(i,1,3) = 1;
+    elseif sig.IGD==-1
+        extra = '(+)';
+        statsIGD(i,1,1) = 1;
+    else
+        statsIGD(i,1,2) = 1;
+    end
+    extra = '';
+    if sig.fHV==1
+        extra = '(+)';
+        statsfHV(i,1,1) = 1;
+    elseif sig.fHV==-1
+        extra = '(-)';
+        statsfHV(i,1,3) = 1;
+    else
+        statsfHV(i,1,2) = 1;
+    end
+    label_names_IGD{1} = strcat(label_names_IGD{1},extra);
+    label_names_fHV{1} = strcat(label_names_fHV{1},extra);
+    
+    %check significance between rand and best
+    if strcmp(mode,'MOEAD')
+        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'Random',mode),'','','best1opMOEAD',probName);
+    else
+        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'Random',mode),'','','best1opeMOEA',probName);
+    end
+    extra = '';
+    if sig.IGD==1
+        extra = '(-)';
+        statsIGD(i,3,3) = 1;
+    elseif sig.IGD==-1
+        extra = '(+)';
+        statsIGD(i,3,1) = 1;
+    else
+        statsIGD(i,3,2) = 1;
+    end
+    extra = '';
+    if sig.fHV==1
+        extra = '(+)';
+        statsfHV(i,3,1) = 1;
+    elseif sig.fHV==-1
+        extra = '(-)';
+        statsfHV(i,3,3) = 1;
+    else
+        statsfHV(i,3,2) = 1;
+    end
+    label_names_IGD{3} = strcat(label_names_IGD{3},extra);
+    label_names_fHV{3} = strcat(label_names_fHV{3},extra);
+    
+    
     for j=1:length(selectors)
         for k=1:length(creditDef)
             c = c+1;
-            file = strcat(res_path,filesep,probName,'_',selectors{j},'_',creditDef{k},'.mat');
+            file = strcat(mres_path,filesep,probName,'_',selectors{j},'_',creditDef{k},'.mat');
             load(file,'res'); %assume that the reults stored in vairable named res
             dataIGD(:,c) = res.IGD;
             datafHV(:,c) = res.fHV;
+            dataET(:,c-3,i) = res.ET;
             
             %             dataInj(:,c-size(benchmarkDataIGD,2)) = res.Inj;
-            if strcmp(creditDef{k},'ParentDec')||strcmp(creditDef{k},'Neighbor')||strcmp(creditDef{k},'DecompositionContribution')
-                [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'best1opMOEAD',probName);
+            if strcmp(mode,'MOEAD')
+                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opMOEAD',probName);
+%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomMOEAD',probName);
             else
-%                 [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'best1opeMOEA',probName);
+%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opeMOEA',probName);
 %                 [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'eMOEA',probName);
-                [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'RandomeMOEA',probName);
+                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomeMOEA',probName);
             end
             extra = '';
             if sig.IGD==1
@@ -157,10 +218,13 @@ for i=1:length(problemName)
     end
 end
 
-statsIGD = squeeze(sum(statsIGD,1));
-statsfHV = squeeze(sum(statsfHV,1));
-
-
-
+statsIGD = squeeze(sum(statsIGD,1))
+statsfHV = squeeze(sum(statsfHV,1))
+disp('mean time')
+avgTime = squeeze(mean(dataET,1))';
+stdTime = squeeze(std(dataET,1))';
+% 
+% 
+% 
 % saveas(h1,strcat(base,'_IGD'),'fig');
 % saveas(h2,strcat(base,'_HV'),'fig');

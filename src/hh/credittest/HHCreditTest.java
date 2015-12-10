@@ -48,7 +48,7 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF9", "UF10"};//,"UF11","UF12","UF13"};
+//        String[] problems = new String[]{"UF10", "UF9","UF8"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
         String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
@@ -70,19 +70,16 @@ public class HHCreditTest {
             int numberOfSeeds = 30;
             int maxEvaluations = 300010;
             //Setup heuristic selectors
-//            String[] selectors = new String[]{"AP", "PM"};
+//            String[] selectors = new String[]{"PM", "AP"};
             String[] selectors = new String[]{"Random"};
 //            setup credit definitions
-//            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
-//                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
-//                "CPF", "CEA"};
 //            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
-//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
-            String[] creditDefs = new String[]{"ODP"};
+            String[] creditDefs = new String[]{"OPDe"};
+//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA",};
            
             //for single operator MOEA
-//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
+            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -92,7 +89,7 @@ public class HHCreditTest {
                     futures.clear();
                     for (int k = 0; k < numberOfSeeds; k++) {
 
-//                    for (String op : ops) {
+                    for (String op : ops) {
                         Problem prob = ProblemFactory.getInstance().getProblem(probName);
                         double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
                         for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
@@ -135,13 +132,20 @@ public class HHCreditTest {
 			heuristicProp.put("undx.eta", 0.35);
                         heuristicProp.put("undx.parents", 3);
                         
-                        heuristicProp.put("spx.epsilon", 3);
-                        heuristicProp.put("spx.parents", prob.getNumberOfVariables()+1);
+                        heuristicProp.put("spx.epsilon", 1.0);
+                        heuristicProp.put("spx.parents", 3);
                         
                         heuristicProp.put("pm.rate", 1.0 / prob.getNumberOfVariables()); 
 			heuristicProp.put("pm.distributionIndex", 20.0);
                         
-//                        heuristics.add(of.getVariation(op, heuristicProp, prob));
+//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+                        
+                        heuristics.add(of.getVariation(op, heuristicProp, prob));
 
                         TypedProperties typeProp = new TypedProperties(prop);
                         typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
@@ -157,7 +161,7 @@ public class HHCreditTest {
 //                                    typeProp, "eMOEA", maxEvaluations);
 
 //                            futures.add(pool.submit(test));
-//                        }
+                        }
                     }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {

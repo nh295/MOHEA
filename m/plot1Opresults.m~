@@ -3,8 +3,8 @@ function plot1Opresults
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'UF1_','UF2'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+problemName = {'UF1_','UF2','UF3','UF4'};
 MOEA =  {'MOEAD'};
 % MOEA =  {'eMOEA'};
 operator = {'SBX+PM','DifferentialEvolution+pm','UM','PCX+PM','UNDX+PM','SPX+PM'};
@@ -13,7 +13,7 @@ operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 % path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-res_path =strcat(path,'mRes1opNew');
+res_path =strcat(path,'mRes1opNew2');
 
 a = 30; %number of trials
 b = length(MOEA)*length(operator);
@@ -32,6 +32,9 @@ bottomPos = 0.15;
 intervalPos = (1-leftPos)/5;
 width = 0.115;
 height = 0.3;
+
+statsIGD = zeros(length(problemName),b,3);
+statsfHV = zeros(length(problemName),b,3);
 
 for i=1:length(problemName)
     probName = problemName{i};
@@ -60,22 +63,30 @@ for i=1:length(problemName)
             end
             
             if strcmp(MOEA{j},'MOEAD')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_MOEAD_DifferentialEvoluation+PM.mat'));
+                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_MOEAD_DifferentialEvolution+pm.mat'));
             elseif strcmp(MOEA{j},'eMOEA')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_eMOEA_SBX+pm.mat'));
+                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_eMOEA_SBX+PM.mat'));
             end
             extra = '';
             if sig.IGD==1
                 extra = '(-)';
+                statsIGD(i,c,3) = 1;
             elseif sig.IGD==-1
-                extra = '(+)'; 
+                extra = '(+)';
+                statsIGD(i,c,1) = 1;
+            else
+                statsIGD(i,c,2) = 1;
             end
             label_names_IGD = [label_names_IGD,strcat(operatorName{k},extra)]; %concats the labels
             extra = '';
-            if sig.fHV==1
+           if sig.fHV==1
                 extra = '(+)';
+                statsfHV(i,c,1) = 1;
             elseif sig.fHV==-1
-                extra = '(-)'; 
+                extra = '(-)';
+                statsfHV(i,c,3) = 1;
+            else
+                statsfHV(i,c,2) = 1;
             end
             label_names_fHV = [label_names_fHV,strcat(operatorName{k},extra)]; %concats the labels
         end
@@ -140,6 +151,9 @@ for i=1:length(problemName)
 end
 saveas(h1,strcat(MOEA{1},'1opIGD'),'fig');
 saveas(h2,strcat(MOEA{1},'1opHV'),'fig');
+
+statsIGD = squeeze(sum(statsIGD,1))
+statsfHV = squeeze(sum(statsfHV,1))
 end
 
 function [p,sig] = significance(data,basecasefile)

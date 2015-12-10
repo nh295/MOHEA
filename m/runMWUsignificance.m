@@ -1,10 +1,10 @@
-function [p,sig] = runMWUsignificance(path,selector1,creditDef1,benchmark,problemName)
+function [p,sig] = runMWUsignificance(path,mResPath,selector1,creditDef1,benchmark,problemName)
 %Given a path, the heuristic selector name, credit definition name, and
 %problem name this function will run a Mann Whitney U test (aka Wilcoxon
 %rank sum test) to compare a method to the benchmark
 
-origin = cd(strcat(path,filesep,'mRes6opsInjection'));
-file1 = dir(strcat(problemName,'_',selector1,'_',creditDef1,'.mat'));
+origin = cd(mResPath);
+file1 = dir(strcat(problemName,'*',selector1,'*',creditDef1,'.mat'));
 res1 = load(file1.name,'res');
 
 cd(strcat(path,filesep,'Benchmarks',filesep,benchmark))
@@ -17,7 +17,7 @@ p = struct;
 sig = struct;
 for i=1:length(f_names)
     f_name = f_names{i};
-    if strcmp(f_name,'Inj')
+    if strcmp(f_name,'Inj')||strcmp(f_name,'ET')
         continue
     end
     data1 = getfield(res1.res,f_name);

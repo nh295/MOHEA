@@ -3,10 +3,10 @@ function plot1Opresults
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'UF1_','UF2'};
-MOEA =  {'MOEAD'};
-% MOEA =  {'eMOEA'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+problemName = {'UF8'};
+% MOEA =  {'MOEAD'};
+MOEA =  {'eMOEA'};
 operator = {'SBX+PM','DifferentialEvolution+pm','UM','PCX+PM','UNDX+PM','SPX+PM'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
