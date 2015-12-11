@@ -6,6 +6,7 @@
 package hh.credittest;
 
 import hh.IO.IOCreditHistory;
+import hh.IO.IOSelectionHistory;
 import hh.rewarddefinition.RewardDefFactory;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.hyperheuristics.HHFactory;
@@ -63,7 +64,7 @@ public class TestRun implements Callable {
         this.properties = properties;
         this.problem = problem;
         this.epsilonDouble = properties.getDoubleArray("ArchiveEpsilon",
-                        new double[]{EpsilonHelper.getEpsilon(problem)});
+                new double[]{EpsilonHelper.getEpsilon(problem)});
         this.probName = probName;
         this.maxEvaluations = maxEvaluations;
         this.path = path;
@@ -78,11 +79,11 @@ public class TestRun implements Callable {
      * @return a new {@code eMOEA} instance
      */
     private IHyperHeuristic newHeMOEA() {
-        
+
         int populationSize = (int) properties.getDouble("populationSize", 600);
-        
+
         int injectionRate = (int) properties.getDouble("injectionRate", 0.25);
-        
+
         //for injection
         int lagWindow = (int) properties.getDouble("lagWindow", 50);
 
@@ -94,27 +95,27 @@ public class TestRun implements Callable {
         DominanceComparator comparator = new ParetoDominanceComparator();
 
         EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(epsilonDouble);
-                
+
         final TournamentSelection selection = new TournamentSelection(
                 2, comparator);
-        
+
         //Use default values for selectors
         TypedProperties selectorProp = new TypedProperties();
-        selectorProp.setInt("windowSize", (int)0.5*populationSize);
+        selectorProp.setInt("windowSize", (int) 0.5 * populationSize);
         //all other properties use default parameters
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), selectorProp,heuristics);
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), selectorProp, heuristics);
         try {
-            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
+            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
         } catch (IOException ex) {
             Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
-                
+
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-            initialization, selector, rewardDef,injectionRate,lagWindow);
+                initialization, selector, rewardDef, injectionRate, lagWindow);
 
         return hemoea;
     }
-    
+
     /**
      * Returns a new Hyper eMOEA instance.
      *
@@ -129,29 +130,36 @@ public class TestRun implements Callable {
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
-        
+
         int neighborhoodSize = properties.getInt("neighborhood", 20);
-        
+
         double delta = properties.getDouble("delta", 0.9);
-        
+
         double eta = properties.getDouble("eta", 2.0);
-        
+
         int updateUtility = properties.getInt("updateUtility", 50);
-        
+
         //Use default values for selectors
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(),heuristics);
-        rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
-                
-        MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization, 
-            delta, eta, updateUtility, selector, rewardDef);
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(), heuristics);
+        try {
+            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
+        } catch (IOException ex) {
+            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization,
+                delta, eta, updateUtility, selector, rewardDef);
 
         return moeadhh;
     }
-    
+
     /**
-     * Goes through one run of the algorithm. Returns the algorithm object. Can get the population from the algorithm object
-     * @return the algorithm object. Can get the population from the algorithm object
-     * @throws Exception 
+     * Goes through one run of the algorithm. Returns the algorithm object. Can
+     * get the population from the algorithm object
+     *
+     * @return the algorithm object. Can get the population from the algorithm
+     * object
+     * @throws Exception
      */
     @Override
     public IHyperHeuristic call() throws Exception {
@@ -160,33 +168,33 @@ public class TestRun implements Callable {
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
-//                .attachAdditiveEpsilonIndicatorCollector()
-//                .attachGenerationalDistanceCollector()
-//                .attachInvertedGenerationalDistanceCollector()
-//                .attachHypervolumeCollector()
-//                .attachHypervolumeJmetalCollector()
-//                .withEpsilon(epsilonDouble)
-//                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
-//                .attachEpsilonProgressCollector()
-//                .attachInjectionCollector()
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+                //                .attachHypervolumeCollector()
+                .attachHypervolumeJmetalCollector()
+                .withEpsilon(epsilonDouble)
+                //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
+                //                .attachEpsilonProgressCollector()
+                //                .attachInjectionCollector()
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting "+ hh.getNextHeuristicSupplier() + rewardDef +" on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
+        System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
 //            System.out.printf("Percent done: \n");
 //        int k=0;
-            while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
-                instAlgorithm.step();
+        while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
+            instAlgorithm.step();
 //                System.out.print("\b\b\b\b\b\b");
 //                PopulationIO.writeObjectives(new File(path+ File.separator+"SIDe"+Integer.toString(k)+".pop"),((MOEADHH)hh).getPopulation());
-                }
-            
+        }
+
         hh.terminate();
         long finishTime = System.currentTimeMillis();
-        System.out.println("Done with optimization. Execution time: " + ((finishTime-startTime)/1000) + "s");
+        System.out.println("Done with optimization. Execution time: " + ((finishTime - startTime) / 1000) + "s");
 
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
@@ -214,10 +222,13 @@ public class TestRun implements Callable {
                 writer.append("\n");
             }
 //        
-//         String name = path + File.separator + "results" + File.separator + probName + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-//         IOCreditHistory ioch = new IOCreditHistory();
-//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
+            String name = path + File.separator + "results" + File.separator + probName + "_"
+                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+            IOCreditHistory ioch = new IOCreditHistory();
+            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
+
+            IOSelectionHistory iosh = new IOSelectionHistory();
+            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
 
             writer.flush();
         } catch (IOException ex) {

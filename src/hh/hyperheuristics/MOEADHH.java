@@ -230,7 +230,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                             + "recognized. Used " + creditDef.getType() + ".");
             }
 
-            heuristicSelectionHistory.add(operator);
+            heuristicSelectionHistory.add(operator,this.numberOfEvaluations);
                     updateQualityHistory();
             }
 

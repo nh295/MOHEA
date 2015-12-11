@@ -7,6 +7,7 @@ package hh.history;
 
 import hh.heuristicgenerators.HeuristicSequence;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,16 +24,18 @@ public class OperatorSelectionHistory implements Serializable {
 
     private static final long serialVersionUID = -2323214225020219554L;
 
-    protected HashMap<Variation, Stack<Integer>> history;
-    protected int selectionCount;
+    protected HashMap<Variation, Integer> operatorSelectionCount;
+    protected ArrayList<Selection> history;
+    protected int totalSelectionCount;
 
     public OperatorSelectionHistory(Collection<Variation> heuristics) {
-        history = new HashMap();
+        operatorSelectionCount = new HashMap();
         Iterator<Variation> iter = heuristics.iterator();
         while (iter.hasNext()) {
-            history.put(iter.next(), new Stack());
+            operatorSelectionCount.put(iter.next(), 0);
         }
-        this.selectionCount = 0;
+        this.totalSelectionCount = 0;
+        history = new ArrayList<>();
     }
 
     /**
@@ -43,18 +46,27 @@ public class OperatorSelectionHistory implements Serializable {
      * heuristics in the ordered they occurred. Selections at the beginning of
      * the search are at the top of the Stack.
      */
-    public Stack<Variation> getOrderedHistory() {
-        Stack<Variation> out = new Stack();
-        for (int i = selectionCount - 1; i > 0; i--) {
-            Iterator<Variation> iter = history.keySet().iterator();
-            while (iter.hasNext()) {
-                Variation operator = iter.next();
-                if (!history.get(operator).empty() && history.get(operator).peek() == i) {
-                    out.push(operator);
-                    history.get(operator).pop();
-                    break;
-                }
-            }
+    public ArrayList<Variation> getOrderedHistory() {
+        ArrayList<Variation> out = new ArrayList<>();
+        for(int i=0;i<history.size();i++){
+            Selection sel = history.get(i);
+            out.add(sel.getOperator());
+        }
+        return out;
+    }
+    
+    /**
+     * Returns the history of the time the operator was selected 
+     *
+     * @return a stack of Variations which contains the history of the selected
+     * heuristics in the ordered they occurred. Selections at the beginning of
+     * the search are at the top of the Stack.
+     */
+    public ArrayList<Integer> getOrderedSelectionTime() {
+        ArrayList<Integer> out = new ArrayList<>();
+        for(int i=0;i<history.size();i++){
+            Selection sel = history.get(i);
+            out.add(sel.getTime());
         }
         return out;
     }
@@ -65,15 +77,16 @@ public class OperatorSelectionHistory implements Serializable {
      *
      * @param operator to add to the history
      */
-    public void add(Variation operator) {
+    public void add(Variation operator, int timeSelected) {
         if (operator.getClass().equals(HeuristicSequence.class)) {
             Iterator<Variation> iter = ((HeuristicSequence) operator).getSequence().iterator();
             while (iter.hasNext()) {
-                this.add(iter.next());
+                this.add(iter.next(),timeSelected);
             }
         } else {
-            history.get(operator).push(selectionCount);
-            selectionCount++;
+            history.add(new Selection(operator, timeSelected));
+            operatorSelectionCount.put(operator,operatorSelectionCount.get(operator)+1);
+            totalSelectionCount++;
         }
     }
 
@@ -85,18 +98,18 @@ public class OperatorSelectionHistory implements Serializable {
      * @return
      */
     public int getSelectedTimes(Variation heuristic) {
-        return history.get(heuristic).size();
+        return operatorSelectionCount.get(heuristic);
     }
 
     /**
      * Clears all selection history
      */
     public void reset() {
-        Iterator<Variation> iter = history.keySet().iterator();
+        Iterator<Variation> iter = operatorSelectionCount.keySet().iterator();
         while (iter.hasNext()) {
-            history.get(iter.next()).clear();
+            operatorSelectionCount.put(iter.next(),0);
         }
-        selectionCount = 0;
+        totalSelectionCount = 0;
     }
 
     /**
@@ -106,7 +119,7 @@ public class OperatorSelectionHistory implements Serializable {
      * @return the total number of selections made so far
      */
     public int getTotalSelectionCount() {
-        return selectionCount;
+        return totalSelectionCount;
     }
 
     /**
@@ -116,7 +129,27 @@ public class OperatorSelectionHistory implements Serializable {
      * process
      */
     public Collection<Variation> getOperators() {
-        return history.keySet();
+        return operatorSelectionCount.keySet();
+    }
+    
+    private class Selection implements Serializable{
+        private static final long serialVersionUID = -2323214221420219554L;
+        
+        private final Variation operator;
+        private final int time;
+
+        public Variation getOperator() {
+            return operator;
+        }
+
+        public int getTime() {
+            return time;
+        }
+        
+        public Selection (Variation operator, int time){
+            this.operator = operator;
+            this.time = time;
+        }
     }
 
 }
