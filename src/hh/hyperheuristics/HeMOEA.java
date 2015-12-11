@@ -209,7 +209,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
 
         //select next heuristic
         Variation operator = operatorSelector.nextHeuristic();
-//        operatorSelectionHistory.add(operator);
+        operatorSelectionHistory.add(operator,this.numberOfEvaluations);
 
         Solution[] parents;
 
