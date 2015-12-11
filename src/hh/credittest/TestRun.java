@@ -103,7 +103,11 @@ public class TestRun implements Callable {
         selectorProp.setInt("windowSize", (int)0.5*populationSize);
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), selectorProp,heuristics);
-        rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
+        try {
+            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null),  properties,problem);
+        } catch (IOException ex) {
+            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
+        }
                 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
             initialization, selector, rewardDef,injectionRate,lagWindow);
@@ -119,7 +123,7 @@ public class TestRun implements Callable {
      * @param problem the problem
      * @return a new {@code eMOEA} instance
      */
-    private IHyperHeuristic newMOEADHH() {
+    private IHyperHeuristic newMOEADHH() throws IOException {
         
         int populationSize = (int) properties.getDouble("populationSize", 600);
 
@@ -156,12 +160,12 @@ public class TestRun implements Callable {
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
+//                .attachAdditiveEpsilonIndicatorCollector()
+//                .attachGenerationalDistanceCollector()
+//                .attachInvertedGenerationalDistanceCollector()
 //                .attachHypervolumeCollector()
-                .attachHypervolumeJmetalCollector()
-                .withEpsilon(epsilonDouble)
+//                .attachHypervolumeJmetalCollector()
+//                .withEpsilon(epsilonDouble)
 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
 //                .attachEpsilonProgressCollector()
 //                .attachInjectionCollector()
@@ -187,10 +191,10 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-//        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-//                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
+        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+                + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+//                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
         File results = new File(filename + ".res");
         System.out.println("Saving results");
 
