@@ -2,11 +2,11 @@
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF9','UF10'};
 % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-base = 'Do';
+base = 'R2';
 
 switch base
     case {'De'}
@@ -18,10 +18,10 @@ switch base
         creditShort = {'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
         mode = 'eMOEA';
     case{'R2'}
-%         creditDef = {'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-%         creditShort = {'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
-        creditDef = {'OPa_BIR2PARENT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-        creditShort = {'OP-R2','SI-R2-A','CS-R2-PF','CS-R2-A'};
+        creditDef = {'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+        creditShort = {'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
+%         creditDef = {'OPa_BIR2PARENT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
+%         creditShort = {'OP-R2','SI-R2-A','CS-R2-PF','CS-R2-A'};
         mode = 'eMOEA';
 end
 
@@ -150,8 +150,8 @@ for i=1:length(problemName)
             
             %             dataInj(:,c-size(benchmarkDataIGD,2)) = res.Inj;
             if strcmp(mode,'MOEAD')
-                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opMOEAD',probName);
-%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomMOEAD',probName);
+%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opMOEAD',probName);
+                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomMOEAD',probName);
             else
 %                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opeMOEA',probName);
 %                 [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'eMOEA',probName);
@@ -223,7 +223,7 @@ statsfHV = squeeze(sum(statsfHV,1))
 disp('mean time')
 avgTime = squeeze(mean(dataET,1))';
 stdTime = squeeze(std(dataET,1))';
-% 
+% % 
 % 
 % 
 % saveas(h1,strcat(base,'_IGD'),'fig');

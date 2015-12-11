@@ -3,21 +3,20 @@ function creditAnalysis(mode)
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'UF9','UF10','UF8'};
-selectors = {'Random'};
+problemName = {'UF10'};
+selectors = {'Probability'};
 % creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
 %     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
 %     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditDef = {
- 'ParetoFrontContribution','EArchiveContribution',...
-     'CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-shortCreditName = {'OP-Do','SI-Do-PF','SI-Do-A'...
-    'OP-R2','SI-R2-PF','SI-R2-A'};
+% shortCreditName = {'OP-De','SI-De','CS-De',...
+%     'OP-Do','SI-Do-PF','SI-Do-A',...
+%     'OP-R2','SI-R2-PF','SI-R2-A'};
+creditDef = {'DecompositionContribution'};
+shortCreditName = {'CS-De'};
 % path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-% path = '/Users/nozomihitomi/Desktop/';
 path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
 % respath = strcat(path,'mResNewCredits');
-respath = strcat(path,'newresultsCredits');
+respath = strcat(path,'resultsCreditsNew');
 origin = cd(respath);
 nops = 6;
 
@@ -67,10 +66,10 @@ switch mode
         filesProcessed = 0;
         h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
-            filesProcessed = filesProcessed + 1;
-            waitbar(filesProcessed/nFiles);
             for b=1:length(selectors)
                 for c=1:length(creditDef)
+                    filesProcessed = filesProcessed + 1;
+                    waitbar(filesProcessed/nFiles);
                     load(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'));
                     eraCreditsAllOp = java.util.HashMap;
                     eraCreditVel = java.util.HashMap;
@@ -155,26 +154,25 @@ switch mode
                     
                     plotName = strcat(problemName{a},'_',shortCreditName{c});
                     h1=figure(1);
+                    subplot(1,nFiles,filesProcessed)
                     plot(cred);
                     save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit','.mat'),'cred');
                     legend(labels)
                     xlabel('Epoch')
                     ylabel('Average credits earned in epoch')
                     title(strcat(problemName{a},'  ',shortCreditName{c},' credit'))
-                    saveas(h1,strcat(plotName,'_credit'),'fig');
-                    saveas(h1,strcat(plotName,'_credit'),'jpeg');
                     
                     h2=figure(2);
+                    subplot(1,nFiles,filesProcessed)
                     plot(abs(credVel));
                     save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_creditVel','.mat'),'credVel');
                     xlabel('Epoch')
                     ylabel('Speed in the change of the average credits earned in epoch')
                     legend(labels)
                     title(strcat(problemName{a},'  ',shortCreditName{c},' velocity'))
-                    saveas(h2,strcat(plotName,'_velocity'),'fig');
-                    saveas(h2,strcat(plotName,'_velocity'),'jpeg');
                     
                     h3=figure(3);
+                    subplot(1,nFiles,filesProcessed)
                     area(sel);
                     save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_sel','.mat'),'sel');
                     axis([0,nepochs,0,1.5])
@@ -187,14 +185,19 @@ switch mode
                     t.String = sprintf(subtitle);
                     t.Position=[0.1500    0.67    0.3589    0.2333];
                     t.HorizontalAlignment = 'right';
-                    saveas(h3,strcat(plotName,'_select'),'fig');
-                    saveas(h3,strcat(plotName,'_select'),'jpeg');
-                    clf(h1)
-                    clf(h2)
-                    clf(h3)
                     clear allcredits;
                 end
             end
         end
         close(h)
+        
+        saveas(h1,strcat(plotName,'_credit'),'fig');
+        saveas(h1,strcat(plotName,'_credit'),'jpeg');
+        saveas(h2,strcat(plotName,'_velocity'),'fig');
+        saveas(h2,strcat(plotName,'_velocity'),'jpeg');
+        saveas(h3,strcat(plotName,'_select'),'fig');
+        saveas(h3,strcat(plotName,'_select'),'jpeg');
+        clf(h1)
+        clf(h2)
+        clf(h3)
 end
