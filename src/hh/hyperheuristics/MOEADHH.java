@@ -175,7 +175,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             Solution[] offspring= operator.evolve(parents);
 
             //compute the credit assignment specific rewards
-            switch (creditDef.getType()) {
+            switch (creditDef.getInputType()) {
                 case OP:
                     double reward = 0;
                     for (Solution child : offspring) {
@@ -227,7 +227,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                     break;
                 default:
                     throw new NullPointerException("Credit definition not "
-                            + "recognized. Used " + creditDef.getType() + ".");
+                            + "recognized. Used " + creditDef.getInputType() + ".");
             }
 
             heuristicSelectionHistory.add(operator,this.numberOfEvaluations);

@@ -76,7 +76,7 @@ public class ParentDecomposition extends AbstractOffspringParent {
     
     @Override
     public String toString() {
-        return "ParentDecomposition";
+        return "OP-De";
     }
 
 }

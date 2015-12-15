@@ -12,13 +12,13 @@ import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
- * Class defining the type for reward definition based on comparing the offspring solution to the parent solution
+ * Class defining the inputType for reward definition based on comparing the offspring solution to the parent solution
  * @author nozomihitomi
  */
 public abstract class AbstractOffspringParent extends AbstractRewardDefintion{
 
     public AbstractOffspringParent(){
-        type = CreditFunctionType.OP;
+        inputType = CreditFunctionType.OP;
     }
     
     

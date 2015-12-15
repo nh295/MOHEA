@@ -224,7 +224,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
 
         Solution[] children = operator.evolve(parents);
-        if (creditDef.getType() == CreditFunctionType.OP) {
+        if (creditDef.getInputType() == CreditFunctionType.OP) {
             double creditValue = 0;
             for (Solution child : children) {
                 evaluate(child);
@@ -238,7 +238,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
-                                    + "recognized. Used " + creditDef.getType() + ".");
+                                    + "recognized. Used " + creditDef.getInputType() + ".");
                     }
                 }
                 archive.add(child);
@@ -246,7 +246,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             Reward reward = new Reward(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getType() == CreditFunctionType.SI) {
+        } else if (creditDef.getInputType() == CreditFunctionType.SI) {
             double creditValue = 0.0;
             for (Solution child : children) {
                 evaluate(child);
@@ -264,14 +264,14 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
-                                    + "recognized. Used " + creditDef.getType() + ".");
+                                    + "recognized. Used " + creditDef.getInputType() + ".");
                     }
                 }
             }
             Reward reward = new Reward(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getType() == CreditFunctionType.CS) {
+        } else if (creditDef.getInputType() == CreditFunctionType.CS) {
             ArrayList<Solution> removedFromArchive = new ArrayList();
             ArrayList<Solution> childrenInArchive = new ArrayList();
             for (Solution child : children) {
@@ -320,7 +320,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     break;
                 default:
                     throw new NullPointerException("Credit definition not "
-                            + "recognized. Used " + creditDef.getType() + ".");
+                            + "recognized. Used " + creditDef.getInputType() + ".");
             }
             Iterator<Variation> iter = popContRewards.keySet().iterator();
             while (iter.hasNext()) {

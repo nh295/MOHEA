@@ -47,7 +47,7 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
     
     @Override
     public String toString() {
-        return "ParetoFrontContribution";
+        return "CS-Do-PF";
     }
     /**
      * 

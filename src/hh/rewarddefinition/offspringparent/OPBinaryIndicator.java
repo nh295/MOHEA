@@ -122,7 +122,7 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
 
     @Override
     public String toString() {
-        return "OPa_" + indicator.toString() + operatesOn;
+        return "OP-" + indicator.toString() + operatesOn;
     }
 
 }

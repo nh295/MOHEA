@@ -28,7 +28,7 @@ public class EArchiveContribution extends ParetoFrontContribution{
     
     @Override
     public String toString() {
-        return "EArchiveContribution";
+        return "CS-Do-A";
     }
     
 }

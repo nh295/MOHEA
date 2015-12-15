@@ -76,6 +76,6 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
     
     @Override
     public String toString() {
-        return "OffspringParetoFront";
+        return "SI-PF";
     }
 }

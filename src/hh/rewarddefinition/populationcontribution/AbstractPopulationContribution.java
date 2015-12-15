@@ -22,7 +22,7 @@ import org.moeaframework.core.Variation;
 public abstract class AbstractPopulationContribution extends AbstractRewardDefintion{
     
     public AbstractPopulationContribution(){
-        type = CreditFunctionType.CS;
+        inputType = CreditFunctionType.CS;
     }
     
     /**
