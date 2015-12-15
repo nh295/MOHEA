@@ -168,12 +168,12 @@ public class TestRun implements Callable {
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
-                //                .attachHypervolumeCollector()
-                .attachHypervolumeJmetalCollector()
-                .withEpsilon(epsilonDouble)
+//                .attachAdditiveEpsilonIndicatorCollector()
+//                .attachGenerationalDistanceCollector()
+//                .attachInvertedGenerationalDistanceCollector()
+//                //                .attachHypervolumeCollector()
+//                .attachHypervolumeJmetalCollector()
+//                .withEpsilon(epsilonDouble)
                 //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 //                .attachEpsilonProgressCollector()
                 //                .attachInjectionCollector()
@@ -224,11 +224,11 @@ public class TestRun implements Callable {
 //        
             String name = path + File.separator + "results" + File.separator + probName + "_"
                     + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-            IOCreditHistory ioch = new IOCreditHistory();
-            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
-
-            IOSelectionHistory iosh = new IOSelectionHistory();
-            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
+//            IOCreditHistory ioch = new IOCreditHistory();
+//            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
+//
+//            IOSelectionHistory iosh = new IOSelectionHistory();
+//            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
 
             writer.flush();
         } catch (IOException ex) {

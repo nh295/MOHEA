@@ -52,8 +52,8 @@ public class HHCreditTest {
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
         String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(10);
+//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+        pool = Executors.newFixedThreadPool(10);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -76,9 +76,9 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
-//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
+            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
            
             //for single operator MOEA

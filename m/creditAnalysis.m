@@ -9,12 +9,13 @@ selectors = {'Probability'};
 %     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
 %     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
 % shortCreditName = {'OP-De','SI-De','CS-De',...
-%     'OP-Do','SI-Do-PF','SI-Do-A',...
-%     'OP-R2','SI-R2-PF','SI-R2-A'};
-creditDef = {'DecompositionContribution'};
-shortCreditName = {'CS-De'};
+%     'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A'...
+%     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
+creditDef = {'OPop_BIR2ARCHIVE' };
+shortCreditName = {'SI-R2-A'};
 % path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
+% path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 % respath = strcat(path,'mResNewCredits');
 respath = strcat(path,'resultsCreditsNew');
 origin = cd(respath);
