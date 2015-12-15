@@ -20,8 +20,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
-import org.moeaframework.core.NondominatedPopulation;
-import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.spi.OperatorFactory;
@@ -48,18 +46,18 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF4","UF10"};//,"UF11","UF12","UF13"};
+        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
-        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
+//        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(10);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -76,8 +74,8 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
-//            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
+            String[] creditDefs = new String[]{"CSDe"};
 //            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
            
@@ -164,8 +162,8 @@ public class HHCreditTest {
 //                                    typeProp, "eMOEA", maxEvaluations);
 
 //                            futures.add(pool.submit(test));
-                        }
-//                    }
+//                        }
+                    }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
@@ -173,13 +171,6 @@ public class HHCreditTest {
 //                            String name = path + File.separator + "results" + File.separator + probName + "_"
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 
-//                            //save the approximation set
-//                            NondominatedPopulation ndPop = hh.getResult();
-//                            try {
-//                                PopulationIO.writeObjectives(new File(name + ".NDpop"), ndPop);
-//                            } catch (IOException ex) {
-//                                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
-//                            }
 //                            save selection history
 //                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
 //                                    name + ".hist");

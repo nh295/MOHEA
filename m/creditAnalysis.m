@@ -9,16 +9,18 @@ selectors = {'Probability'};
 %     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
 %     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
 % shortCreditName = {'OP-De','SI-De','CS-De',...
-%     'OP-Do','SI-Do-PF','SI-Do-A',...
-%     'OP-R2','SI-R2-PF','SI-R2-A'};
+%    'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A',...
+%     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 creditDef = {'DecompositionContribution'};
 shortCreditName = {'CS-De'};
 % path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-% respath = strcat(path,'mResNewCredits');
-respath = strcat(path,'resultsCreditsNew');
+respath = strcat(path,'results');
+% respath = strcat(path,'resultsCreditsNew');
 origin = cd(respath);
-nops = 6;
+ops = {'SBX+PM','DifferentialEvolution+PM', 'UM','UNDX+PM','SPX+PM','PCX+PM'};
+nops = length(ops);
+labels = {'SBX','DE', 'UM','UNDX','SPX','PCX'};
 
 switch mode
     case 1 %read in the credit csv files
@@ -32,6 +34,9 @@ switch mode
                 for c=1:length(creditDef)
                     fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
                     files = dir(fileType);
+                    if(length(files)~=30)
+                        error('Missing some files. Only found %f files. Looking for 30 files',length(files));
+                    end
                     allcredits  = cell(length(files),1);
                     for i=1:length(files)
                         expData = java.util.HashMap;
@@ -74,6 +79,7 @@ switch mode
                     eraCreditsAllOp = java.util.HashMap;
                     eraCreditVel = java.util.HashMap;
                     eraSelectionFreq = java.util.HashMap;
+                    maximumCreditValue = 0;
                     for i=1:length(allcredits)
                         iter = allcredits{i}.keySet.iterator;
                         totalEpochSelection = zeros(nepochs,1);
@@ -84,6 +90,8 @@ switch mode
                         while iter.hasNext
                             operator = iter.next;
                             data = allcredits{i}.get(operator);
+                            ind = isnan(data(:,2));
+                            data(ind,2) = 0;
                             maxCredit = max([maxCredit;data(:,2)]);
                             minCredit = min([minCredit;data(:,2)]);
                             eraCreditOneOp = zeros(nepochs,1);
@@ -106,12 +114,13 @@ switch mode
                             epochSelectionFreq.put(operator,eraSelectionOneOp);
 
                         end
-                        
+                        maximumCreditValue = max([maxCredit,maximumCreditValue]);
                         iter = allcredits{i}.keySet.iterator;
                         while iter.hasNext
                             operator = iter.next;
                             %normalize credits
-                            normEraCreditOneOp = (rawEraCredits.get(operator)-minCredit)/(maxCredit-minCredit);
+                            normEraCreditOneOp = rawEraCredits.get(operator);
+%                             normEraCreditOneOp = (rawEraCredits.get(operator)-minCredit)/(maxCredit-minCredit);
                             if isempty(eraCreditsAllOp.get(operator))
                                 eraCreditsAllOp.put(operator,normEraCreditOneOp);
                                 eraCreditVel.put(operator,diff(normEraCreditOneOp));
@@ -128,31 +137,26 @@ switch mode
                             end
                         end
                     end
-                    
+                    disp(maximumCreditValue)
                     %take the average over the number of trials
-                    iter2 = allcredits{i}.keySet.iterator;
-                    labels = cell(nops,1);
-                    ind = 1;
                     subtitle = 'Selection rate = \n';
                     cred = zeros(nepochs,allcredits{i}.keySet.size);
                     credVel = zeros(nepochs-1,allcredits{i}.keySet.size);
                     sel = zeros(nepochs,allcredits{i}.keySet.size);
-                    while iter2.hasNext
-                        operator = iter2.next;
+                    for i=1:nops
+                        operator = ops{i};
                         %take the average over the trials
                         eraCreditsAllOp.put(operator,eraCreditsAllOp.get(operator)/length(allcredits));
                         eraCreditVel.put(operator,eraCreditVel.get(operator)/length(allcredits));
                         eraSelectionFreq.put(operator,eraSelectionFreq.get(operator)/length(allcredits));
                         
-                        labels{ind}=operator;
                         subtitle = strcat(subtitle,operator,':\t',sprintf('%.4f',mean(eraSelectionFreq.get(operator))),'\n');
-                        cred(:,ind) = eraCreditsAllOp.get(operator);
-                        credVel(:,ind) = eraCreditVel.get(operator);
-                        sel(:,ind) = eraSelectionFreq.get(operator);
-                        ind = ind +1;
+                        cred(:,i) = eraCreditsAllOp.get(operator);
+                        credVel(:,i) = eraCreditVel.get(operator);
+                        sel(:,i) = eraSelectionFreq.get(operator);
                     end
                     
-                    plotName = strcat(problemName{a},'_',shortCreditName{c});
+                    
                     h1=figure(1);
                     subplot(1,nFiles,filesProcessed)
                     plot(cred);
@@ -181,16 +185,17 @@ switch mode
                     legend(labels)
                     title(strcat(problemName{a},'  ',shortCreditName{c},' select'))
                     %create textbox that shows selection frequency
-                    t = annotation('textbox');
-                    t.String = sprintf(subtitle);
-                    t.Position=[0.1500    0.67    0.3589    0.2333];
-                    t.HorizontalAlignment = 'right';
+%                     t = annotation('textbox');
+%                     t.String = sprintf(subtitle);
+%                     t.Position=[0.1500    0.67    0.3589    0.2333];
+%                     t.HorizontalAlignment = 'right';
                     clear allcredits;
                 end
             end
         end
         close(h)
         
+        plotName = strcat(problemName{a},'_',shortCreditName{c});
         saveas(h1,strcat(plotName,'_credit'),'fig');
         saveas(h1,strcat(plotName,'_credit'),'jpeg');
         saveas(h2,strcat(plotName,'_velocity'),'fig');

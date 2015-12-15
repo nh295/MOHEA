@@ -17,7 +17,9 @@ import org.moeaframework.core.Solution;
  */
 public class AbstractRewardDefintion implements IRewardDefinition {
 
-    protected CreditFunctionType type;
+    protected CreditFunctionType inputType;
+    
+    protected FitnessFunctionType fitType;
 
     protected RewardDefinedOn operatesOn;
     
@@ -29,8 +31,13 @@ public class AbstractRewardDefintion implements IRewardDefinition {
     protected ArrayList<SortedLinkedList<Double>> sortedObjs;
 
     @Override
-    public CreditFunctionType getType() {
-        return type;
+    public CreditFunctionType getInputType() {
+        return inputType;
+    }
+    
+    @Override
+    public FitnessFunctionType getFitnessType() {
+        return fitType;
     }
 
     @Override

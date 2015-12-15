@@ -752,8 +752,12 @@ public class MOEAD extends AbstractAlgorithm {
      */
     protected Population getNeighborhoodSolutions(int index){
         Population neighbors = new Population();
-        List<Integer> matingIndices = getMatingIndices(index);
-        for(Integer mateIndex:matingIndices){
+        
+        List<Integer> neightborIndices = new ArrayList<Integer>();
+        for (Individual individual : population.get(index).getNeighbors()) {
+                neightborIndices.add(population.indexOf(individual));
+        }
+        for(Integer mateIndex:neightborIndices){
             neighbors.add(population.get(mateIndex).getSolution());
         }
         return neighbors;

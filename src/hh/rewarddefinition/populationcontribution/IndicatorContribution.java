@@ -165,7 +165,7 @@ public class IndicatorContribution extends AbstractPopulationContribution{
     
     @Override
     public String toString() {
-        return "CNI_" + indicator.toString() + operatesOn;
+        return "CS-" + indicator.toString() + operatesOn;
     }
     
 }

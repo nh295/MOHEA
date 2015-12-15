@@ -5,8 +5,6 @@
  */
 package hh.credittest;
 
-import hh.IO.IOCreditHistory;
-import hh.IO.IOSelectionHistory;
 import hh.rewarddefinition.RewardDefFactory;
 import hh.rewarddefinition.IRewardDefinition;
 import hh.hyperheuristics.HHFactory;
@@ -14,6 +12,7 @@ import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.hyperheuristics.MOEADHH;
 import hh.nextheuristic.INextHeuristic;
+import hh.rewarddefinition.FitnessFunctionType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.Population;
-import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
@@ -163,20 +161,20 @@ public class TestRun implements Callable {
      */
     @Override
     public IHyperHeuristic call() throws Exception {
-//        IHyperHeuristic hh = newMOEADHH();
-        IHyperHeuristic hh = newHeMOEA();
+        IHyperHeuristic hh;
+        if(rewardDef.getFitnessType()==FitnessFunctionType.De)
+             hh = newMOEADHH();
+        else
+            hh = newHeMOEA();
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
                 .attachInvertedGenerationalDistanceCollector()
-                //                .attachHypervolumeCollector()
                 .attachHypervolumeJmetalCollector()
                 .withEpsilon(epsilonDouble)
-                //                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
-                //                .attachEpsilonProgressCollector()
-                //                .attachInjectionCollector()
+                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
         Algorithm instAlgorithm = instrumenter.instrument(hh);
@@ -184,12 +182,8 @@ public class TestRun implements Callable {
         // run the executor using the listener to collect results
         System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
-//            System.out.printf("Percent done: \n");
-//        int k=0;
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();
-//                System.out.print("\b\b\b\b\b\b");
-//                PopulationIO.writeObjectives(new File(path+ File.separator+"SIDe"+Integer.toString(k)+".pop"),((MOEADHH)hh).getPopulation());
         }
 
         hh.terminate();
@@ -221,24 +215,19 @@ public class TestRun implements Callable {
                 }
                 writer.append("\n");
             }
-//        
-            String name = path + File.separator + "results" + File.separator + probName + "_"
-                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-            IOCreditHistory ioch = new IOCreditHistory();
-            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
-
-            IOSelectionHistory iosh = new IOSelectionHistory();
-            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
-
             writer.flush();
+            
+//            String name = path + File.separator + "results" + File.separator + probName + "_"
+//                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+//            IOCreditHistory ioch = new IOCreditHistory();
+//            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
+//
+//            IOSelectionHistory iosh = new IOSelectionHistory();
+//            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
+
         } catch (IOException ex) {
             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        
-//         String name = path + File.separator + "results" + File.separator + probName + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-//         IOCreditHistory ioch = new IOCreditHistory();
-//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
 
         return hh;
     }
