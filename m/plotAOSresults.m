@@ -2,11 +2,11 @@
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF9','UF10'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-base = 'R2';
+base = 'De';
 
 switch base
     case {'De'}
@@ -224,7 +224,7 @@ disp('mean time')
 avgTime = squeeze(mean(dataET,1))';
 stdTime = squeeze(std(dataET,1))';
 % % 
-% 
-% 
-% saveas(h1,strcat(base,'_IGD'),'fig');
-% saveas(h2,strcat(base,'_HV'),'fig');
+
+
+saveas(h1,strcat(base,'_IGD'),'fig');
+saveas(h2,strcat(base,'_HV'),'fig');
