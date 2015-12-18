@@ -59,7 +59,7 @@ public class OffspringEArchive extends AbstractOffspringPopulation{
     
     @Override
     public String toString() {
-        return "OffspringEArchive";
+        return "SI-A";
     }
     
 }

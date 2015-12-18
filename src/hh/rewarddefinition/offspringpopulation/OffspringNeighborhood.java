@@ -24,6 +24,6 @@ public class OffspringNeighborhood extends AbstractOffspringPopulation{
     
     @Override
     public String toString() {
-        return "OffspringNeighborhood";
+        return "SI-De";
     }
 }

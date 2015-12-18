@@ -36,14 +36,9 @@ public class ParentDomination extends AbstractOffspringParent {
     private final double creditNoOneDominates;
 
     /**
-     * The type of dominance comparator to be used
+     * The inputType of dominance comparator to be used
      */
     private final DominanceComparator comparator;
-
-    /**
-     * parallel purpose random generator
-     */
-    private final ParallelPRNG pprng;
 
     /**
      * Constructor to specify the amount of reward that will be assigned. A
@@ -79,7 +74,6 @@ public class ParentDomination extends AbstractOffspringParent {
         this.creditParentDominates = rewardParentDominates;
         this.creditNoOneDominates = rewardNoOneDominates;
         this.comparator = comparator;
-        this.pprng = new ParallelPRNG();
     }
 
     /**
@@ -144,6 +138,6 @@ public class ParentDomination extends AbstractOffspringParent {
 
     @Override
     public String toString() {
-        return "ParentDomination";
+        return "OP-Do";
     }
 }

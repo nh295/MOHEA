@@ -24,6 +24,6 @@ public class DecompositionContribution extends ParetoFrontContribution{
     
     @Override
     public String toString() {
-        return "DecompositionContribution";
+        return "CS-De";
     }
 }

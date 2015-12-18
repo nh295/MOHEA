@@ -142,7 +142,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
 
     @Override
     public String toString() {
-        return "OPop_" + indicator.toString() + operatesOn;
+        return "SI-" + indicator.toString() + operatesOn;
     }
 
 }

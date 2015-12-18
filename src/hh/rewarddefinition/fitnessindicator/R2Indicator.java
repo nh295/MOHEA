@@ -264,7 +264,7 @@ public class R2Indicator implements IIndicator {
 
     @Override
     public String toString() {
-        return "BIR2";
+        return "R2";
     }
 
     protected class WtVector {
