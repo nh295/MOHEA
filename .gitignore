@@ -1,2 +1,5 @@
 \
 /dist/
+# ignore build and nbproject files
+*/build/**
+*/nbproject/**
