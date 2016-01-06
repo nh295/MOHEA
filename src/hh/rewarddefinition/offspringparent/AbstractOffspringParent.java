@@ -8,6 +8,7 @@ package hh.rewarddefinition.offspringparent;
 
 import hh.rewarddefinition.AbstractRewardDefintion;
 import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -19,6 +20,7 @@ public abstract class AbstractOffspringParent extends AbstractRewardDefintion{
 
     public AbstractOffspringParent(){
         inputType = CreditFunctionType.OP;
+        fitType = FitnessFunctionType.Do;
     }
     
     

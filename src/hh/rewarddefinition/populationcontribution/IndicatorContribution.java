@@ -6,6 +6,8 @@
 package hh.rewarddefinition.populationcontribution;
 
 import hh.hyperheuristics.SerializableVal;
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
@@ -51,6 +53,8 @@ public class IndicatorContribution extends AbstractPopulationContribution{
     public IndicatorContribution(IIndicator indicator,RewardDefinedOn operatesOn) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
+        this.fitType = FitnessFunctionType.R2;
+        this.inputType = CreditFunctionType.CS;
         if(!this.operatesOn.equals(RewardDefinedOn.ARCHIVE)&&!this.operatesOn.equals(RewardDefinedOn.PARETOFRONT))
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
     }

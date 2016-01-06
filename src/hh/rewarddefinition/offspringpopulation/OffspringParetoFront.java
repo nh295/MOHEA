@@ -6,6 +6,8 @@
 
 package hh.rewarddefinition.offspringpopulation;
 
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.RewardDefinedOn;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
@@ -37,6 +39,8 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
      */
     public OffspringParetoFront(double creditNonDominated,double creditDominated) {
         operatesOn = RewardDefinedOn.PARETOFRONT;
+        inputType = CreditFunctionType.SI;
+        fitType = FitnessFunctionType.Do;
         this.creditDominated = creditDominated;
         this.creditNonDominated = creditNonDominated;
     }

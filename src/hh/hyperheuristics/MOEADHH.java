@@ -231,7 +231,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
             }
 
             heuristicSelectionHistory.add(operator,this.numberOfEvaluations);
-                    updateQualityHistory();
+//            updateQualityHistory();
             }
 
             generation++;

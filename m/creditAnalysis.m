@@ -11,12 +11,12 @@ selectors = {'Probability'};
 % shortCreditName = {'OP-De','SI-De','CS-De',...
 %    'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A',...
 %     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
-creditDef = {'DecompositionContribution'};
-shortCreditName = {'CS-De'};
-% path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-respath = strcat(path,'results');
-% respath = strcat(path,'resultsCreditsNew');
+creditDef = {'OPop_BIR2PARETOFRONT'};
+shortCreditName = {'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A'};
+path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+% path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
+% respath = strcat(path,'results');
+respath = strcat(path,'resultsCreditsNew');
 origin = cd(respath);
 ops = {'SBX+PM','DifferentialEvolution+PM', 'UM','UNDX+PM','SPX+PM','PCX+PM'};
 nops = length(ops);
@@ -24,17 +24,17 @@ labels = {'SBX','DE', 'UM','UNDX','SPX','PCX'};
 
 switch mode
     case 1 %read in the credit csv files
-        nFiles = length(problemName)*length(selectors)*length(creditDef);
+        nFiles = length(problemName)*length(selectors)*length(shortCreditName);
         filesProcessed = 0;
         h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
             filesProcessed = filesProcessed + 1;
             waitbar(filesProcessed/nFiles);
             for b=1:length(selectors)
-                for c=1:length(creditDef)
+                for c=1:length(shortCreditName)
                     fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
                     files = dir(fileType);
-                    if(length(files)~=30)
+                    if(length(files)~=1)
                         error('Missing some files. Only found %f files. Looking for 30 files',length(files));
                     end
                     allcredits  = cell(length(files),1);
@@ -55,7 +55,7 @@ switch mode
                         allcredits{i} = expData;
                     end
                     %save files
-                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'),'allcredits');
+                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit.mat'),'allcredits');
                 end
             end
         end
@@ -67,19 +67,20 @@ switch mode
         nepochs = 100;
         maxEval = 300000;
         epochLength = maxEval/nepochs;
-        nFiles = length(problemName)*length(selectors)*length(creditDef);
+        nFiles = length(problemName)*length(selectors)*length(shortCreditName);
         filesProcessed = 0;
         h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
             for b=1:length(selectors)
-                for c=1:length(creditDef)
+                for c=1:length(shortCreditName)
                     filesProcessed = filesProcessed + 1;
                     waitbar(filesProcessed/nFiles);
-                    load(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'credit.mat'));
+                    load(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit.mat'));
                     eraCreditsAllOp = java.util.HashMap;
                     eraCreditVel = java.util.HashMap;
                     eraSelectionFreq = java.util.HashMap;
                     maximumCreditValue = 0;
+                    allcredits= cred;
                     for i=1:length(allcredits)
                         iter = allcredits{i}.keySet.iterator;
                         totalEpochSelection = zeros(nepochs,1);
@@ -159,7 +160,7 @@ switch mode
                     
                     h1=figure(1);
                     subplot(1,nFiles,filesProcessed)
-                    plot(cred);
+                    semilogy(cred);
                     save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit','.mat'),'cred');
                     legend(labels)
                     xlabel('Epoch')

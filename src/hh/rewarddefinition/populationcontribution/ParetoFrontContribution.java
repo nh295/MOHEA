@@ -7,6 +7,8 @@
 package hh.rewarddefinition.populationcontribution;
 
 import hh.hyperheuristics.SerializableVal;
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.Reward;
 import hh.rewarddefinition.RewardDefinedOn;
 import java.util.Collection;
@@ -40,7 +42,9 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
      */
     public ParetoFrontContribution(double rewardInPF,double rewardNotInPF) {
         super();
-        operatesOn = RewardDefinedOn.PARETOFRONT;
+        this.operatesOn = RewardDefinedOn.PARETOFRONT;
+        this.fitType = FitnessFunctionType.Do;
+        this.inputType = CreditFunctionType.CS;
         this.rewardNotInPF = rewardNotInPF;
         this.rewardInPF = rewardInPF;
     }

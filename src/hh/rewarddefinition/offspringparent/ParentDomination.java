@@ -5,6 +5,7 @@
  */
 package hh.rewarddefinition.offspringparent;
 
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.RewardDefinedOn;
 import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
@@ -70,6 +71,7 @@ public class ParentDomination extends AbstractOffspringParent {
     public ParentDomination(double rewardOffspringDominates, double rewardNoOneDominates, double rewardParentDominates, DominanceComparator comparator) {
         super();
         operatesOn = RewardDefinedOn.PARENT;
+        fitType = FitnessFunctionType.Do;
         this.creditOffspringDominates = rewardOffspringDominates;
         this.creditParentDominates = rewardParentDominates;
         this.creditNoOneDominates = rewardNoOneDominates;

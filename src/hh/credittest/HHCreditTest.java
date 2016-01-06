@@ -46,7 +46,7 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
+        String[] problems = new String[]{"UF10"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
@@ -57,26 +57,26 @@ public class HHCreditTest {
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
 //                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
-//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
                 problem = args[1];
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 1;
             int maxEvaluations = 300010;
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM", "AP"};
-//            String[] selectors = new String[]{"PM"};
+//            String[] selectors = new String[]{"PM", "AP"};
+            String[] selectors = new String[]{"PM"};
 //            setup credit definitions
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
 //            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
-            String[] creditDefs = new String[]{"CSDe"};
-//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
+            String[] creditDefs = new String[]{"CEA"};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe","ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
 //            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
            
             //for single operator MOEA
@@ -99,19 +99,20 @@ public class HHCreditTest {
 
                         //Setup algorithm parameters
                         Properties prop = new Properties();
-                        String popSize;
+                        int popSize;
                         switch(prob.getNumberOfObjectives()){
-                            case 2: popSize = "600";
+                            case 2: popSize = 600;
                                     break;
-                            case 3: popSize = "1000";
+                            case 3: popSize = 1000;
                                     break;
-                            case 5: popSize = "1200";
+                            case 5: popSize = 1200;
                                 break;
                             default: throw new UnsupportedOperationException("Unsupported test problem: Problems with 2,3, and 5 objectives are supported");
                         }
                         prop.put("populationSize", popSize);
                         prop.put("HH", selector);
                         prop.put("CredDef", credDefStr);
+                        prop.put("frrmab.windowsize",0.5*popSize);
 
                         //Choose heuristics to be applied. Use default values (probabilities)
                         ArrayList<Variation> heuristics = new ArrayList<>();
@@ -139,12 +140,13 @@ public class HHCreditTest {
                         heuristicProp.put("pm.rate", 1.0 / prob.getNumberOfVariables()); 
 			heuristicProp.put("pm.distributionIndex", 20.0);
                         
-                        heuristics.add(of.getVariation("um", heuristicProp, prob));
+                        
+//                        heuristics.add(of.getVariation("um", heuristicProp, prob));
                         heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
+//                        heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
                         
 //                        heuristics.add(of.getVariation(op, heuristicProp, prob));
 

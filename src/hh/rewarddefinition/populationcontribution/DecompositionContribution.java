@@ -6,6 +6,9 @@
 
 package hh.rewarddefinition.populationcontribution;
 
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
+
 /**
  *
  * @author nozomihitomi
@@ -20,6 +23,8 @@ public class DecompositionContribution extends ParetoFrontContribution{
      */
     public DecompositionContribution(double rewardInN,double rewardNotInN) {
         super(rewardInN, rewardNotInN);
+        this.fitType = FitnessFunctionType.De;
+        this.inputType = CreditFunctionType.CS;
     }
     
     @Override

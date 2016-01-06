@@ -5,6 +5,7 @@
  */
 package hh.rewarddefinition.offspringparent;
 
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
 import hh.rewarddefinition.fitnessindicator.IIndicator;
@@ -48,12 +49,14 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
      *
      * @param indicator The indicator to use
      * @param kappa the IBEA parameter to scale indicator values
+     * @param prob
      */
     public OPBinaryIndicator(IIndicator indicator, double kappa, Problem prob) {
         this.indicator = indicator;
         this.kappa = kappa;
         //has to be the population because parent may not lie on PF or in archive
         this.operatesOn = RewardDefinedOn.PARENT;
+        this.fitType = FitnessFunctionType.R2;
 
         if (indicator.getClass().equals(HypervolumeIndicator.class)) {
             double[] hvRefPoint = new double[prob.getNumberOfObjectives()];

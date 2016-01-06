@@ -5,6 +5,8 @@
  */
 package hh.rewarddefinition.offspringpopulation;
 
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import hh.rewarddefinition.RewardDefinedOn;
 import hh.rewarddefinition.fitnessindicator.HypervolumeIndicator;
 import hh.rewarddefinition.fitnessindicator.IIndicator;
@@ -50,6 +52,8 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     public OffspringPopulationIndicator(IIndicator indicator, RewardDefinedOn operatesOn) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
+        fitType = FitnessFunctionType.R2;
+        inputType = CreditFunctionType.SI;
         if (!this.operatesOn.equals(RewardDefinedOn.ARCHIVE) && !this.operatesOn.equals(RewardDefinedOn.PARETOFRONT)) {
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
         }

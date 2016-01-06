@@ -23,7 +23,7 @@ public class EArchiveContribution extends ParetoFrontContribution{
      */
     public EArchiveContribution(double inArchive, double notInArchive) {
         super(inArchive,notInArchive);
-        operatesOn = RewardDefinedOn.ARCHIVE;
+        this.operatesOn = RewardDefinedOn.ARCHIVE;
     }
     
     @Override

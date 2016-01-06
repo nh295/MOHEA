@@ -5,6 +5,8 @@
  */
 package hh.rewarddefinition.offspringparent;
 
+import hh.rewarddefinition.CreditFunctionType;
+import hh.rewarddefinition.FitnessFunctionType;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -25,6 +27,13 @@ public class ParentDecomposition extends AbstractOffspringParent {
      * The reference point used to compute the Chebyshev function
      */
     private double[] idealPoint;
+
+    public ParentDecomposition() {
+        inputType = CreditFunctionType.OP;
+        fitType = FitnessFunctionType.De;
+    }
+    
+    
 
     /**
      * Sets the ideal point used in decomposition methods. Update the ideal

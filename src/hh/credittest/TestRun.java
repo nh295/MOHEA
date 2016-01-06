@@ -5,14 +5,15 @@
  */
 package hh.credittest;
 
-import hh.rewarddefinition.RewardDefFactory;
-import hh.rewarddefinition.IRewardDefinition;
+import hh.IO.IOCreditHistory;
 import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.hyperheuristics.MOEADHH;
 import hh.nextheuristic.INextHeuristic;
 import hh.rewarddefinition.FitnessFunctionType;
+import hh.rewarddefinition.IRewardDefinition;
+import hh.rewarddefinition.RewardDefFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -97,16 +98,9 @@ public class TestRun implements Callable {
         final TournamentSelection selection = new TournamentSelection(
                 2, comparator);
 
-        //Use default values for selectors
-        TypedProperties selectorProp = new TypedProperties();
-        selectorProp.setInt("windowSize", (int) 0.5 * populationSize);
         //all other properties use default parameters
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), selectorProp, heuristics);
-        try {
-            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
-        } catch (IOException ex) {
-            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+
 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
                 initialization, selector, rewardDef, injectionRate, lagWindow);
@@ -137,13 +131,8 @@ public class TestRun implements Callable {
 
         int updateUtility = properties.getInt("updateUtility", 50);
 
-        //Use default values for selectors
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), new TypedProperties(), heuristics);
-        try {
-            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
-        } catch (IOException ex) {
-            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization,
                 delta, eta, updateUtility, selector, rewardDef);
@@ -162,6 +151,12 @@ public class TestRun implements Callable {
     @Override
     public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh;
+        try {
+            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
+        } catch (IOException ex) {
+            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         if(rewardDef.getFitnessType()==FitnessFunctionType.De)
              hh = newMOEADHH();
         else
@@ -193,7 +188,7 @@ public class TestRun implements Callable {
         Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-        String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+        String filename = path + File.separator + "test" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 //         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
 //                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
@@ -217,10 +212,10 @@ public class TestRun implements Callable {
             }
             writer.flush();
             
-//            String name = path + File.separator + "results" + File.separator + probName + "_"
-//                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-//            IOCreditHistory ioch = new IOCreditHistory();
-//            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
+            String name = path + File.separator + "test" + File.separator + probName + "_"
+                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
+            IOCreditHistory ioch = new IOCreditHistory();
+            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
 //
 //            IOSelectionHistory iosh = new IOSelectionHistory();
 //            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");

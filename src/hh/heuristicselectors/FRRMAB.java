@@ -64,7 +64,8 @@ public class FRRMAB extends AbstractMAB {
         HashMap<Variation, Double> rewardSums = computeRewardSum();
         HashMap<Variation, Double> FRR = computeFRR(rewardSums);
         for (Variation op : operators) {
-            qualities.put(op, FRR.get(op));
+            if(FRR.get(op)!=null) //this only = null before all operators get selected at least once
+                qualities.put(op, FRR.get(op));
         }
     }
 
@@ -185,6 +186,11 @@ public class FRRMAB extends AbstractMAB {
             return -Double.compare(t1.getReward(), t2.getReward());
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "FRRMAB";
     }
 
 }
