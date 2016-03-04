@@ -163,7 +163,7 @@ public class EpsilonMOEA extends AbstractEvolutionaryAlgorithm implements
 		} else if (!dominated) {
                     int ind = pprng.nextInt(population.size());
                     out = population.get(ind);
-			population.remove(out);
+			population.remove(ind);
 			population.add(newSolution);
 		} else 
                     out = null;

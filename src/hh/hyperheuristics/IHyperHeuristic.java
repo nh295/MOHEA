@@ -10,7 +10,7 @@ import hh.history.CreditHistory;
 import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
 import hh.nextheuristic.INextHeuristic;
-import hh.rewarddefinition.IRewardDefinition;
+import hh.creditassigment.IRewardDefinition;
 import org.moeaframework.core.Algorithm;
 
 /**

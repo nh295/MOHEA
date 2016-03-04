@@ -3,15 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/fitnessindicator/R2Indicator.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/TestRun.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/spi/OperatorFactory.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/operator/real/UNDX.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/core/operator/real/SBX.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/hyperheuristics/MOEADHH.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/credittest/HHCreditTest.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/rewarddefinition/offspringparent/OPBinaryIndicator.java</file>
-            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/src/hh/history/OperatorSelectionHistory.java</file>
+            <file>file:/Users/nozomihitomi/Dropbox/MOHEA/MOEAFramework-2.4/src/org/moeaframework/algorithm/EpsilonMOEA.java</file>
         </group>
     </open-files>
 </project-private>

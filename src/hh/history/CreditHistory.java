@@ -5,7 +5,7 @@
  */
 package hh.history;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class CreditHistory implements Serializable {
 
     private static final long serialVersionUID = -2323214225020219554L;
 
-    protected HashMap<Variation, ArrayList<Reward>> history;
+    protected HashMap<Variation, ArrayList<Credit>> history;
     
     private int maxIteration = 0;
 
@@ -40,13 +40,13 @@ public class CreditHistory implements Serializable {
     }
 
     /**
-     * Add a reward to the history. Reward is tagged with iteration from when
-     * the reward is issued
+     * Add a reward to the history. Credit is tagged with iteration from when
+ the reward is issued
      *
      * @param heuristic
      * @param reward
      */
-    public void add(Variation heuristic, Reward reward) {
+    public void add(Variation heuristic, Credit reward) {
         history.get(heuristic).add(reward);
         maxIteration = Math.max(maxIteration, reward.getIteration());
     }
@@ -56,7 +56,7 @@ public class CreditHistory implements Serializable {
      * @param operator
      * @return 
      */
-    public Collection<Reward> getHistory(Variation operator) {
+    public Collection<Credit> getHistory(Variation operator) {
         return history.get(operator);
     }
 
@@ -64,8 +64,8 @@ public class CreditHistory implements Serializable {
      * Returns a map of the last rewards received by each operator
      * @return 
      */
-    public HashMap<Variation, Reward> getLatest() {
-        HashMap<Variation, Reward> out = new HashMap<>();
+    public HashMap<Variation, Credit> getLatest() {
+        HashMap<Variation, Credit> out = new HashMap<>();
         for (Variation operator : getOperators()) {
             out.put(operator, this.getHistory(operator).iterator().next());
         }

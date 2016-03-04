@@ -6,7 +6,7 @@ problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-base = 'De';
+base = 'test';
 
 switch base
     case {'De'}
@@ -22,6 +22,10 @@ switch base
         creditShort = {'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 %         creditDef = {'OPa_BIR2PARENT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
 %         creditShort = {'OP-R2','SI-R2-A','CS-R2-PF','CS-R2-A'};
+        mode = 'eMOEA';
+    case{'test'}
+        creditDef = {'OPop_BIR2ARCHIVE'};
+        creditShort = {'SI-R2-A'};
         mode = 'eMOEA';
 end
 
@@ -190,7 +194,7 @@ for i=1:length(problemName)
     figure(h1) 
     [~,ind]=min(mean(dataIGD,1));
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
-    boxplot(hsubplot1{i},dataIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot1{i},dataIGD(:,3:end),label_names_IGD(:,3:end),'colors',boxColors(:,3:end),'boxstyle','filled','medianstyle','target','symbol','+')
     set(hsubplot1{i},'TickLabelInterpreter','tex');
     set(hsubplot1{i},'XTickLabelRotation',90);
     set(hsubplot1{i},'FontSize',13)
@@ -205,7 +209,7 @@ for i=1:length(problemName)
     figure(h2)
     [~,ind]=max(mean(datafHV,1));
     label_names_fHV{ind} = strcat('\bf{',label_names_fHV{ind},'}');
-    boxplot(hsubplot2{i},datafHV,label_names_fHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot2{i},datafHV(:,3:end),label_names_fHV(:,3:end),'colors',boxColors(:,3:end),'boxstyle','filled','medianstyle','target','symbol','+')
     set(hsubplot2{i},'TickLabelInterpreter','tex');
     set(hsubplot2{i},'XTickLabelRotation',90);
     set(hsubplot2{i},'FontSize',13);

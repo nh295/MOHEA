@@ -6,7 +6,7 @@
 package hh.IO;
 
 import hh.history.CreditHistory;
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,16 +45,16 @@ public class IOCreditHistory {
         Collection<Variation> operators = creditHistory.getOperators();
         try (FileWriter fw = new FileWriter(new File(filename))) {
             for(Variation oper:operators){
-                Collection<Reward> hist = creditHistory.getHistory(oper);
+                Collection<Credit> hist = creditHistory.getHistory(oper);
                 int[] iters = new int[hist.size()];
                 double[] vals = new double[hist.size()];
-                Iterator<Reward> iter = hist.iterator();
-                Reward reward = iter.next();
+                Iterator<Credit> iter = hist.iterator();
+                Credit reward = iter.next();
                 iters[0]=reward.getIteration();
                 vals[0]=reward.getValue();
                 int index=0;
                 while(iter.hasNext()){
-                    Reward nextReward = iter.next();
+                    Credit nextReward = iter.next();
                     int iteration = nextReward.getIteration();
                     double rewardVal = nextReward.getValue();
                     iters[index] = iteration;
@@ -92,7 +92,7 @@ public class IOCreditHistory {
 //            Arrays.fill(data[operNum], -1.0);
 //            Iterator<Reward> iter = creditHistory.getHistory(operator).iterator();
 //            while(iter.hasNext()){
-//                Reward reward = iter.next();
+//                Credit reward = iter.next();
 //                int iteration = reward.getIteration();
 //                if(data[operNum][iteration]==-1){
 //                    data[operNum][iteration]=reward.getValue();

@@ -179,6 +179,11 @@ public class Instrumenter extends ProblemBuilder {
 	 */
 	private Accumulator lastAccumulator;
         
+        /**
+         * The reference point for the hypervolume calcuation
+         */
+        private Solution referencePointHV;
+        
 	
 	/**
 	 * Constructs a new instrumenter instance, initially with no collectors.
@@ -236,11 +241,12 @@ public class Instrumenter extends ProblemBuilder {
         /**
 	 * Includes the hypervolume collector from Jmetal when instrumenting algorithms.
 	 * 
+         * @param referencePoint the reference point to use when computing the hypervolume
 	 * @return a reference to this instrumenter
 	 */
-	public Instrumenter attachHypervolumeJmetalCollector() {
+	public Instrumenter attachHypervolumeJmetalCollector(Solution referencePoint) {
 		includeHypervolumeJmetal = true;
-		
+		this.referencePointHV = referencePoint;
 		return this;
 	}
 	
@@ -579,7 +585,7 @@ public class Instrumenter extends ProblemBuilder {
 	public InstrumentedAlgorithm instrument(Algorithm algorithm) {
 		List<Collector> collectors = new ArrayList<Collector>();
 		
-		if (includeHypervolume || includeGenerationalDistance || 
+		if (includeHypervolume || includeHypervolumeJmetal || includeGenerationalDistance || 
 				includeInvertedGenerationalDistance || includeSpacing ||
 				includeAdditiveEpsilonIndicator || includeContribution) {
 			Problem problem = algorithm.getProblem();
@@ -595,12 +601,8 @@ public class Instrumenter extends ProblemBuilder {
 						new Hypervolume(problem, referenceSet), archive));
 			}
                         if (includeHypervolumeJmetal) {
-                            double[] refPointObj = new double[problem.getNumberOfObjectives()];
-                            Arrays.fill(refPointObj, 2.0); //Used for UF1-10 
-//                            refPointObj = new double[]{3.0, 5.0, 7.0, 9.0, 11.0}; //used for WFG problems
-                            Solution refPoint = new Solution(refPointObj);
 				collectors.add(new IndicatorCollector(
-						new FastHypervolume(problem, referenceSet,refPoint), archive));
+						new FastHypervolume(problem, referenceSet,referencePointHV), archive));
 			}
 			
 			if (includeGenerationalDistance) {

@@ -7,7 +7,7 @@
 package hh.heuristicselectors;
 
 import hh.nextheuristic.AbstractOperatorSelector;
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.Collection;
 import org.moeaframework.core.Variation;
 
@@ -44,7 +44,7 @@ public class RandomSelect extends AbstractOperatorSelector{
     }
 
     @Override
-    public void update(Reward reward, Variation heuristic) {
+    public void update(Credit reward, Variation heuristic) {
         //no need to do any updates
     }
     

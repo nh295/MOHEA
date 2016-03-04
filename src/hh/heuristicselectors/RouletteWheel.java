@@ -6,7 +6,7 @@
 package hh.heuristicselectors;
 
 import hh.nextheuristic.AbstractOperatorSelector;
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -138,7 +138,7 @@ public class RouletteWheel extends AbstractOperatorSelector {
      * @param heuristic to be rewarded
      */
     @Override
-    public void update(Reward reward, Variation heuristic) {
+    public void update(Credit reward, Variation heuristic) {
         qualities.put(heuristic, qualities.get(heuristic)+reward.getValue());
         super.checkQuality();
         updateProbabilities();

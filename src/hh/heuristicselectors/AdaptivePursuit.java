@@ -5,7 +5,7 @@
  */
 package hh.heuristicselectors;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.Collection;
 import java.util.Iterator;
 import org.moeaframework.core.Variation;
@@ -69,7 +69,7 @@ public class AdaptivePursuit extends ProbabilityMatching {
      * Updates the probabilities stored in the selector
      */
     @Override
-    public void update(Reward reward, Variation heuristic) {
+    public void update(Credit reward, Variation heuristic) {
         super.update(reward, heuristic);
         updateProbabilities();
     }

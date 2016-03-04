@@ -6,7 +6,7 @@
 
 package hh.heuristicselectors;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Variation;
@@ -56,7 +56,7 @@ public class ProbabilityMatching extends RouletteWheel {
      * @param heuristic to be rewarded
      */
     @Override
-    public void update(Reward reward, Variation heuristic) {
+    public void update(Credit reward, Variation heuristic) {
         double newQuality = (1-alpha)*qualities.get(heuristic) + reward.getValue();
         qualities.put(heuristic, newQuality);
         super.checkQuality();
