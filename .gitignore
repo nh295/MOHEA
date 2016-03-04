@@ -1,2 +1,11 @@
-\
-/dist/
+#Comment:
+
+#ignore build files
+build.*
+build/**
+
+#ignore the nbproject
+nbproject/**
+
+#ignore the dist folder containing the libararies and jar files
+dist/**
