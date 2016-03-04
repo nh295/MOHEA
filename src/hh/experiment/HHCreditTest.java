@@ -46,7 +46,7 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"UF10"};//,"UF11","UF12","UF13"};
+        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
@@ -57,8 +57,8 @@ public class HHCreditTest {
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
 //                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
-                path = "/Users/nozomihitomi/Dropbox/MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+//                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
                 problem = args[1];
@@ -99,20 +99,19 @@ public class HHCreditTest {
 
                         //Setup algorithm parameters
                         Properties prop = new Properties();
-                        int popSize;
+                        String popSize;
                         switch(prob.getNumberOfObjectives()){
-                            case 2: popSize = 600;
+                            case 2: popSize = "600";
                                     break;
-                            case 3: popSize = 1000;
+                            case 3: popSize = "1000";
                                     break;
-                            case 5: popSize = 1200;
+                            case 5: popSize = "1200";
                                 break;
                             default: throw new UnsupportedOperationException("Unsupported test problem: Problems with 2,3, and 5 objectives are supported");
                         }
                         prop.put("populationSize", popSize);
                         prop.put("HH", selector);
                         prop.put("CredDef", credDefStr);
-                        prop.put("frrmab.windowsize",0.5*popSize);
 
                         //Choose heuristics to be applied. Use default values (probabilities)
                         ArrayList<Variation> heuristics = new ArrayList<>();
@@ -168,7 +167,7 @@ public class HHCreditTest {
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
-//                          
+//                            
 //                            String name = path + File.separator + "results" + File.separator + probName + "_"
 //                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 
@@ -197,3 +196,4 @@ public class HHCreditTest {
         pool.shutdown();
     }
 }
+
