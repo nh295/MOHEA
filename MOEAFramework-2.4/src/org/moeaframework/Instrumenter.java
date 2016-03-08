@@ -596,8 +596,7 @@ public class Instrumenter extends ProblemBuilder {
 			}
                         if (includeHypervolumeJmetal) {
                             double[] refPointObj = new double[problem.getNumberOfObjectives()];
-                            Arrays.fill(refPointObj, 2.0); //Used for UF1-10 
-//                            refPointObj = new double[]{3.0, 5.0, 7.0, 9.0, 11.0}; //used for WFG problems
+                            Arrays.fill(refPointObj, 1.1); //based on recomendation by Ishibuchi et. al. 2010. "Many objective test problems to visually examine the behavior of multiobjective evolution in a decision space".
                             Solution refPoint = new Solution(refPointObj);
 				collectors.add(new IndicatorCollector(
 						new FastHypervolume(problem, referenceSet,refPoint), archive));

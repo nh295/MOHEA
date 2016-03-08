@@ -71,10 +71,13 @@ public class FastHypervolume extends NormalizedIndicator{
 //  }
 
   public double computeHypervolume(NondominatedPopulation population, Solution referencePoint) {
-      //first filter out all the points that do no dominate the referencePoint
+      //normalize objective values to upperbounds of the known PF in each objective
+      NondominatedPopulation normPop = normalize(population);
+      
+      //filter out all the points that do no dominate the referencePoint
       Population pop = new Population();
       ParetoObjectiveComparator domComp = new ParetoObjectiveComparator();
-      for(Solution soln:population){
+      for(Solution soln:normPop){
             if(domComp.compare(soln, referencePoint)==-1)
                   pop.add(soln);
       }
