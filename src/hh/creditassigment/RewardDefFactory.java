@@ -62,7 +62,6 @@ public class RewardDefFactory {
         double satisfy = prop.getDouble("satisfy", 1.0);
         double disatisfy = prop.getDouble("disatisfy", 0.0);
         double neither = prop.getDouble("neither", 0.0);
-        int rank = prop.getInt("rankThresh", 5);
         //reference point used to compute hypervolume
         double[] defRef = new double[problem.getNumberOfObjectives()];
         Arrays.fill(defRef, 2.0);
@@ -85,7 +84,7 @@ public class RewardDefFactory {
             case "OPDe": //offspring improves parent in subproblem
                 credDef = new ParentDecomposition();
                 break;
-            case "ODP": //offspring dominates parent
+            case "OPDo": //offspring dominates parent
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPIAE": //offspring parent additive epsilon indicator using pareto front
@@ -103,33 +102,33 @@ public class RewardDefFactory {
             case "SIDe": //
                 credDef = new OffspringNeighborhood();
                 break;
-            case "OPopPF": //in pareto front
+            case "SIDoPF": //in pareto front
                 credDef = new OffspringParetoFront(satisfy, disatisfy);
                 break;
-            case "OPopEA": //in epsilon archive
+            case "SIDoA": //in epsilon archive
                 credDef = new OffspringEArchive(satisfy, disatisfy);
                 break;
-            case "OPopIPFAE": //offpsring improvement to additive epsilon indicator value for pareto front
+            case "SIAEPF": //offpsring improvement to additive epsilon indicator value for pareto front
                 credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),CreditDefinedOn.PARETOFRONT);
                 break;
-            case "OPopIPFHV":
+            case "SIHVPF":
                 //offpsring improvement to hypervolume of pareto front
                 credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem),CreditDefinedOn.PARETOFRONT);
                 break;
-            case "OPopIPFR2": //offpsring improvement to R2 indicator value for pareto front
+            case "SIR2PF": //offpsring improvement to R2 indicator value for pareto front
                 credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.PARETOFRONT);
                 break;
 //            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
 //                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj,numVec),CreditDefinedOn.PARETOFRONT,new Solution(idealPoint));
 //                break;
-            case "OPopIEAAE": //offpsring improvement to additive epsilon indicator value for epsilon archive
+            case "SIAEA": //offpsring improvement to additive epsilon indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),CreditDefinedOn.ARCHIVE);
                 break;
-            case "OPopIEAHV":
+            case "SIHVA":
                 //offpsring improvement to hypervolume of pareto front
                 credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), CreditDefinedOn.ARCHIVE);
                 break;
-            case "OPopIEAR2": //offpsring improvement to R2 indicator value for epsilon archive
+            case "SIR2A": //offpsring improvement to R2 indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.ARCHIVE);
                 break;
 //            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
@@ -138,22 +137,22 @@ public class RewardDefFactory {
             case "CSDe": //contribution to the subproblem's neighborhood
                 credDef = new DecompositionContribution(satisfy, disatisfy);
                 break;
-            case "CPF": //contribution to pareto front
+            case "CSDoPF": //contribution to pareto front
                 credDef = new ParetoFrontContribution(satisfy, disatisfy);
                 break;
-            case "CEA": //contribution to epsilon archive
+            case "CSDoA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
-            case "CHVPF": //Contribution to HV of Pareto front
+            case "CSHVPF": //Contribution to HV of Pareto front
                 credDef = new IndicatorContribution(new HypervolumeIndicator(problem), CreditDefinedOn.PARETOFRONT);
                 break;
-            case "CHVEA": //Contribution to HV of epsilon archive
+            case "CSHVA": //Contribution to HV of epsilon archive
                 credDef = new IndicatorContribution(new HypervolumeIndicator(problem), CreditDefinedOn.ARCHIVE);
                 break;
-            case "CR2PF": //Contribution to R2 of Pareto front
+            case "CSR2PF": //Contribution to R2 of Pareto front
                 credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), CreditDefinedOn.PARETOFRONT);
                 break;
-            case "CR2EA": //Contribution to R2 of epsilon archive
+            case "CSR2A": //Contribution to R2 of epsilon archive
                 credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), CreditDefinedOn.ARCHIVE);
                 break;
             default:

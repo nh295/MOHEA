@@ -7,5 +7,8 @@ build/**
 #ignore the nbproject
 nbproject/**
 
-#ignore the dist folder containing the libararies and jar files
+#ignore the dist folder containing the libraries and jar files
 dist/**
+
+#ignore data from first IEEE submission
+“Data from first submission”/**

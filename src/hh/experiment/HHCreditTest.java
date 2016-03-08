@@ -65,7 +65,7 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 50;
             int maxEvaluations = 300010;
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
