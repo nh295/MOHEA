@@ -1,5 +1,19 @@
+<<<<<<< HEAD
 \
 /dist/
 # ignore build and nbproject files
 */build/**
 */nbproject/**
+=======
+#Comment:
+
+#ignore build files
+build.*
+build/**
+
+#ignore the nbproject
+nbproject/**
+
+#ignore the dist folder containing the libararies and jar files
+dist/**
+>>>>>>> 8c70157cdbbfd9bbdfb12e1baec5402a85a05581

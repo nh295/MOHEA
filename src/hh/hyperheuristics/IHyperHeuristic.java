@@ -10,7 +10,7 @@ import hh.history.CreditHistory;
 import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
 import hh.nextheuristic.INextHeuristic;
-import hh.rewarddefinition.IRewardDefinition;
+import hh.creditassigment.ICreditAssignment;
 import org.moeaframework.core.Algorithm;
 
 /**
@@ -47,7 +47,7 @@ public interface IHyperHeuristic extends Algorithm{
      * Gets the credit definition being used.
      * @return 
      */
-    public IRewardDefinition getCreditDefinition();
+    public ICreditAssignment getCreditDefinition();
     
     /**
      * Gets the strategy that is used to generate or select the next heuristic 

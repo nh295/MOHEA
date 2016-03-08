@@ -8,12 +8,12 @@ package hh.hyperheuristics;
 import hh.history.CreditHistory;
 import hh.nextheuristic.INextHeuristic;
 import hh.history.OperatorQualityHistory;
-import hh.rewarddefinition.CreditFunctionType;
-import hh.rewarddefinition.IRewardDefinition;
-import hh.rewarddefinition.Reward;
-import hh.rewarddefinition.offspringparent.AbstractOffspringParent;
-import hh.rewarddefinition.offspringpopulation.AbstractOffspringPopulation;
-import hh.rewarddefinition.populationcontribution.AbstractPopulationContribution;
+import hh.creditassigment.CreditFunctionInputType;
+import hh.creditassigment.ICreditAssignment;
+import hh.creditassigment.Credit;
+import hh.creditassignment.offspringparent.AbstractOffspringParent;
+import hh.creditassignment.offspringpopulation.AbstractOffspringPopulation;
+import hh.creditassignment.populationcontribution.AbstractPopulationContribution;
 import hh.history.OperatorSelectionHistory;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +47,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * The Credit definition to be used that defines how much credit to receive
      * for certain types of solutions
      */
-    private final IRewardDefinition creditDef;
+    private final ICreditAssignment creditDef;
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -128,7 +128,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     /**
      * The population contribution rewards from the previous iteration
      */
-    private HashMap<Variation, Reward> prevPopContRewards;
+    private HashMap<Variation, Credit> prevPopContRewards;
 
     /**
      * Creates an instance of a hyper heuristic e-MOEA
@@ -151,7 +151,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public HeMOEA(Problem problem, Population population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Initialization initialization, INextHeuristic heuristicSelector,
-            IRewardDefinition creditDef, double injectionRate, int lagWindow) {
+            ICreditAssignment creditDef, double injectionRate, int lagWindow) {
         super(problem, population, archive, selection, null, initialization);
 
         this.heuristics = heuristicSelector.getOperators();
@@ -175,7 +175,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         //initialize the previous population contribution rewards to all zero for each heuristic
         prevPopContRewards = new HashMap<>();
         for (Variation heur : heuristics) {
-            prevPopContRewards.put(heur, new Reward(0, 0.0));
+            prevPopContRewards.put(heur, new Credit(0, 0.0));
         }
     }
     
@@ -224,7 +224,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
         }
 
         Solution[] children = operator.evolve(parents);
-        if (creditDef.getInputType() == CreditFunctionType.OP) {
+        if (creditDef.getInputType() == CreditFunctionInputType.OP) {
             double creditValue = 0;
             for (Solution child : children) {
                 evaluate(child);
@@ -243,10 +243,10 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                 }
                 archive.add(child);
             }
-            Reward reward = new Reward(this.numberOfEvaluations, creditValue);
+            Credit reward = new Credit(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getInputType() == CreditFunctionType.SI) {
+        } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
             double creditValue = 0.0;
             for (Solution child : children) {
                 evaluate(child);
@@ -268,10 +268,10 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     }
                 }
             }
-            Reward reward = new Reward(this.numberOfEvaluations, creditValue);
+            Credit reward = new Credit(this.numberOfEvaluations, creditValue);
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
-        } else if (creditDef.getInputType() == CreditFunctionType.CS) {
+        } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
             ArrayList<Solution> removedFromArchive = new ArrayList();
             ArrayList<Solution> childrenInArchive = new ArrayList();
             for (Solution child : children) {
@@ -286,7 +286,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                     }
                 }
             }
-            HashMap<Variation, Reward> popContRewards;
+            HashMap<Variation, Credit> popContRewards;
             switch (creditDef.getOperatesOn()) {
                 case PARETOFRONT:
                     ArrayList<Solution> removedFromPF = new ArrayList();
@@ -326,7 +326,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
             while (iter.hasNext()) {
                 Variation operator_i = iter.next();
                 operatorSelector.update(popContRewards.get(operator_i), operator_i);
-                creditHistory.add(operator_i, new Reward(this.numberOfEvaluations,popContRewards.get(operator_i).getValue()));
+                creditHistory.add(operator_i, new Credit(this.numberOfEvaluations,popContRewards.get(operator_i).getValue()));
             }
         } else {
             throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
@@ -361,9 +361,9 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * @return the rewards for each heuristic with the up to date iteration
      * count
      */
-    private HashMap<Variation, Reward> reusePrevPopContRewards() {
+    private HashMap<Variation, Credit> reusePrevPopContRewards() {
         for (Variation heur : heuristics) {
-            Reward r = new Reward(iteration, prevPopContRewards.get(heur).getValue());
+            Credit r = new Credit(iteration, prevPopContRewards.get(heur).getValue());
             prevPopContRewards.put(heur, r);
         }
         return prevPopContRewards;
@@ -429,7 +429,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     }
 
     @Override
-    public IRewardDefinition getCreditDefinition() {
+    public ICreditAssignment getCreditDefinition() {
         return creditDef;
     }
 

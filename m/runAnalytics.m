@@ -7,7 +7,7 @@ selectors = {'Probability','Adaptive'};
 % selectors = {'MOEAD'};
 % creditDef = { 'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
 % creditDef = {'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-creditDef = {'DecompositionContribution'};
+creditDef = {'ParentDec','Neighbor','DecompositionContribution'};
 % creditDef = {'SBX+PM','DifferentialEvolution+pm','UM','PCX+PM','UNDX+PM','SPX+PM'};
 % creditDef = {'Decomposition','Domination'};
 % problemName = {'UF10'};
@@ -24,16 +24,16 @@ for j=1:length(selectors)
     for i=1:length(creditDef)
 %         figure
         for k=1:length(problemName)
-%             [AEI,GD,fHV,IGD] = getAllResults(strcat(path),selectors{j},creditDef{i},problemName{k});
-            [AEI,GD,fHV,IGD,ET] = getAllResults(strcat(path,filesep,'results6opsInjectionNew'),selectors{j},creditDef{i},problemName{k});
-            if(isempty(AEI))
+            [ET] = getTime(strcat(path,filesep,'timedExperiments'),selectors{j},creditDef{i},problemName{k});
+%             [AEI,GD,fHV,IGD,ET] = getAllResults(strcat(path,filesep,'results6opsInjectionNew'),selectors{j},creditDef{i},problemName{k});
+            if(isempty(ET))
                 disp(strcat(problemName{k},selectors{j},creditDef{i}))
             end
-            res.GD = squeeze(GD(:,end));
-            res.AEI = squeeze(AEI(:,end));
+%             res.GD = squeeze(GD(:,end));
+%             res.AEI = squeeze(AEI(:,end));
 %             res.Inj = squeeze(Inj(:,end));
-            res.fHV = squeeze(fHV(:,end));
-            res.IGD = squeeze(IGD(:,end));
+%             res.fHV = squeeze(fHV(:,end));
+%             res.IGD = squeeze(IGD(:,end));
             res.ET = squeeze(ET(:,end));
             save(strcat(problemName{k},'_',selectors{j},'_',creditDef{i},'.mat'),'res');
 

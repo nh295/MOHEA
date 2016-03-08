@@ -8,6 +8,7 @@ package hh.heuristicselectors;
 import hh.history.OperatorSelectionHistory;
 import hh.nextheuristic.AbstractOperatorSelector;
 import java.util.Collection;
+import java.util.Iterator;
 import org.moeaframework.core.Variation;
 
 /**
@@ -22,6 +23,10 @@ public abstract class AbstractMAB extends AbstractOperatorSelector{
     private final OperatorSelectionHistory tempHistory;
     
     private final double c;
+    
+    private Iterator<Variation> opIter;
+    
+    private int selectionCount;
 
     /**
      * 
@@ -32,10 +37,13 @@ public abstract class AbstractMAB extends AbstractOperatorSelector{
         super(operators);
         this.tempHistory = new OperatorSelectionHistory(operators);
         this.c = c;
+        opIter = operators.iterator();
     }
     
     protected void resetSelectionHistory(){
         tempHistory.reset();
+        selectionCount = 0;
+        opIter = operators.iterator();
     }
     
     /**
@@ -54,6 +62,15 @@ public abstract class AbstractMAB extends AbstractOperatorSelector{
      */
     @Override
     public Variation nextHeuristic() {
-        return argMax(operators);
+        Variation out;
+        //first select each operator at least once
+        if(opIter.hasNext())
+            out = opIter.next();
+        else
+            out = argMax(operators);
+        
+        selectionCount++;
+        tempHistory.add(out, selectionCount);
+        return out;
     }
 }

@@ -67,7 +67,7 @@ public class HHFactory {
                 break;
             case "FRRMAB":{
                 double c = properties.getDouble("c", 0.5);
-                int windowSize = properties.getInt("windowSize",100);
+                int windowSize = properties.getInt("frrmab.windowsize",100);
                 double d = properties.getDouble("d", 1);
                 heuristicSelector = new FRRMAB(heuristics, c, windowSize,d);
             }

@@ -6,7 +6,7 @@
 
 package hh.nextheuristic;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Variation;
@@ -31,7 +31,7 @@ public interface INextHeuristic{
      * @param reward received 
      * @param heuristic to be rewarded
      */
-    public void update(Reward reward,Variation heuristic);
+    public void update(Credit reward,Variation heuristic);
     
     /**
      * Resets all stored history, qualities and credits

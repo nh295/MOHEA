@@ -6,7 +6,7 @@
 
 package hh.nextheuristic;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;

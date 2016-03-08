@@ -43,6 +43,7 @@ import org.moeaframework.core.operator.real.DifferentialEvolution3;
 import org.moeaframework.core.operator.real.DifferentialEvolution4;
 import org.moeaframework.core.operator.real.PCX;
 import org.moeaframework.core.operator.real.PM;
+import org.moeaframework.core.operator.real.RandOp;
 import org.moeaframework.core.operator.real.SBX;
 import org.moeaframework.core.operator.real.SPX;
 import org.moeaframework.core.operator.real.UM;
@@ -405,6 +406,8 @@ public class OperatorFactory {
 				return new UM(
 						properties.getDouble("um.rate", 
 								1.0 / problem.getNumberOfVariables()));
+                        } else if (name.equalsIgnoreCase("randop")) {
+				return new RandOp();
 			} else if (name.equalsIgnoreCase("am")) {
 				return new AdaptiveMetropolis(
 						(int)properties.getDouble("am.parents", 10),

@@ -5,7 +5,7 @@
  */
 package hh.heuristicselectors;
 
-import hh.rewarddefinition.Reward;
+import hh.creditassigment.Credit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class FRRMAB extends AbstractMAB {
      * @param heuristic
      */
     @Override
-    public void update(Reward reward, Variation heuristic) {
+    public void update(Credit reward, Variation heuristic) {
         //update the sliding window
         window.addLast(new FIR(heuristic, reward));
         if (window.size() > windowSize) {
@@ -64,7 +64,8 @@ public class FRRMAB extends AbstractMAB {
         HashMap<Variation, Double> rewardSums = computeRewardSum();
         HashMap<Variation, Double> FRR = computeFRR(rewardSums);
         for (Variation op : operators) {
-            qualities.put(op, FRR.get(op));
+            if(FRR.get(op)!=null) //this only = null before all operators get selected at least once
+                qualities.put(op, FRR.get(op));
         }
     }
 
@@ -121,9 +122,9 @@ public class FRRMAB extends AbstractMAB {
     private class FIR {
 
         private final Variation operator;
-        private final Reward value;
+        private final Credit value;
 
-        public FIR(Variation operator, Reward value) {
+        public FIR(Variation operator, Credit value) {
             this.operator = operator;
             this.value = value;
         }
@@ -142,14 +143,14 @@ public class FRRMAB extends AbstractMAB {
          *
          * @return
          */
-        public Reward getValue() {
+        public Credit getValue() {
             return value;
         }
 
     }
 
     /**
-     * An ordered pair of the operator and a Reward
+     * An ordered pair of the operator and a Credit
      */
     private class OperatorRewardPair {
 
@@ -185,6 +186,11 @@ public class FRRMAB extends AbstractMAB {
             return -Double.compare(t1.getReward(), t2.getReward());
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "FRRMAB";
     }
 
 }
