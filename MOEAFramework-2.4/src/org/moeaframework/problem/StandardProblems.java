@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
@@ -54,6 +53,8 @@ import org.moeaframework.problem.DTLZ.DTLZ1;
 import org.moeaframework.problem.DTLZ.DTLZ2;
 import org.moeaframework.problem.DTLZ.DTLZ3;
 import org.moeaframework.problem.DTLZ.DTLZ4;
+import org.moeaframework.problem.DTLZ.DTLZ5;
+import org.moeaframework.problem.DTLZ.DTLZ6;
 import org.moeaframework.problem.DTLZ.DTLZ7;
 import org.moeaframework.problem.LZ.LZ1;
 import org.moeaframework.problem.LZ.LZ2;
@@ -648,7 +649,11 @@ public class StandardProblems extends ProblemProvider {
 			} else if (name.startsWith("DTLZ3")) {
 				return new DTLZ3(Integer.parseInt(name.substring(6)));
 			} else if (name.startsWith("DTLZ4")) {
-				return new DTLZ4(Integer.parseInt(name.substring(6)));
+                            return new DTLZ4(Integer.parseInt(name.substring(6)));
+                        } else if (name.startsWith("DTLZ5")) {
+                            return new DTLZ5(Integer.parseInt(name.substring(6)));
+                        } else if (name.startsWith("DTLZ6")) {
+                            return new DTLZ6(Integer.parseInt(name.substring(6)));
 			} else if (name.startsWith("DTLZ7")) {
 				return new DTLZ7(Integer.parseInt(name.substring(6)));
 			} else if (name.startsWith("WFG1")) {
@@ -840,8 +845,14 @@ public class StandardProblems extends ProblemProvider {
 				int numberOfObjectives = Integer.parseInt(name.substring(6));
 				filename = "DTLZ3." + numberOfObjectives + "D.pf";
 			} else if (name.startsWith("DTLZ4")) {
-				int numberOfObjectives = Integer.parseInt(name.substring(6));
-				filename = "DTLZ4." + numberOfObjectives + "D.pf";
+                                int numberOfObjectives = Integer.parseInt(name.substring(6));
+                                filename = "DTLZ4." + numberOfObjectives + "D.pf";
+                        } else if (name.startsWith("DTLZ5")) {
+                                int numberOfObjectives = Integer.parseInt(name.substring(6));
+                                filename = "DTLZ5." + numberOfObjectives + "D.pf";
+                        } else if (name.startsWith("DTLZ6")) {
+                                int numberOfObjectives = Integer.parseInt(name.substring(6));
+                                filename = "DTLZ6." + numberOfObjectives + "D.pf";
 			} else if (name.startsWith("DTLZ7")) {
 				int numberOfObjectives = Integer.parseInt(name.substring(6));
 				filename = "DTLZ7." + numberOfObjectives + "D.pf";

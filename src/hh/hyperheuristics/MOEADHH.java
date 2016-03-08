@@ -9,7 +9,7 @@ import hh.history.CreditHistory;
 import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
 import hh.nextheuristic.INextHeuristic;
-import hh.creditassigment.IRewardDefinition;
+import hh.creditassigment.ICreditAssignment;
 import hh.creditassigment.Credit;
 import hh.creditassignment.offspringparent.ParentDecomposition;
 import hh.creditassignment.populationcontribution.DecompositionContribution;
@@ -41,7 +41,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
      * The Credit definition to be used that defines how much credit to receive
      * for certain types of solutions
      */
-    private final IRewardDefinition creditDef;
+    private final ICreditAssignment creditDef;
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -99,7 +99,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
 
     public MOEADHH(Problem problem, int neighborhoodSize,
             Initialization initialization, double delta, double eta, int updateUtility,
-            INextHeuristic operatorSelector, IRewardDefinition creditDef) {
+            INextHeuristic operatorSelector, ICreditAssignment creditDef) {
         super(problem, neighborhoodSize, initialization, operatorSelector.getOperators().iterator().next(), delta, eta, updateUtility);
         this.heuristics = operatorSelector.getOperators();
         this.operatorSelector = operatorSelector;
@@ -286,7 +286,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
     }
 
     @Override
-    public IRewardDefinition getCreditDefinition() {
+    public ICreditAssignment getCreditDefinition() {
         return creditDef;
     }
 

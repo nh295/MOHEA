@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -5,12 +6,7 @@
  */
 package hh.experiment;
 
-import hh.IO.IOCreditHistory;
-import hh.IO.IOQualityHistory;
-import hh.IO.IOSelectionHistory;
 import hh.hyperheuristics.IHyperHeuristic;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -46,9 +42,14 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
-//        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7"};
+//        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
+//        String[] problems = new String[]{"DTLZ7_3"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
+//        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
+//        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
+        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
+            "DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3",
+            "WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 //        pool = Executors.newFixedThreadPool(1);
@@ -56,8 +57,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -65,8 +66,8 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 50;
-            int maxEvaluations = 300010;
+            int numberOfSeeds = 30;
+            
             //Setup heuristic selectors
             String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"PM"};
@@ -74,13 +75,10 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe",};
-            String[] creditDefs = new String[]{"CSDe"};
-//            String[] creditDefs = new String[]{"ODP","OPopPF", "OPopEA","CPF", "CEA","OPIR2","OPopIEAR2","CR2PF","CR2EA"};
-//            String[] creditDefs = new String[]{"OPIR2","OPopIPFR2","OPopIEAR2","CR2PF","CR2EA"};
+            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe"};
            
             //for single operator MOEA
-//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
+            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -88,9 +86,10 @@ public class HHCreditTest {
                 for (String credDefStr : creditDefs) {
                     //parallel process all runs
                     futures.clear();
+                    
+//                    for (String op : ops) {
                     for (int k = 0; k < numberOfSeeds; k++) {
 
-//                    for (String op : ops) {
                         Problem prob = ProblemFactory.getInstance().getProblem(probName);
                         double[] epsilonDouble = new double[prob.getNumberOfObjectives()];
                         for (int i = 0; i < prob.getNumberOfObjectives(); i++) {
@@ -99,19 +98,38 @@ public class HHCreditTest {
 
                         //Setup algorithm parameters
                         Properties prop = new Properties();
-                        String popSize;
-                        switch(prob.getNumberOfObjectives()){
-                            case 2: popSize = "600";
-                                    break;
-                            case 3: popSize = "1000";
-                                    break;
-                            case 5: popSize = "1200";
-                                break;
-                            default: throw new UnsupportedOperationException("Unsupported test problem: Problems with 2,3, and 5 objectives are supported");
+                        String popSize = "0";
+                        int maxEvaluations = 0;
+                        if(prob.getName().startsWith("UF")){
+                            maxEvaluations = 300000;
+                            if(prob.getNumberOfObjectives()==2)
+                                popSize = "600";
+                            if(prob.getNumberOfObjectives()==3) 
+                                popSize = "1000";
+                        }else if(prob.getName().startsWith("DTLZ") || prob.getName().startsWith("WFG")){
+                            if(prob.getNumberOfObjectives()==2){
+                                maxEvaluations = 25000;
+                                popSize = "100";
+                            }
+                            if(prob.getNumberOfObjectives()==3){
+                                maxEvaluations = 25000;
+                                popSize = "105";
+                            }
+                        }
+                        if(maxEvaluations==0){
+                            throw new IllegalArgumentException("Problem not recognized: " + probName);
                         }
                         prop.put("populationSize", popSize);
                         prop.put("HH", selector);
                         prop.put("CredDef", credDefStr);
+                        
+                        //saving results settings
+                        prop.put("saveFolder", "results");
+                        prop.put("saveIndicators", "true");
+                        prop.put("saveFinalPopulation", "false");
+                        prop.put("saveOperatorCreditHistory", "false");
+                        prop.put("saveOperatorSelectionHistory", "false");
+                        prop.put("saveOperatorQualityHistory", "false");
 
                         //Choose heuristics to be applied. Use default values (probabilities)
                         ArrayList<Variation> heuristics = new ArrayList<>();
@@ -162,38 +180,17 @@ public class HHCreditTest {
 //                                    typeProp, "eMOEA", maxEvaluations);
 
 //                            futures.add(pool.submit(test));
-//                        }
-                    }
+                        }
                     for (Future<IHyperHeuristic> run : futures) {
                         try {
                             IHyperHeuristic hh = run.get();
-//                            
-//                            String name = path + File.separator + "results" + File.separator + probName + "_"
-//                                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-
-//                            save selection history
-//                            IOSelectionHistory.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(),
-//                                    name + ".hist");
-                            //save credit history
-//                          IOCreditHistory.saveHistory(((IHyperHeuristic) hh).getCreditHistory(),
-//                          path + File.separator + "results" + File.separator + probName + "_"
-//                          + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName() + ".credit");
-//                          IOCreditHistory ioch = new IOCreditHistory();
-//                          ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv",",");
-//                            save quality history
-//                            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(),
-//                                    name + ".qual");
-//                            hh.reset();
-//                            hh = null;
                         } catch (InterruptedException | ExecutionException ex) {
                             Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    System.out.println("Finished " + probName + "_" + selector + "_" + credDefStr + "\n\n");
                 }
             }
         }
         pool.shutdown();
     }
 }
-

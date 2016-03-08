@@ -6,14 +6,16 @@
 package hh.experiment;
 
 import hh.IO.IOCreditHistory;
+import hh.IO.IOQualityHistory;
+import hh.IO.IOSelectionHistory;
 import hh.hyperheuristics.HHFactory;
 import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.hyperheuristics.MOEADHH;
 import hh.nextheuristic.INextHeuristic;
 import hh.creditassigment.CreditFitnessFunctionType;
-import hh.creditassigment.IRewardDefinition;
-import hh.creditassigment.RewardDefFactory;
+import hh.creditassigment.ICreditAssignment;
+import hh.creditassigment.CreditDefFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,14 +33,18 @@ import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
+import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
+import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -53,7 +59,7 @@ public class TestRun implements Callable {
     protected Problem problem;
     protected String probName;
     protected String path;
-    private IRewardDefinition rewardDef;
+    private ICreditAssignment rewardDef;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
     private final Collection<Variation> heuristics;
@@ -119,7 +125,7 @@ public class TestRun implements Callable {
      * @return a new {@code eMOEA} instance
      */
     private IHyperHeuristic newMOEADHH() throws IOException {
-        
+
         int populationSize = (int) properties.getDouble("populationSize", 600);
 
         Initialization initialization = new RandomInitialization(problem,
@@ -154,7 +160,7 @@ public class TestRun implements Callable {
     public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh;
         try {
-            rewardDef = RewardDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
+            rewardDef = CreditDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
         } catch (IOException ex) {
             Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -165,9 +171,9 @@ public class TestRun implements Callable {
             hh = newHeMOEA();
         
         double[] refPointObj = new double[problem.getNumberOfObjectives()];
-        Arrays.fill(refPointObj, 2.0);
+        Arrays.fill(refPointObj, 1.1);
 
-        Instrumenter instrumenter = new Instrumenter().withFrequency(300000)
+        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations / 100)
                 .withProblem(probName)
                 .attachAdditiveEpsilonIndicatorCollector()
                 .attachGenerationalDistanceCollector()
@@ -180,7 +186,7 @@ public class TestRun implements Callable {
         InstrumentedAlgorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + problem.getName() + " with pop size: " + properties.getDouble("populationSize", 600));
+        System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + probName + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();
@@ -193,42 +199,66 @@ public class TestRun implements Callable {
         Accumulator accum = instAlgorithm.getAccumulator();
 
         hh.setName(String.valueOf(System.nanoTime()));
-        String filename = path + File.separator + "test" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
+
+        String filename = path + File.separator + properties.getProperties().getProperty("saveFolder") + File.separator + probName + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-//         String filename = path + File.separator + "results" + File.separator + problem.getName() + "_" // + problem.getNumberOfObjectives()+ "_"
-//                +  "MOEAD_" + hh.getNextHeuristicSupplier().getOperators().iterator().next() +"_"+ hh.getName();
-        File results = new File(filename + ".res");
-        System.out.println("Saving results");
 
-        try (FileWriter writer = new FileWriter(results)) {
-            Set<String> keys = accum.keySet();
-            Iterator<String> keyIter = keys.iterator();
-            while (keyIter.hasNext()) {
-                String key = keyIter.next();
-                int dataSize = accum.size(key);
-                writer.append(key).append(",");
-                for (int i = 0; i < dataSize; i++) {
-                    writer.append(accum.get(key, i).toString());
-                    if (i + 1 < dataSize) {
-                        writer.append(",");
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
+            File results = new File(filename + ".res");
+            System.out.println("Saving results");
+
+            try (FileWriter writer = new FileWriter(results)) {
+                Set<String> keys = accum.keySet();
+                Iterator<String> keyIter = keys.iterator();
+                while (keyIter.hasNext()) {
+                    String key = keyIter.next();
+                    int dataSize = accum.size(key);
+                    writer.append(key).append(",");
+                    for (int i = 0; i < dataSize; i++) {
+                        writer.append(accum.get(key, i).toString());
+                        if (i + 1 < dataSize) {
+                            writer.append(",");
+                        }
                     }
+                    writer.append("\n");
                 }
-                writer.append("\n");
-            }
-            writer.flush();
-            
-            String name = path + File.separator + "test" + File.separator + probName + "_"
-                    + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-            IOCreditHistory ioch = new IOCreditHistory();
-            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), name + ".creditcsv", ",");
-//
-//            IOSelectionHistory iosh = new IOSelectionHistory();
-//            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), name + ".hist");
 
-        } catch (IOException ex) {
-            Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
+                //also record the final HV
+                NondominatedPopulation ndPop = instAlgorithm.getResult();
+                Arrays.fill(refPointObj, 1.1);
+                FastHypervolume fHV = new FastHypervolume(problem, ProblemFactory.getInstance().getReferenceSet(probName), new Solution(refPointObj));
+                double hv = fHV.evaluate(ndPop);
+                writer.append("Final HV, " + hv + "\n");
+
+                writer.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveFinalPopulation"))) {
+            NondominatedPopulation ndPop = instAlgorithm.getResult();
+            try {
+                PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
+            } catch (IOException ex) {
+                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorCreditHistory"))) {
+            IOCreditHistory ioch = new IOCreditHistory();
+            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), filename + ".credit");
+        }
+
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorSelectionHistory"))) {
+            IOSelectionHistory iosh = new IOSelectionHistory();
+            iosh.saveHistory(((IHyperHeuristic) hh).getSelectionHistory(), filename + ".hist");
+        }
+
+        //save operator quality history
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorQualityHistory"))) {
+            IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(), filename + ".qual");
+        }
+        
         return hh;
     }
 }

@@ -15,7 +15,7 @@ import org.moeaframework.core.Solution;
  *
  * @author SEAK2
  */
-public class AbstractRewardDefintion implements IRewardDefinition {
+public class AbstractRewardDefintion implements ICreditAssignment {
 
     protected CreditFunctionInputType inputType;
     

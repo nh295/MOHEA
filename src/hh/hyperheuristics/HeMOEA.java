@@ -9,7 +9,7 @@ import hh.history.CreditHistory;
 import hh.nextheuristic.INextHeuristic;
 import hh.history.OperatorQualityHistory;
 import hh.creditassigment.CreditFunctionInputType;
-import hh.creditassigment.IRewardDefinition;
+import hh.creditassigment.ICreditAssignment;
 import hh.creditassigment.Credit;
 import hh.creditassignment.offspringparent.AbstractOffspringParent;
 import hh.creditassignment.offspringpopulation.AbstractOffspringPopulation;
@@ -47,7 +47,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
      * The Credit definition to be used that defines how much credit to receive
      * for certain types of solutions
      */
-    private final IRewardDefinition creditDef;
+    private final ICreditAssignment creditDef;
 
     /**
      * The history that stores all the heuristics selected by the hyper
@@ -151,7 +151,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     public HeMOEA(Problem problem, Population population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Initialization initialization, INextHeuristic heuristicSelector,
-            IRewardDefinition creditDef, double injectionRate, int lagWindow) {
+            ICreditAssignment creditDef, double injectionRate, int lagWindow) {
         super(problem, population, archive, selection, null, initialization);
 
         this.heuristics = heuristicSelector.getOperators();
@@ -429,7 +429,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
     }
 
     @Override
-    public IRewardDefinition getCreditDefinition() {
+    public ICreditAssignment getCreditDefinition() {
         return creditDef;
     }
 

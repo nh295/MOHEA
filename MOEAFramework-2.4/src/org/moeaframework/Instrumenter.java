@@ -241,7 +241,7 @@ public class Instrumenter extends ProblemBuilder {
         /**
 	 * Includes the hypervolume collector from Jmetal when instrumenting algorithms.
 	 * 
-         * @param referencePoint the reference point to use when computing the hypervolume
+         * @param referencePoint the reference point in the normalized space to use when computing the hypervolume
 	 * @return a reference to this instrumenter
 	 */
 	public Instrumenter attachHypervolumeJmetalCollector(Solution referencePoint) {
