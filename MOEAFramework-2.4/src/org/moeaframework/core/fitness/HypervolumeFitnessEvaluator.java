@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -28,6 +28,8 @@ public class HypervolumeFitnessEvaluator extends IndicatorFitnessEvaluator {
 
 	/**
 	 * Determines the reference point for the hypervolume metric.
+	 * 
+	 * ** larger fitness values are worse **
 	 */
 	public static final double rho = 2.0;
 
@@ -132,6 +134,11 @@ public class HypervolumeFitnessEvaluator extends IndicatorFitnessEvaluator {
 		}
 
 		return volume;
+	}
+	
+	@Override
+	public boolean areLargerValuesPreferred() {
+		return false;
 	}
 
 }

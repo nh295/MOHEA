@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -247,9 +247,11 @@ public class QualityIndicator {
 		}
 		
 		generationalDistance = GenerationalDistance.evaluate(problem,
-				normalizedApproximationSet, normalizedReferenceSet);
+				normalizedApproximationSet, normalizedReferenceSet,
+				Settings.getGDPower());
 		invertedGenerationalDistance = InvertedGenerationalDistance.evaluate(
-				problem, normalizedApproximationSet, normalizedReferenceSet);
+				problem, normalizedApproximationSet, normalizedReferenceSet,
+				Settings.getIGDPower());
 		additiveEpsilonIndicator = AdditiveEpsilonIndicator.evaluate(problem,
 				normalizedApproximationSet, normalizedReferenceSet);
 		maximumParetoFrontError = MaximumParetoFrontError.evaluate(problem,

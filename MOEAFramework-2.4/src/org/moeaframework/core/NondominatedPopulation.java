@@ -33,83 +33,105 @@ import org.moeaframework.core.comparator.ParetoDominanceComparator;
  */
 public class NondominatedPopulation extends Population implements Cloneable {
 
-    /**
-     * The dominance comparator used by this non-dominated population.
-     */
+	/**
+	 * The dominance comparator used by this non-dominated population.
+	 */
     private final DominanceComparator comparator;
-    
+	
     protected boolean changedFlag;
 
-    /**
+	/**
      * Used after running add or addAndReturnRemovedSolutions to see if
      * insertion of new solution changed population
      *
      * @return
-     */
+	 */
     public boolean isChanged() {
         return changedFlag;
     }
-
+    
     /**
-     * Constructs an empty non-dominated population using the Pareto dominance
-     * relation.
-     */
-    public NondominatedPopulation() {
-        this(new ParetoDominanceComparator());
-    }
+	 * If {@code true}, allow duplicate solutions in this non-dominated
+	 * population.  Duplicate solutions are those whose Euclidean distance
+	 * is smaller than {@code Settings.EPSILON}.
+	 */
+	protected final boolean allowDuplicates;
 
-    /**
-     * Constructs an empty non-dominated population using the specified
-     * dominance relation.
-     *
-     * @param comparator the dominance relation used by this non-dominated
+	/**
+	 * Constructs an empty non-dominated population using the Pareto dominance
+	 * relation.
+	 */
+	public NondominatedPopulation() {
+		this(new ParetoDominanceComparator());
+	}
+
+	/**
+	 * Constructs an empty non-dominated population using the specified 
+	 * dominance relation.
+	 * 
+	 * @param comparator the dominance relation used by this non-dominated
+	 *        population
+	 */
+	public NondominatedPopulation(DominanceComparator comparator) {
+		this(comparator, false);
+	}
+        
+        /**
+	 * Constructs an empty non-dominated population using the specified 
+	 * dominance relation.
+	 * 
+	 * @param comparator the dominance relation used by this non-dominated
+	 *        population
+	 * @param allowDuplicates allow duplicate solutions into the non-dominated
+	 *        population
+	 */
+	public NondominatedPopulation(DominanceComparator comparator,
+			boolean allowDuplicates) {
+		super();
+		this.comparator = comparator;
+		this.allowDuplicates = allowDuplicates;
+	}
+
+	/**
+	 * Constructs a non-dominated population using the Pareto dominance relation
+	 * and initialized with the specified solutions.
+	 * 
+	 * @param iterable the solutions used to initialize this non-dominated
      * population
-     */
-    public NondominatedPopulation(DominanceComparator comparator) {
-        super();
-        this.comparator = comparator;
-    }
+	 */
+	public NondominatedPopulation(Iterable<? extends Solution> iterable) {
+		this();
+		addAll(iterable);
+	}
 
-    /**
-     * Constructs a non-dominated population using the Pareto dominance relation
-     * and initialized with the specified solutions.
-     *
-     * @param iterable the solutions used to initialize this non-dominated
+	/**
+	 * Constructs a non-dominated population using the specified dominance
+	 * comparator and initialized with the specified solutions.
+	 * 
+	 * @param comparator the dominance relation used by this non-dominated
      * population
-     */
-    public NondominatedPopulation(Iterable<? extends Solution> iterable) {
-        this();
-        addAll(iterable);
-    }
+	 * @param iterable the solutions used to initialize this non-dominated
+     * population
+	 */
+	public NondominatedPopulation(DominanceComparator comparator,
+			Iterable<? extends Solution> iterable) {
+		this(comparator);
+		addAll(iterable);
+	}
 
-    /**
-     * Constructs a non-dominated population using the specified dominance
-     * comparator and initialized with the specified solutions.
-     *
-     * @param comparator the dominance relation used by this non-dominated
-     * population
-     * @param iterable the solutions used to initialize this non-dominated
-     * population
-     */
-    public NondominatedPopulation(DominanceComparator comparator,
-            Iterable<? extends Solution> iterable) {
-        this(comparator);
-        addAll(iterable);
-    }
-
-    /**
-     * If {@code newSolution} is dominates any solution or is non-dominated with
-     * all solutions in this population, the dominated solutions are removed and
-     * {@code newSolution} is added to this population. Otherwise,
-     * {@code newSolution} is dominated and is not added to this population.
-     */
-    @Override
-    public boolean add(Solution newSolution) {
+	/**
+	 * If {@code newSolution} is dominates any solution or is non-dominated with
+	 * all solutions in this population, the dominated solutions are removed and
+	 * {@code newSolution} is added to this population. Otherwise,
+	 * {@code newSolution} is dominated and is not added to this population.
+	 */
+	@Override
+	public boolean add(Solution newSolution) {
         addAndReturnRemovedSolutions(newSolution);
         return changedFlag;
-    }
+			}
 
-    /**
+	/**
      * If {@code newSolution} is dominates any solution or is non-dominated with
      * all solutions in this population, the dominated solutions are removed and
      * {@code newSolution} is added to this population. Otherwise,
@@ -119,7 +141,7 @@ public class NondominatedPopulation extends Population implements Cloneable {
      * nondominated population. If return an empty list, new solution enters
      * nondominated set but doesn't replace any solutions. If return null, then
      * new solution didn't enter nondominated set
-     */
+	 */
     public Collection<Solution> addAndReturnRemovedSolutions(Solution newSolution) {
         Iterator<Solution> iterator = iterator();
         ArrayList<Solution> removed = new ArrayList<>();
@@ -132,54 +154,81 @@ public class NondominatedPopulation extends Population implements Cloneable {
                 iterator.remove();
             } else if (flag > 0) {
                 return null;
-            } else if (distance(newSolution, oldSolution) < Settings.EPS) {
+            } else if (!allowDuplicates && distance(newSolution, oldSolution) < Settings.EPS) {
                 return null;
             }
         }
         changedFlag = super.add(newSolution);
         return removed;
     }
-
+    
     /**
-     * Adds the specified solution to the population, bypassing the
-     * non-domination check. This method should only be used when a
-     * non-domination check has been performed elsewhere, such as in a subclass.
-     * <p>
-     * <b>This method should only be used internally, and should never be made
-     * public by any subclasses.</b>
-     *
-     * @param newSolution the solution to be added
-     * @return true if the population was modified as a result of this operation
-     */
-    public boolean forceAddWithoutCheck(Solution newSolution) {
-        return super.add(newSolution);
-    }
+	 * Replace the solution at the given index with the new solution, but only
+	 * if the new solution is non-dominated.  To maintain non-dominance within
+	 * this population, any solutions dominated by the new solution will also
+	 * be replaced.
+	 */
+	@Override
+	public void replace(int index, Solution newSolution) {
+		Iterator<Solution> iterator = iterator();
 
-    /**
-     * Returns the Euclidean distance between two solutions in objective space.
-     *
-     * @param s1 the first solution
-     * @param s2 the second solution
-     * @return the distance between the two solutions in objective space
-     */
-    protected double distance(Solution s1, Solution s2) {
-        double distance = 0.0;
+		while (iterator.hasNext()) {
+			Solution oldSolution = iterator.next();
+			int flag = comparator.compare(newSolution, oldSolution);
 
-        for (int i = 0; i < s1.getNumberOfObjectives(); i++) {
-            distance += Math.pow(s1.getObjective(i) - s2.getObjective(i), 2.0);
-        }
+			if (flag < 0) {
+				iterator.remove();
+			} else if (flag > 0) {
+				return;
+			} else if (!allowDuplicates &&
+					distance(newSolution, oldSolution) < Settings.EPS) {
+				return;
+			}
+		}
 
-        return Math.sqrt(distance);
-    }
+		super.replace(index, newSolution);
+	}
 
-    /**
-     * Returns the dominance comparator used by this non-dominated population.
-     *
-     * @return the dominance comparator used by this non-dominated population
-     */
-    public DominanceComparator getComparator() {
-        return comparator;
-    }
+	/**
+	 * Adds the specified solution to the population, bypassing the
+	 * non-domination check. This method should only be used when a
+	 * non-domination check has been performed elsewhere, such as in a subclass.
+	 * <p>
+	 * <b>This method should only be used internally, and should never be made
+	 * public by any subclasses.</b>
+	 * 
+	 * @param newSolution the solution to be added
+	 * @return true if the population was modified as a result of this operation
+	 */
+        public boolean forceAddWithoutCheck(Solution newSolution) {
+		return super.add(newSolution);
+	}
+
+	/**
+	 * Returns the Euclidean distance between two solutions in objective space.
+	 * 
+	 * @param s1 the first solution
+	 * @param s2 the second solution
+	 * @return the distance between the two solutions in objective space
+	 */
+	protected double distance(Solution s1, Solution s2) {
+		double distance = 0.0;
+
+		for (int i = 0; i < s1.getNumberOfObjectives(); i++) {
+			distance += Math.pow(s1.getObjective(i) - s2.getObjective(i), 2.0);
+		}
+
+		return Math.sqrt(distance);
+	}
+
+	/**
+	 * Returns the dominance comparator used by this non-dominated population.
+	 * 
+	 * @return the dominance comparator used by this non-dominated population
+	 */
+	public DominanceComparator getComparator() {
+		return comparator;
+	}
 
     /**
      * Shallow clone that only copies the Solution instances to a new instance
@@ -194,7 +243,7 @@ public class NondominatedPopulation extends Population implements Cloneable {
         Iterator<Solution> iterator = iterator();
         while (iterator.hasNext()) {
             ndPopClone.forceAddWithoutCheck(iterator.next());
-        }
+    }
         return ndPopClone;
     }
 

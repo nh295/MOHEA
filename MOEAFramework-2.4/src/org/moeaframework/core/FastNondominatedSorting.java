@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -99,7 +99,7 @@ public class FastNondominatedSorting {
 
 		while (!remaining.isEmpty()) {
 			NondominatedPopulation front = new NondominatedPopulation(
-					comparator);
+					comparator, true);
 
 			for (Solution solution : remaining) {
 				front.add(solution);
@@ -123,7 +123,7 @@ public class FastNondominatedSorting {
 	 * 
 	 * @param front the population whose solutions are to be evaluated
 	 */
-	protected void updateCrowdingDistance(Population front) {
+	public void updateCrowdingDistance(Population front) {
 		int n = front.size();
 
 		if (n < 3) {

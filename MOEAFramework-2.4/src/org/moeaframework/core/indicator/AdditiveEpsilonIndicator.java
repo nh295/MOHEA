@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -85,4 +85,4 @@ public class AdditiveEpsilonIndicator extends NormalizedIndicator {
 		return eps_i;
 	}
 
-    }
+}

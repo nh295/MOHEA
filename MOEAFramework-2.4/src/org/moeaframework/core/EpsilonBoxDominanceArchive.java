@@ -53,8 +53,8 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 	 * that have occurred.
 	 */
 	private int numberOfDominatingImprovements;
-        
-        /**
+
+	/**
          * The number of times the archive is used for injection
          */
         private int injectionCount;
@@ -154,7 +154,7 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
     public Collection<Solution> addAndReturnRemovedSolutions(Solution newSolution) {
         
         ArrayList<Solution> removed = new ArrayList<>();
-        Iterator<Solution> iterator = iterator();
+		Iterator<Solution> iterator = iterator();
 
 		boolean same = false;
 		boolean dominates = false;
@@ -180,10 +180,10 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 			}
 		}
 		forceAddWithoutCheck(newSolution);
-                
+
                 changedFlag = true;
                 return removed;
-    }
+	}
 
 	/**
 	 * Returns the &epsilon;-box dominance comparator used by this archive.
@@ -214,7 +214,7 @@ public class EpsilonBoxDominanceArchive extends NondominatedPopulation {
 	public int getNumberOfDominatingImprovements() {
 		return numberOfDominatingImprovements;
 	}
-        
+
         /**
          * Increments the number of times the archive has been used for injection
          */

@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -70,6 +70,20 @@ public class Settings {
 	 * The prefix for all property keys.
 	 */
 	public static final String KEY_PREFIX = "org.moeaframework.";
+	
+	/**
+	 * The property key for the power used in the generational distance
+	 * calculation.
+	 */
+	public static final String KEY_GD_POWER = KEY_PREFIX + 
+			"core.indicator.gd_power";
+	
+	/**
+	 * The property key for the power used in the inverted generational
+	 * distance calculation.
+	 */
+	public static final String KEY_IGD_POWER = KEY_PREFIX +
+			"core.indicator.igd_power";
 	
 	/**
 	 * The property key for the continuity correction flag.
@@ -167,6 +181,13 @@ public class Settings {
 			"analysis.sensitivity.cleanup";
 	
 	/**
+	 * The property key for listing the allowed packages that can be
+	 * instrumented.
+	 */
+	public static final String KEY_ALLOWED_PACKAGES = KEY_PREFIX +
+			"allowed_packages";
+	
+	/**
 	 * Loads the properties.
 	 */
 	static {
@@ -237,6 +258,26 @@ public class Settings {
 	 */
 	public static boolean isContinuityCorrection() {
 		return PROPERTIES.getBoolean(KEY_CONTINUITY_CORRECTION, false);
+	}
+	
+	/**
+	 * Returns the power used in the generational distance calculation.
+	 * The default value is 2.0.
+	 * 
+	 * @return the power used in the generational distance calculation
+	 */
+	public static double getGDPower() {
+		return PROPERTIES.getDouble(KEY_GD_POWER, 2.0);
+	}
+	
+	/**
+	 * Returns the power used in the inverted generational distance calculation.
+	 * The default value is 1.0.
+	 * 
+	 * @return the power used in the inverted generational distance calculation
+	 */
+	public static double getIGDPower() {
+		return PROPERTIES.getDouble(KEY_IGD_POWER, 1.0);
 	}
 	
 	/**
@@ -436,7 +477,8 @@ public class Settings {
 	public static String[] getDiagnosticToolAlgorithms() {
 		return PROPERTIES.getStringArray(KEY_DIAGNOSTIC_TOOL_ALGORITHMS, 
 				new String[] { "NSGAII", "NSGAIII", "GDE3", "eMOEA", "eNSGAII", 
-				"MOEAD", "Random" });
+				"MOEAD", "CMA-ES", "SPEA2", "PAES", "PESA2", "OMOPSO", "SMPSO",
+				"IBEA", "SMS-EMOA", "VEGA", "DBEA", "Random" });
 	}
 	
 	/**
@@ -497,6 +539,16 @@ public class Settings {
 	 */
 	public static String getCleanupStrategy() {
 		return PROPERTIES.getString(KEY_CLEANUP_STRATEGY, "error");
+	}
+	
+	/**
+	 * Returns the allowed packages that can be instrumented.  By default, only
+	 * packages in "org.moeaframework" can be instrumented.
+	 * 
+	 * @return the allowed packages that can be instrumented
+	 */
+	public static String[] getAllowedPackages() {
+		return PROPERTIES.getStringArray(KEY_ALLOWED_PACKAGES, new String[0]);
 	}
 	
 	/**

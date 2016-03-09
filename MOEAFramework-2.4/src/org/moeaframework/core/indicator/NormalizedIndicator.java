@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -27,58 +27,58 @@ import org.moeaframework.core.Problem;
  */
 public abstract class NormalizedIndicator implements Indicator {
 
-    /**
-     * The problem.
-     */
-    protected final Problem problem;
+	/**
+	 * The problem.
+	 */
+	protected final Problem problem;
 
-    /**
-     * The normalizer to normalize populations so that all objectives reside in
-     * the range {@code [0, 1]}.
-     */
-    private final Normalizer normalizer;
-
-    /**
-     * The normalized reference set.
-     */
+	/**
+	 * The normalizer to normalize populations so that all objectives reside in
+	 * the range {@code [0, 1]}.
+	 */
+	private final Normalizer normalizer;
+	
+	/**
+	 * The normalized reference set.
+	 */
 	private final NondominatedPopulation normalizedReferenceSet;
 
-    /**
-     * Constructs a normalized indicator for the specified problem and
-     * corresponding reference set.
-     *
-     * @param problem the problem
-     * @param referenceSet the reference set for the problem
+	/**
+	 * Constructs a normalized indicator for the specified problem and 
+	 * corresponding reference set.
+	 * 
+	 * @param problem the problem
+	 * @param referenceSet the reference set for the problem
 	 * @throws IllegalArgumentException if the reference set contains fewer
 	 *         than two solutions
-     */
-    public NormalizedIndicator(Problem problem,
-            NondominatedPopulation referenceSet) {
-        super();
-        this.problem = problem;
+	 */
+	public NormalizedIndicator(Problem problem,
+			NondominatedPopulation referenceSet) {
+		super();
+		this.problem = problem;
+		
+		normalizer = new Normalizer(problem, referenceSet);
+		normalizedReferenceSet = normalizer.normalize(referenceSet);
+	}
+	
+	/**
+	 * Normalizes the specified approximation set.
+	 * 
+	 * @param approximationSet the approximation set to be normalized
+	 * @return a new population representing the normalized approximation set
+	 */
+	protected NondominatedPopulation normalize(
+			NondominatedPopulation approximationSet) {
+		return normalizer.normalize(approximationSet);
+	}
+	
+	/**
+	 * Returns the normalized reference set.
+	 * 
+	 * @return the normalized reference set
+	 */
+	protected NondominatedPopulation getNormalizedReferenceSet() {
+		return normalizedReferenceSet;
+	}
 
-        normalizer = new Normalizer(problem, referenceSet);
-        normalizedReferenceSet = normalizer.normalize(referenceSet);
-    }
-
-    /**
-     * Normalizes the specified approximation set.
-     *
-     * @param approximationSet the approximation set to be normalized
-     * @return a new population representing the normalized approximation set
-     */
-    protected NondominatedPopulation normalize(
-            NondominatedPopulation approximationSet) {
-        return normalizer.normalize(approximationSet);
-    }
-
-    /**
-     * Returns the normalized reference set.
-     *
-     * @return the normalized reference set
-     */
-    protected NondominatedPopulation getNormalizedReferenceSet() {
-        return normalizedReferenceSet;
-    }
-
-    }
+}

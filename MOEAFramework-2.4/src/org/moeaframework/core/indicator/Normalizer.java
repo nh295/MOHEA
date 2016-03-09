@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -62,11 +62,6 @@ public class Normalizer {
 		this.problem = problem;
 		this.minimum = new double[problem.getNumberOfObjectives()];
 		this.maximum = new double[problem.getNumberOfObjectives()];
-                //For UF problems for Hyperheuristics Journal paper
-//                for(int i=0;i<problem.getNumberOfObjectives();i++){
-//                    this.minimum[i] = 0.0;
-//                    this.maximum[i] = 2.0;
-//                }
 
 		calculateRanges(population);		
 		checkRanges();
@@ -190,17 +185,6 @@ public class Normalizer {
 			if (solution.violatesConstraints()) {
 				continue;
 			}
-//                        //added so that if there are pts beyond the reference pt, they are ignored in the HV calculation
-//                        double[] objs = solution.getObjectives();
-//                        boolean outsideRefPt = false;
-//                        for(int i=0;i<objs.length;i++){
-//                            if(objs[i]>maximum[i]){
-//                                outsideRefPt = true;
-//                                break;
-//                            }
-//                        }
-//                        if(outsideRefPt)
-//                            continue;
 			
 			Solution clone = solution.copy();
 	

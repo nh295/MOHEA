@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -114,8 +114,8 @@ public class Population implements Iterable<Solution> {
 	public boolean add(Solution solution) {
 		return data.add(solution);
 	}
-        
-        /**
+
+	/**
 	 * Adds a collection of solutions to this population.
 	 * 
 	 * @param iterable the collection of solutions to be added
@@ -141,6 +141,16 @@ public class Population implements Iterable<Solution> {
 	 */
 	public <T extends Solution> boolean addAll(T[] solutions) {
 		return addAll(Arrays.asList(solutions));
+	}
+	
+	/**
+	 * Replaces the solution at the given index.
+	 * 
+	 * @param index the index to replace
+	 * @param solution the new solution
+	 */
+	public void replace(int index, Solution solution) {
+		data.set(index, solution);
 	}
 
 	/**

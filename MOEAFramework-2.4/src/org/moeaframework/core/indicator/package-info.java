@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -83,6 +83,13 @@
  *     <td>Yes</td>
  *     <td>No</td>
  *     <td>Maximize &rarr; 1</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link org.moeaframework.core.indicator.R2Indicator}</td>
+ *     <td>No</td>
+ *     <td>Yes</td>
+ *     <td>Yes</td>
+ *     <td>Minimize &rarr; -1</td>
  *   </tr>
  * </table>
  * <p>
