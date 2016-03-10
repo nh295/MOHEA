@@ -6,9 +6,21 @@
 package moea;
 
 import hh.creditassignment.fitnessindicator.DoubleComparator;
+import hh.creditassignment.fitnessindicator.R2Indicator;
 import hh.creditassignment.fitnessindicator.SortedLinkedList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.moeaframework.algorithm.AbstractEvolutionaryAlgorithm;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
@@ -17,7 +29,6 @@ import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
-import org.moeaframework.core.fitness.IndicatorFitnessEvaluator;
 
 /**
  * R2 MOEA is steady state indicator based algorithm developed by Diaz et al. It
@@ -40,17 +51,19 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
     /**
      * The r2rank comparator.
      */
-    private R2RankComparator rankComparator;
-    
+    private final R2RankComparator rankComparator;
+
     /**
      * The r2contribution comparator.
      */
-    private R2ContributionComparator contributionComparator;
+    private final R2ContributionComparator contributionComparator;
+
+    private final ArrayList<WtVector> wtVecs;
 
     /**
      * The variation operator.
      */
-    private Variation variation;
+    private final Variation variation;
 
     /**
      * The utopia point (point not dominated by any individual in the
@@ -84,20 +97,21 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
      *
      * @param problem the problem
      * @param childNumer the number of children to create in each generation
+     * @param numVecs the number of uniformly spaced vectors to use
      * @param archive the external archive; or {@code null} if no external
      * archive is used
      * @param initialization the initialization operator
      * @param variation the variation operator
-     * @param fitnessEvaluator fitnessEvaluator the indicator fitness evaluator
-     * to use (e.g., hypervolume additive-epsilon indicator)
      */
-    public R2MOEA(Problem problem, int childNumer, NondominatedPopulation archive,
-            Initialization initialization, Variation variation, IndicatorFitnessEvaluator fitnessEvaluator) {
+    public R2MOEA(Problem problem, int childNumer, int numVecs, NondominatedPopulation archive,
+            Initialization initialization, Variation variation) {
         super(problem, new Population(), archive, initialization);
         this.childNumber = childNumer;
         this.variation = variation;
-        this.comparator = new R2RankComparator();
+        this.rankComparator = new R2RankComparator();
+        this.contributionComparator = new R2ContributionComparator();
         this.pprng = new ParallelPRNG();
+        this.wtVecs = initializeWts(problem.getNumberOfObjectives(), numVecs);
     }
 
     @Override
@@ -106,6 +120,11 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
 
         computeUtopia(population);
         computeBounds(population);
+
+        for (Solution soln : population) {
+            soln.setAttribute("contribution", 0.0);
+            soln.setAttribute("rank", 0);
+        }
     }
 
     @Override
@@ -121,37 +140,123 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
 
         evaluateAll(offspring);
         population.addAll(offspring);
-        evaluateFitness(population);
 
-        //remove a parent for every offspring created
+        //Update the utopia point with added offspring
         for (Solution child : offspring) {
             updateBoundsInsert(child);
             updateMinMax();
-
-            int worstIndex = findWorstIndex();
-
-            updateBoundsRemove(population.get(worstIndex));
             updateUtopia(child);
             updateMinMax();
+        }
+
+        ArrayList<Integer> solutionsToRemove = fastR2Sorting(offspring);
+        for (Integer index : solutionsToRemove) {
+            updateBoundsRemove(population.get(index));
+            population.remove(index);
         }
     }
 
     /**
-     * Returns the index of the solution with the worst fitness value.
+     * Computes the contribution of a solution to the R2 indicator. Solutions
+     * that do not contribute to the R2 indicator get a higher rank.
      *
-     * @return the index of the solution with the worst fitness value
+     * @return the population indices of the solution to remove from the
+     * population
      */
-    private int findWorstIndex() {
-        int worstIndex = 0;
-
-        for (int i = 1; i < population.size(); i++) {
-            if (fitnessComparator.compare(population.get(worstIndex),
-                    population.get(i)) == -1) {
-                worstIndex = i;
-            }
+    private ArrayList<Integer> fastR2Sorting(Population offspringPopulation) {
+        ArrayList<Integer> indicesUnrankedSolutions = new ArrayList<>(population.size());
+        ArrayList<Solution> normalizedPopulation = new ArrayList<>(population.size());
+        int k=0;
+        for (Solution soln : population) {
+            soln.setAttribute("contribution", 0.0);
+            indicesUnrankedSolutions.add(k);
+            k++;
+            normalizedPopulation.add(normalizeObjectives(soln));
         }
 
-        return worstIndex;
+        int rank = 1;
+        while (!indicesUnrankedSolutions.isEmpty()) {
+            HashSet<Integer> contributed = new HashSet();
+            for (WtVector wt : wtVecs) {
+                double popUtility = Double.POSITIVE_INFINITY;
+                int aIndex = -1;
+                for (int i = 0; i < indicesUnrankedSolutions.size(); i++) {
+                    double tmpUtility = solnUtility(wt, normalizedPopulation.get(indicesUnrankedSolutions.get(i)), utopia);
+                    if (tmpUtility < popUtility) {
+                        popUtility = tmpUtility;
+                        aIndex = i;
+                    }
+                }
+                Solution a = population.get(indicesUnrankedSolutions.get(aIndex));
+                a.setAttribute("contribution", popUtility + (double) a.getAttribute("contribution"));
+                contributed.add(aIndex);
+            }
+            //remove from unranked solutions starting from largest index. This will keep unranked solutions ordered
+            ArrayList<Integer> indicesToRemove = new ArrayList<>(contributed);
+            Collections.sort(indicesToRemove);
+            Collections.reverse(indicesToRemove);
+            Iterator iter = indicesToRemove.iterator();
+            while (iter.hasNext()) {
+                int indexToRemove = (int) iter.next();
+                Solution soln = population.get(indicesUnrankedSolutions.get(indexToRemove));
+                soln.setAttribute("rank", rank);
+                indicesUnrankedSolutions.remove(indexToRemove);
+            }
+            rank++;
+        }
+
+        ArrayList<Integer> leastContributors = new ArrayList<>();
+        //remove as many individuals as new offspring
+        while (leastContributors.size() < offspringPopulation.size()) {
+            rank--;
+            //find solutions with highest rank
+            ArrayList<Integer> highestRankedSolutions = new ArrayList<>();
+            for (int i = 0; i < population.size(); i++) {
+                if ((int) population.get(i).getAttribute("rank") == rank) {
+                    highestRankedSolutions.add(i);
+                    if (leastContributors.size() < offspringPopulation.size()) {
+                        return leastContributors;
+                    }
+                }
+            }
+
+            //find solution with highest rank and lowest contribution to R2 value
+            if (highestRankedSolutions.size() == 1) {
+                leastContributors.add(highestRankedSolutions.get(0));
+                if (leastContributors.size() < offspringPopulation.size()) {
+                    return leastContributors;
+                }
+            } else {
+                double minContribution = Double.POSITIVE_INFINITY;
+                for (Integer index : highestRankedSolutions) {
+                    double contribution = (double) population.get(index).getAttribute("contribution");
+                    if (contribution < minContribution) {
+                        minContribution = contribution;
+                        leastContributors.add(index);
+                    }
+                }
+            }
+        }
+        return leastContributors;
+    }
+
+    /**
+     * Computes the utility of a solution wrt to a weight vector using a
+     * Tchebycheff function. Tchebycheff function: u_w(z) = -max{w_j*|z'_j -
+     * z_j|} where w_j is the jth component of the weight vector, z' is the
+     * reference point and z is the objective value.
+     *
+     * @param vec weight vector
+     * @param solution
+     * @param refPt reference point
+     * @return utility of a solution wrt to a weight vectorq
+     */
+    private double solnUtility(WtVector vec, Solution solution, Solution refPt) {
+        double solnUtil = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+            solnUtil = Math.max(solnUtil, vec.get(i) * Math.abs(solution.getObjective(i) - refPt.getObjective(i)));
+        }
+        return solnUtil;
     }
 
     private void updateMinMax() {
@@ -196,17 +301,18 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
     }
 
     /**
-     * Normalizes the objective vector of a given individual
+     * Normalizes the objective vector of a given individual and copies over
+     * rank and contribution attributes
      *
      * @param solution
      * @return
      */
-    private double[] normalizeObjectives(Solution solution) {
-        double[] normalizedObjs = new double[solution.getNumberOfObjectives()];
+    private Solution normalizeObjectives(Solution solution) {
+        Solution normalizedObjs = solution.copy();
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
             double lowBound = minObjs.getObjective(i);
             double upBound = maxObjs.getObjective(i);
-            normalizedObjs[i] = (solution.getObjective(i) - lowBound) / (upBound - lowBound);
+            normalizedObjs.setObjective(i, (solution.getObjective(i) - lowBound) / (upBound - lowBound));
         }
         return normalizedObjs;
     }
@@ -239,20 +345,12 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
     }
 
     /**
-     * This implements fast R2 sorting from Diaz-Manriquez et al. 2013. A
-     * ranking method based on the R2 indicator for many objective optimization
+     * This method is a binary tournament selection of parents based on the
+     * fitness values (i.e. R2 contribution rank)
      *
-     * @param population
-     */
-    private void evaluateFitness(Population population) {
-
-    }
-
-    /**
-     * This method is a binary tournament selection of parents based on the fitness values (i.e. R2 contribution rank)
      * @param arity
      * @param population
-     * @return 
+     * @return
      */
     private Solution[] selectParents(int arity, Population population) {
         Solution[] result = new Solution[arity];
@@ -264,12 +362,19 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
                 Solution candidate = population
                         .get(pprng.nextInt(population.size()));
 
-                int flag = comparator.compare(winner, candidate);
+                int flag = rankComparator.compare(winner, candidate);
 
+                //first compare using rank. then use contribution
                 if (flag > 0) {
                     winner = candidate;
+                } else if (flag == 0) {
+                    flag = contributionComparator.compare(winner, candidate);
+                    if (flag > 0) {
+                        winner = candidate;
+                    }
                 }
             }
+            result[i] = winner;
         }
 
         return result;
@@ -278,24 +383,89 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
     /**
      * This comparator compares the R2 rank computed from fast R2 sorting
      */
-    private class R2RankComparator implements Comparator<Solution>{
+    private class R2RankComparator implements Comparator<Solution> {
+
         @Override
         public int compare(Solution t, Solution t1) {
-            int rank1 = (int)t.getAttribute("rank");
-            int rank2 = (int)t.getAttribute("rank");
+            int rank1 = (int) t.getAttribute("rank");
+            int rank2 = (int) t.getAttribute("rank");
             return Integer.compare(rank1, rank2);
         }
     }
-    
+
     /**
      * This comparator compares the R2 contribution
      */
-    private class R2ContributionComparator implements Comparator<Solution>{
+    private class R2ContributionComparator implements Comparator<Solution> {
+
         @Override
         public int compare(Solution t, Solution t1) {
-            double ca1 = (double)t.getAttribute("contribution");
-            double ca2 = (double)t.getAttribute("contribution");
+            double ca1 = (double) t.getAttribute("contribution");
+            double ca2 = (double) t.getAttribute("contribution");
             return Double.compare(ca1, ca2);
+        }
+    }
+
+    /**
+     * Method from jmetal to load the weights for problems meeting certain
+     * criteria such as number of objectives and population size. Returns true
+     * if the weights can be loaded and false if the weights data is
+     * unavailable.
+     *
+     * @param numObj
+     * @param numVecs
+     */
+    private ArrayList<WtVector> initializeWts(int numObj, int numVecs) {
+
+        String dataFileName;
+        dataFileName = "W" + numObj + "D_"
+                + numVecs + ".dat";
+
+        ArrayList<WtVector> out = new ArrayList<>(numVecs);
+        try {
+            // Open the file
+            FileInputStream fis = new FileInputStream("weight" + File.separator
+                    + dataFileName);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+
+            int j = 0;
+            String aux = br.readLine();
+            while (aux != null) {
+                StringTokenizer st = new StringTokenizer(aux);
+                j = 0;
+                double[] wts = new double[numObj];
+                while (st.hasMoreTokens()) {
+                    double value = (new Double(st.nextToken())).doubleValue();
+                    wts[j] = value;
+                    j++;
+                }
+                out.add(new WtVector(wts));
+                aux = br.readLine();
+            }
+            br.close();
+        } catch (IOException | NumberFormatException e) {
+            System.out
+                    .println("initUniformWeight: failed when reading for file: "
+                            + "weight" + File.separator + dataFileName);
+            Logger.getLogger(R2Indicator.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return out;
+    }
+
+    protected class WtVector {
+
+        /**
+         * Weights for vector
+         */
+        private final double[] weights;
+
+        public WtVector(double[] weights) {
+            this.weights = weights;
+        }
+
+        public double get(int i) {
+            return weights[i];
         }
     }
 }

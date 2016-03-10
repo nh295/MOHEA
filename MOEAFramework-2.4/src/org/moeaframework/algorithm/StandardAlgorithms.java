@@ -18,6 +18,7 @@
 package org.moeaframework.algorithm;
 
 import java.util.Properties;
+import moea.R2MOEA;
 
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
@@ -128,6 +129,8 @@ public class StandardAlgorithms extends AlgorithmProvider {
 					name.equalsIgnoreCase("NSGA-II") ||
 					name.equalsIgnoreCase("NSGA2")) {
 				return newNSGAII(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("R2MOEA")){
+                                return newR2MOEA(typedProperties, problem);
 			} else if (name.equalsIgnoreCase("NSGAIII") ||
 					name.equalsIgnoreCase("NSGA-III") ||
 					name.equalsIgnoreCase("NSGA3")) {
@@ -425,5 +428,21 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		
 		return new RandomSearch(problem, generator, archive);
 	}
+
+    private Algorithm newR2MOEA(TypedProperties properties, Problem problem) {
+        int populationSize = (int)properties.getDouble("populationSize", 100);
+        
+        int numberOffspring = (int)properties.getDouble("numberOffspring", 1);
+        
+        int numVecs = (int)properties.getDouble("numberVectors", 100);
+
+		Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+
+		Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+
+		return new R2MOEA(problem, numberOffspring, numVecs, null,initialization, variation);
+    }
 
 }
