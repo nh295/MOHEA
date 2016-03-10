@@ -125,6 +125,7 @@ public class R2MOEA extends AbstractEvolutionaryAlgorithm {
             soln.setAttribute("contribution", 0.0);
             soln.setAttribute("rank", 0);
         }
+        System.out.println("Finished initializing. Running...");
     }
 
     @Override

@@ -51,8 +51,8 @@ public class HHCreditTest {
             "DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3",
             "WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -185,7 +185,7 @@ public class HHCreditTest {
                             prop.put("operator", op);
                             typeProp = new TypedProperties(prop);
                             TestRunBenchmark test = new TestRunBenchmark(path, prob, probName,
-                                    typeProp, "R2MOEA", maxEvaluations);
+                                    typeProp, "SMSEMOA", maxEvaluations);
                             futures.add(pool.submit(test));
                         }
                     for (Future<IHyperHeuristic> run : futures) {
