@@ -180,7 +180,6 @@ public class TestRun implements Callable {
                 .attachInvertedGenerationalDistanceCollector()
                 .attachHypervolumeJmetalCollector(new Solution(refPointObj))
                 .withEpsilon(epsilonDouble)
-                .withReferenceSet(new File(path + File.separator + "pf" + File.separator + probName + ".dat"))
                 .attachElapsedTimeCollector();
 
         InstrumentedAlgorithm instAlgorithm = instrumenter.instrument(hh);

@@ -75,7 +75,8 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"ODP","OPIAE","OPIR2",
 //                "OPopPF", "OPopEA", "OPopIPFAE","OPopIPFR2","OPopIEAAE","OPopIEAR2",
 //                "CPF", "CEA"};
-            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe"};
+//            String[] creditDefs = new String[]{"OPDe","SIDe","CSDe"};
+            String[] creditDefs = new String[]{"OPDo","SIDoA","CSDoA"};
            
             //for single operator MOEA
             String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
