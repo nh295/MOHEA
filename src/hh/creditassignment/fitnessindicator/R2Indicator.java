@@ -53,7 +53,7 @@ public class R2Indicator implements IIndicator {
      * @param numObjs number of objectives
      * @param numVecs number of vectors
      */
-    public R2Indicator(int numObjs, int numVecs) throws IOException {
+    public R2Indicator(int numObjs, int numVecs) {
         wtVecs = new ArrayList<>();
         initializeWts(numObjs, numVecs);
     }
@@ -224,7 +224,7 @@ public class R2Indicator implements IIndicator {
      * @param numObj
      * @param numVecs
      */
-    private void initializeWts(int numObj,int numVecs) throws IOException {
+    private void initializeWts(int numObj,int numVecs) {
         
         String dataFileName;
         dataFileName = "W" + numObj + "D_"
@@ -258,7 +258,6 @@ public class R2Indicator implements IIndicator {
                     .println("initUniformWeight: failed when reading for file: "
                             + "weight" + File.separator + dataFileName);
             Logger.getLogger(R2Indicator.class.getName()).log(Level.SEVERE, null, e);
-            throw e;
         }
     }
 
