@@ -36,6 +36,7 @@ import org.moeaframework.core.comparator.ChainedComparator;
 import org.moeaframework.core.comparator.CrowdingComparator;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
+import org.moeaframework.core.fitness.HypervolumeContributionFitnessEvaluator;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
 import org.moeaframework.core.operator.UniformSelection;
@@ -139,10 +140,12 @@ public class StandardAlgorithms extends AlgorithmProvider {
 					name.equalsIgnoreCase("eNSGA2")) {
 				return neweNSGAII(typedProperties, problem);
 			} else if (name.equalsIgnoreCase("eMOEA")) {
-				return neweMOEA(typedProperties, problem);
-			} else if (name.equalsIgnoreCase("Random")) {
-				return newRandomSearch(typedProperties, problem);
-			} else {
+                                return neweMOEA(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("SMSEMOA")) {
+                                return newSMSEMOA(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("Random")) {
+                                return newRandomSearch(typedProperties, problem);
+                        } else {
 				return null;
 			}
 		} catch (FrameworkException e) {
@@ -443,6 +446,20 @@ public class StandardAlgorithms extends AlgorithmProvider {
 				properties, problem);
 
 		return new R2MOEA(problem, numberOffspring, numVecs, null,initialization, variation);
+    }
+
+    private Algorithm newSMSEMOA(TypedProperties properties, Problem problem) {
+        int populationSize = (int)properties.getDouble("populationSize", 100);
+        
+        double offset = properties.getDouble("HVoffset", 2);
+
+		Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+
+		Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+
+		return new SMSEMOA(problem, initialization, variation, new HypervolumeContributionFitnessEvaluator(problem, offset));
     }
 
 }

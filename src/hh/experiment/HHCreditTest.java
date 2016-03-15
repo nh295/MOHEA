@@ -185,7 +185,7 @@ public class HHCreditTest {
                             prop.put("operator", op);
                             typeProp = new TypedProperties(prop);
                             TestRunBenchmark test = new TestRunBenchmark(path, prob, probName,
-                                    typeProp, "R2MOEA", maxEvaluations);
+                                    typeProp, "SMSEMOA", maxEvaluations);
                             futures.add(pool.submit(test));
                         }
                     for (Future<IHyperHeuristic> run : futures) {
