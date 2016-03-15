@@ -3,13 +3,14 @@
 
 #ignore build files
 build.*
-build/**
+build/*
+*.class
 
 #ignore the nbproject
-nbproject/**
+nbproject/*
 
 #ignore the dist folder containing the libraries and jar files
-dist/**
+dist/*
 
 #ignore data from first IEEE submission
-“Data from first submission”/**
+“Data from first submission”/*

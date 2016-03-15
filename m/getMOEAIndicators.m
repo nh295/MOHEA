@@ -1,4 +1,4 @@
-function [AEI,GD,fHV,IGD,ET] = getMOEAIndicators(filename)
+function [AEI,GD,fHV,IGD,finalHV,ET] = getMOEAIndicators(filename)
 %reads the csv values starting from the 2nd column
 %filename must include path and extension
 %EI is the epsilon indicator
@@ -24,6 +24,8 @@ while(~feof(fid))
             ET = readLine(line);
         case{'FastHypervolume'}
             fHV = readLine(line);
+        case{'Final HV'}
+            finalHV = readLine(line);
         otherwise
             continue;
     end
