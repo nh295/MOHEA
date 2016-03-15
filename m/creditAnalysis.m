@@ -50,7 +50,7 @@ switch mode
                                 op_data(j,2)=str2double(raw_credits{j}); %credit
                             end
                             expData.put(raw_credits{1},op_data);
-                        end
+                            end20*pi/180
                         fclose(fid);
                         allcredits{i} = expData;
                     end

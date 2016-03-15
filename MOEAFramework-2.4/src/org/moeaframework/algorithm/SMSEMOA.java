@@ -19,6 +19,7 @@ package org.moeaframework.algorithm;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import moea.SteadyStateFastNonDominatedSorting;
 
 import org.moeaframework.core.FastNondominatedSorting;
 import org.moeaframework.core.FitnessEvaluator;
@@ -61,6 +62,8 @@ public class SMSEMOA extends AbstractEvolutionaryAlgorithm {
 	 * The variation operator.
 	 */
 	private Variation variation;
+        
+        private SteadyStateFastNonDominatedSorting enlu;
 
 	/**
 	 * Constructs a new SMS-EMOA instance.
@@ -98,6 +101,7 @@ public class SMSEMOA extends AbstractEvolutionaryAlgorithm {
 		if (fitnessEvaluator != null) {
 			fitnessEvaluator.evaluate(population);
 		}
+                enlu = new SteadyStateFastNonDominatedSorting();
 	}
 
 	@Override
@@ -107,10 +111,11 @@ public class SMSEMOA extends AbstractEvolutionaryAlgorithm {
 		Solution[] offspring = variation.evolve(parents);
 		
 		evaluate(offspring[0]);
-		population.add(offspring[0]);
-		
-		// rank the solutions and remove the worst
-		new FastNondominatedSorting().evaluate(population);
+//		population.add(offspring[0]);
+//		
+//		// rank the solutions and remove the worst
+//		new FastNondominatedSorting().evaluate(population);
+                enlu.addSolution(offspring[0], population);
 		
 		if (fitnessEvaluator == null) {
 			population.truncate(populationSize, 
@@ -128,23 +133,27 @@ public class SMSEMOA extends AbstractEvolutionaryAlgorithm {
 	 */
 	private void computeFitnessForLastFront() {
 		Population front = new Population();
-		int rank = 0;
-		
+//		int rank = 0;
+//		
 		for (Solution solution : population) {
-			int solutionRank = (Integer)solution.getAttribute(
-					FastNondominatedSorting.RANK_ATTRIBUTE);
-			
-			if (solutionRank > rank) {
-				front.clear();
-				rank = solutionRank;
-			}
-			
-			if (solutionRank == rank) {
-				front.add(solution);
-			}
-			
+//			int solutionRank = (Integer)solution.getAttribute(
+//					FastNondominatedSorting.RANK_ATTRIBUTE);
+//			
+//			if (solutionRank > rank) {
+//				front.clear();
+//				rank = solutionRank;
+//			}
+//			
+//			if (solutionRank == rank) {
+//				front.add(solution);
+//			}
+////			
 			solution.setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, 0.0);
 		}
+                for(Integer i : enlu.getLastFront()){
+                    Solution solution = population.get(i);
+                    front.add(solution);
+                }
 		
 		fitnessEvaluator.evaluate(front);
 	}
