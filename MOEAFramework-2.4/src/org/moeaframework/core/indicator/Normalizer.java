@@ -198,4 +198,12 @@ public class Normalizer {
 		}
 	}
 
+    public double[] getMaximum() {
+        return maximum;
+    }
+
+    public double[] getMinimum() {
+        return minimum;
+    }
+
 }

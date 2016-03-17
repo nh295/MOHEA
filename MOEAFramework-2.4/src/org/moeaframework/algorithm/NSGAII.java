@@ -47,12 +47,12 @@ public class NSGAII extends AbstractEvolutionaryAlgorithm implements
 	/**
 	 * The selection operator.
 	 */
-	private final Selection selection;
+	protected final Selection selection;
 
 	/**
 	 * The variation operator.
 	 */
-	private final Variation variation;
+	protected final Variation variation;
 
 	/**
 	 * Constructs the NSGA-II algorithm with the specified components.

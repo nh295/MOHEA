@@ -47,22 +47,22 @@ public class IBEA extends AbstractEvolutionaryAlgorithm {
 	 * The indicator fitness evaluator to use (e.g., hypervolume or
 	 * additive-epsilon indicator).
 	 */
-	private IndicatorFitnessEvaluator fitnessEvaluator;
+	protected IndicatorFitnessEvaluator fitnessEvaluator;
 	
 	/**
 	 * The fitness comparator for comparing solutions based on their fitness.
 	 */
-	private FitnessComparator fitnessComparator;
+	protected FitnessComparator fitnessComparator;
 	
 	/**
 	 * The selection operator.
 	 */
-	private Selection selection;
+	protected Selection selection;
 	
 	/**
 	 * The variation operator.
 	 */
-	private Variation variation;
+	protected Variation variation;
 
 	/**
 	 * Constructs a new IBEA instance.
@@ -122,7 +122,7 @@ public class IBEA extends AbstractEvolutionaryAlgorithm {
 	 * 
 	 * @return the index of the solution with the worst fitness value
 	 */
-	private int findWorstIndex() {
+	protected int findWorstIndex() {
 		int worstIndex = 0;
 		
 		for (int i = 1; i < population.size(); i++) {

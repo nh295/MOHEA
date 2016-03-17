@@ -105,7 +105,7 @@ public class HypervolumeFitnessEvaluator extends IndicatorFitnessEvaluator {
 	 * @return the hypervolume of the portion of the objective space that is
 	 *         dominated by {@code solution1} but not by {@code solution2}.
 	 */
-	protected double calculateHypervolume(Solution solution1,
+	public double calculateHypervolume(Solution solution1,
 			Solution solution2, int d) {
 		double max = rho;
 		double a = solution1.getObjective(d - 1);

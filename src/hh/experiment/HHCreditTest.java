@@ -43,12 +43,11 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
-        String[] problems = new String[]{"UF1"};
+          String[] problems = new String[]{"UF2"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
-//        String[] problems = new String[]{//"UF1","UF2","UF3",
-//            "UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
+//        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
 //            "DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3",
 //            "WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 
@@ -81,7 +80,7 @@ public class HHCreditTest {
            
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-            String[] ops = new String[]{"de+pm"};
+            String[] ops = new String[]{"sbx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -187,7 +186,7 @@ public class HHCreditTest {
                             prop.put("operator", op);
                             typeProp = new TypedProperties(prop);
                             TestRunBenchmark test = new TestRunBenchmark(path, prob, probName,
-                                    typeProp, "R2EMOA", maxEvaluations);
+                                    typeProp, "SSNSGAII", maxEvaluations);
                             futures.add(pool.submit(test));
                         }
                     for (Future<IHyperHeuristic> run : futures) {
