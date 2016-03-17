@@ -74,6 +74,9 @@ public class TestRunBenchmark extends TestRun {
         long startTime = System.currentTimeMillis();
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();
+            if(Math.floorMod(instAlgorithm.getNumberOfEvaluations(), 1000)==0){
+                System.out.println(instAlgorithm.getNumberOfEvaluations());
+            }
         }
         alg.terminate();
         

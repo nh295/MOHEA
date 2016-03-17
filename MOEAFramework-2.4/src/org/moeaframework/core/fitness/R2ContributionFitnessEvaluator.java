@@ -28,44 +28,62 @@ import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
-import org.moeaframework.core.indicator.Hypervolume;
+import org.moeaframework.core.comparator.ParetoDominanceComparator;
 
 public class R2ContributionFitnessEvaluator implements FitnessEvaluator {
 
     private final Problem problem;
-    
+
     private final R2Indicator r2indicator;
-    
+
     private final Solution refPoint;
     
-    private final double offset;
-    
+    private final ParetoDominanceComparator pdcomp;
+
     /**
      *
      * @param problem
      * @param numVecs
-     * @param offset after normalizing, the offset is added to the points to try to 
+     * @param offset after normalizing, the offset is added to the points to try
+     * to
      */
     public R2ContributionFitnessEvaluator(Problem problem, int numVecs, double offset) {
         super();
         this.problem = problem;
         this.r2indicator = new R2Indicator(problem.getNumberOfObjectives(), numVecs);
-        this.offset = offset;
         this.refPoint = problem.newSolution();
-        for(int i=0; i<problem.getNumberOfObjectives(); i++){
-            refPoint.setObjective(i, -1.0);
+        for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+            refPoint.setObjective(i, -offset);
         }
+        this.pdcomp = new ParetoDominanceComparator();
     }
-    
+
     @Override
     public void evaluate(Population population) {
-        List<Solution> solutions = normalize(population);
-        List<Double> r2contributions = r2indicator.computeContributions(new NondominatedPopulation(solutions), refPoint);
 
-        for (int i = 0; i < population.size(); i++) {
-            population.get(i).setAttribute(FITNESS_ATTRIBUTE, r2contributions.get(i));
+        if (population.size() <= 2) {
+            for (Solution solution : population) {
+                solution.setAttribute(FITNESS_ATTRIBUTE, 0.0);
+            }
+        }else{
+            List<Solution> solutions = normalize(population);
+            NondominatedPopulation ndpop = new NondominatedPopulation(pdcomp,true);
+            for(Solution sltn: solutions){
+                ndpop.add(sltn);
+            }
+            if(population.size()!=ndpop.size()){
+                throw new IllegalStateException("Population size mismatch: Front size " + population.size() + " doesn't match contribution size " + ndpop.size());
+            }
+            
+            List<Double> r2contributions = r2indicator.computeContributions(ndpop, refPoint);
+
+            for (int i = 0; i < population.size(); i++) {
+                population.get(i).setAttribute(FITNESS_ATTRIBUTE, r2contributions.get(i));
+            }
         }
     }
+
+    
 
     private List<Solution> normalize(Population population) {
         List<Solution> result = new ArrayList<Solution>();
@@ -87,7 +105,7 @@ public class R2ContributionFitnessEvaluator implements FitnessEvaluator {
             Solution newSolution = solution.copy();
 
             for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-                newSolution.setObjective(i, ((newSolution.getObjective(i) - min[i])  / (max[i] - min[i])) + offset);
+                newSolution.setObjective(i, ((newSolution.getObjective(i) - min[i]) / (max[i] - min[i])));
             }
 
             result.add(newSolution);
@@ -98,7 +116,7 @@ public class R2ContributionFitnessEvaluator implements FitnessEvaluator {
 
     @Override
     public boolean areLargerValuesPreferred() {
-        return false;
+        return true;
     }
 
 }

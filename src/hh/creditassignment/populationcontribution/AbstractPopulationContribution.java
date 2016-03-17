@@ -28,12 +28,12 @@ public abstract class AbstractPopulationContribution extends AbstractRewardDefin
     /**
      * Computes all the credits received for each heuristic and returns the Credits they earn
      * @param population
-     * @param enteringÏSolutions solutions that entered the nondominated set
+     * @param enteringSolutions solutions that entered the nondominated set
      * @param removedSolutions solutions that were removed after offspring were added to nondominated set
      * @param heuristics
      * @param iteration
      * @return 
      */
     public abstract HashMap<Variation, Credit> compute(Population population,
-            Collection<Solution> enteringÏSolutions,Collection<Solution> removedSolutions,Collection<Variation> heuristics,int iteration);
+            Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions,Collection<Variation> heuristics,int iteration);
 }

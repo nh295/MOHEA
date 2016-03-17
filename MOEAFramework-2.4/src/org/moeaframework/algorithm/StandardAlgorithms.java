@@ -37,6 +37,7 @@ import org.moeaframework.core.comparator.CrowdingComparator;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.fitness.HypervolumeContributionFitnessEvaluator;
+import org.moeaframework.core.fitness.R2ContributionFitnessEvaluator;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
 import org.moeaframework.core.operator.UniformSelection;
@@ -143,6 +144,8 @@ public class StandardAlgorithms extends AlgorithmProvider {
                                 return neweMOEA(typedProperties, problem);
                         } else if (name.equalsIgnoreCase("SMSEMOA")) {
                                 return newSMSEMOA(typedProperties, problem);
+                        }else if (name.equalsIgnoreCase("R2EMOA")) {
+                                return newR2EMOA(typedProperties, problem);
                         } else if (name.equalsIgnoreCase("Random")) {
                                 return newRandomSearch(typedProperties, problem);
                         } else {
@@ -451,7 +454,7 @@ public class StandardAlgorithms extends AlgorithmProvider {
     private Algorithm newSMSEMOA(TypedProperties properties, Problem problem) {
         int populationSize = (int)properties.getDouble("populationSize", 100);
         
-        double offset = properties.getDouble("HVoffset", 2);
+        double offset = properties.getDouble("HVoffset", 1);
 
 		Initialization initialization = new RandomInitialization(problem,
 				populationSize);
@@ -461,5 +464,22 @@ public class StandardAlgorithms extends AlgorithmProvider {
 
 		return new SMSEMOA(problem, initialization, variation, new HypervolumeContributionFitnessEvaluator(problem, offset));
     }
+    
+    private Algorithm newR2EMOA(TypedProperties properties, Problem problem) {
+        int populationSize = (int)properties.getDouble("populationSize", 100);
+        
+        double offset = properties.getDouble("R2offset", 1);
+        
+        int numVecs = (int)properties.getProperties().get("r2.numberVectors");
+
+		Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+
+		Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+
+		return new SMSEMOA(problem, initialization, variation, new R2ContributionFitnessEvaluator(problem, numVecs, offset));
+    }
+
 
 }
