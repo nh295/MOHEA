@@ -129,7 +129,7 @@ public class FastNondominatedSorting {
 		if (n < 3) {
 			for (Solution solution : front) {
 				solution.setAttribute(CROWDING_ATTRIBUTE,
-						Double.POSITIVE_INFINITY);
+						Double.MAX_VALUE);
 			}
 		} else {
 			int numberOfObjectives = front.get(0).getNumberOfObjectives();
@@ -145,9 +145,9 @@ public class FastNondominatedSorting {
 				double maxObjective = front.get(n - 1).getObjective(i);
 
 				front.get(0).setAttribute(CROWDING_ATTRIBUTE,
-						Double.POSITIVE_INFINITY);
+						Double.MAX_VALUE);
 				front.get(n - 1).setAttribute(CROWDING_ATTRIBUTE,
-						Double.POSITIVE_INFINITY);
+						Double.MAX_VALUE);
 
 				for (int j = 1; j < n - 1; j++) {
 					double distance = (Double)front.get(j).getAttribute(
