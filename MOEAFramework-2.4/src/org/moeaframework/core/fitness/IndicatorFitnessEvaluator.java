@@ -50,6 +50,12 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
 	 * {@link #evaluate(Population)}.
 	 */
 	private double[][] fitcomp;
+        
+        private double[] upperbound;
+        
+        private double[] lowerbound;
+        
+        private Population normalizedPopulation;
 
 	/**
 	 * Constructs an indicator-based fitness for the specified problem.
@@ -107,10 +113,13 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
 	@Override
 	public void evaluate(Population population) {
 		Normalizer normalizer = new Normalizer(problem, population);
-		Population normalizedPopulation = normalizer.normalize(population);
+		normalizedPopulation = normalizer.normalize(population);
+                
+                upperbound = normalizer.getMaximum();
+                lowerbound = normalizer.getMinimum();
 
 		// compute fitness components
-		fitcomp = new double[population.size()][population.size()];
+		fitcomp = new double[population.size()+1][population.size()+1];
 		maxAbsIndicatorValue = Double.NEGATIVE_INFINITY;
 
 		for (int i = 0; i < population.size(); i++) {
@@ -176,7 +185,117 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
 		}
 
 		population.remove(removeIndex);
+                maxAbsIndicatorValue = findMaxIndicatorValue();
 	}
+        
+        /**
+	 * After calling {@link #evaluate(Population)}, this method is used to
+	 * iteratively add solutions to the population while updating the
+	 * fitness value. There must be no other modifications to the population
+	 * between invocations of {@link #evaluate(Population)} and this method
+	 * other than adding solutions using this method.
+	 * 
+	 * @param population the population
+	 * @param solution the solution to add
+	 */
+	public void addAndUpdate(Population population, Solution solution) {
+		if (fitcomp == null) {
+			throw new FrameworkException("evaluate must be called first");
+		}
+                
+                population.add(solution);
+                normalizedPopulation.add(normalize(solution));
+                
+                //if solution has objectives outside of the bounds, reevaluate the fitnesses
+                for(int i=0; i<problem.getNumberOfObjectives(); i++){
+                    if(solution.getObjective(i)<lowerbound[i] ||
+                            solution.getObjective(i)>upperbound[i]){
+                        population.add(solution);
+                        evaluate(population);
+                        return;
+                    }
+                }
+		
+                //if solution does not have objectives outside of the current bounds can add it in the fitcomp matrix
+                int lastIndex = population.size() - 1;
+                boolean maxValueChanged = false;
+                for (int i = 0; i < population.size(); i++) {
+                        fitcomp[i][lastIndex] = calculateIndicator(normalizedPopulation.get(i),
+					normalizedPopulation.get(lastIndex));
+                                
+                        fitcomp[lastIndex][i] = calculateIndicator(normalizedPopulation.get(lastIndex),
+					normalizedPopulation.get(i));
+
+			if (Math.abs(fitcomp[i][lastIndex]) > maxAbsIndicatorValue) {
+				maxAbsIndicatorValue = Math.abs(fitcomp[i][lastIndex]);
+                                maxValueChanged = true;
+			}
+                        if (Math.abs(fitcomp[lastIndex][i]) > maxAbsIndicatorValue) {
+				maxAbsIndicatorValue = Math.abs(fitcomp[lastIndex][i]);
+                                maxValueChanged = true;
+			}
+		}
+
+                if(maxValueChanged){
+                        // recalculate fitness from fitness components
+                        for (int i = 0; i < population.size(); i++) {
+                             double sum = 0.0;
+			
+                                for (int j = 0; j < population.size(); j++) {
+                                        if (i != j) {
+                                                sum += Math.exp((-fitcomp[j][i] / maxAbsIndicatorValue) / kappa);
+                                        }
+                                }
+			
+                                population.get(i).setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, sum);
+                    }
+                }else{
+                        //just update values for all incumbent solutions
+                        for (int i = 0; i < population.size() - 1; i++) {
+                                double prevFitness = (double)population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
+                                double newFitness = prevFitness + Math.exp((-fitcomp[lastIndex][i] / maxAbsIndicatorValue) / kappa);
+                                population.get(i).setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, newFitness);
+                        }
+                        
+                        //calcuate fitness for new individual
+                        double sum = 0.0;
+                        for (int j = 0; j < population.size() - 1; j++) {
+                                sum += Math.exp((-fitcomp[j][lastIndex] / maxAbsIndicatorValue) / kappa);
+                        }
+			population.get(lastIndex).setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, sum);
+                }
+
+	}
+        
+        /**
+         * Finds the maximum indicator value already calculated
+         * @return 
+         */
+        protected double findMaxIndicatorValue(){
+                double max = Double.NEGATIVE_INFINITY;
+                
+                for(int i=0; i<fitcomp.length; i++){
+                        for(int j=0; j<fitcomp.length; j++){
+                                if (Math.abs(fitcomp[i][j]) > max) {
+					max = Math.abs(fitcomp[i][j]);
+				}
+                        }
+                }
+                return max;
+        }
+        
+        /**
+         * Normalizes solution using current upper and lower bounds
+         * @param solution
+         * @return 
+         */
+        private Solution normalize(Solution solution){
+            Solution out = solution.copy();
+            for(int i=0; i<problem.getNumberOfObjectives(); i++){
+                out.setObjective(i, (solution.getObjective(i)-lowerbound[i])/(upperbound[i]-lowerbound[i]));
+            }
+            return out;
+        }
 
 	/**
 	 * Returns the indicator value relative to the two solutions.

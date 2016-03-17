@@ -19,6 +19,8 @@ package org.moeaframework.algorithm;
 
 import java.util.Properties;
 import moea.R2MOEA;
+import moea.SteadyStateIBEA;
+import moea.SteadyStateNSGAII;
 
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
 import org.moeaframework.core.Algorithm;
@@ -37,6 +39,7 @@ import org.moeaframework.core.comparator.CrowdingComparator;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.fitness.HypervolumeContributionFitnessEvaluator;
+import org.moeaframework.core.fitness.HypervolumeFitnessEvaluator;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
 import org.moeaframework.core.operator.UniformSelection;
@@ -130,6 +133,8 @@ public class StandardAlgorithms extends AlgorithmProvider {
 					name.equalsIgnoreCase("NSGA-II") ||
 					name.equalsIgnoreCase("NSGA2")) {
 				return newNSGAII(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("SSNSGAII")) {
+				return newSteadyStateNSGAII(typedProperties, problem);
                         } else if (name.equalsIgnoreCase("R2MOEA")){
                                 return newR2MOEA(typedProperties, problem);
 			} else if (name.equalsIgnoreCase("NSGAIII") ||
@@ -143,6 +148,10 @@ public class StandardAlgorithms extends AlgorithmProvider {
                                 return neweMOEA(typedProperties, problem);
                         } else if (name.equalsIgnoreCase("SMSEMOA")) {
                                 return newSMSEMOA(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("IBEA")) {
+                                return newIBEA(typedProperties, problem);
+                        } else if (name.equalsIgnoreCase("SSIBEA")) {
+                                return newSteadyStateIBEA(typedProperties, problem);
                         } else if (name.equalsIgnoreCase("Random")) {
                                 return newRandomSearch(typedProperties, problem);
                         } else {
@@ -235,6 +244,35 @@ public class StandardAlgorithms extends AlgorithmProvider {
 				properties, problem);
 
 		return new NSGAII(problem, population, null, selection, variation,
+				initialization);
+	}
+        
+        /**
+	 * Returns a new {@link NSGAII} instance.
+	 * 
+	 * @param properties the properties for customizing the new {@code NSGAII}
+	 *        instance
+	 * @param problem the problem
+	 * @return a new {@code NSGAII} instance
+	 */
+	private Algorithm newSteadyStateNSGAII(TypedProperties properties, Problem problem) {
+		int populationSize = (int)properties.getDouble("populationSize", 100);
+
+		Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+
+		NondominatedSortingPopulation population = 
+				new NondominatedSortingPopulation();
+
+		TournamentSelection selection = new TournamentSelection(2, 
+				new ChainedComparator(
+						new ParetoDominanceComparator(),
+						new CrowdingComparator()));
+
+		Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+
+		return new SteadyStateNSGAII(problem, population, null, selection, variation,
 				initialization);
 	}
 	
@@ -460,6 +498,34 @@ public class StandardAlgorithms extends AlgorithmProvider {
 				properties, problem);
 
 		return new SMSEMOA(problem, initialization, variation, new HypervolumeContributionFitnessEvaluator(problem, offset));
+    }
+
+    private Algorithm newIBEA(TypedProperties properties, Problem problem) {
+        int populationSize = (int)properties.getDouble("populationSize", 100);
+    
+        Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+        
+        Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+        
+        HypervolumeFitnessEvaluator fitnessEvaluator = new HypervolumeFitnessEvaluator(problem);
+        
+        return new IBEA(problem, null, initialization, variation, fitnessEvaluator);
+    }
+    
+    private Algorithm newSteadyStateIBEA(TypedProperties properties, Problem problem) {
+        int populationSize = (int)properties.getDouble("populationSize", 100);
+    
+        Initialization initialization = new RandomInitialization(problem,
+				populationSize);
+        
+        Variation variation = OperatorFactory.getInstance().getVariation(null, 
+				properties, problem);
+        
+        HypervolumeFitnessEvaluator fitnessEvaluator = new HypervolumeFitnessEvaluator(problem);
+        
+        return new SteadyStateIBEA(problem, null, initialization, variation, fitnessEvaluator);
     }
 
 }
