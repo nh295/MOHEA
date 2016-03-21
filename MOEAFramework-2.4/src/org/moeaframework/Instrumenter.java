@@ -527,7 +527,8 @@ public class Instrumenter extends ProblemBuilder {
 			}
 		} else if ((type.getPackage() != null) && 
 				(!type.getPackage().getName().startsWith("org.moeaframework")&&
-                                 !type.getPackage().getName().startsWith("hh."))) {
+                                 !type.getPackage().getName().startsWith("hh.")&&
+                        !type.getPackage().getName().startsWith("moea"))) {
 			//do not visit objects which are not within this framework
 			return;
 		}

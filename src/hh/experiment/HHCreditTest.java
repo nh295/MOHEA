@@ -47,12 +47,13 @@ public class HHCreditTest {
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
-        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
+        String[] problems = new String[]{
             "DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3",
             "WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
+//            "UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
         pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-//        pool = Executors.newFixedThreadPool(1);
+        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
@@ -186,7 +187,7 @@ public class HHCreditTest {
                             prop.put("operator", op);
                             typeProp = new TypedProperties(prop);
                             TestRunBenchmark test = new TestRunBenchmark(path, prob, probName,
-                                    typeProp, "SSIBEA", maxEvaluations);
+                                    typeProp, "IBEA", maxEvaluations);
                             futures.add(pool.submit(test));
                         }
                     for (Future<IHyperHeuristic> run : futures) {

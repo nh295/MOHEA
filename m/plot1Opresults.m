@@ -6,15 +6,15 @@ function plot1Opresults
 problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = {'UF4'};
 % MOEA =  {'MOEAD'};
-MOEA =  {'eMOEA'};
+MOEA =  {'SSIBEA'};
 % MOEA =  {'eMOEA','MOEAD'};
-operator = {'SBX+PM','DifferentialEvolution+pm','UM','PCX+PM','UNDX+PM','SPX+PM'};
+operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
-path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+% path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-res_path =strcat(path,'mRes1opNew');
+res_path =strcat(path,'mRes1Op');
 
 a = 30; %number of trials
 b = length(MOEA)*length(operator);
@@ -50,10 +50,10 @@ boxColors = '';
 for i=1:length(problemName)
     probName = problemName{i};
     dataIGD = zeros(a,b);
-    datafHV = zeros(a,b);
+    datafinalHV = zeros(a,b);
     
     label_names_IGD={};
-    label_names_fHV={};
+    label_names_finalHV={};
     c=0;
     for j=1:length(operator)
         minIGD = inf;
@@ -63,55 +63,56 @@ for i=1:length(problemName)
             file = strcat(res_path,filesep,probName,'_',MOEA{k},'_',operator{j},'.mat');
             load(file); %assume that the reults stored in vairable named res
             dataIGD(:,c) = res.IGD;
-            datafHV(:,c) = res.fHV;
+            datafinalHV(:,c) = res.finalHV;
             if(mean(dataIGD(:,c))<minIGD)
                 minIGD = mean(dataIGD(:,c));
                 minIGDind = c;
             end
-            if(mean(datafHV(:,c))>maxHV)
-                maxHV = mean(datafHV(:,c));
+            if(mean(datafinalHV(:,c))>maxHV)
+                maxHV = mean(datafinalHV(:,c));
                 maxHVind = c;
             end
             
-            if strcmp(MOEA{k},'MOEAD')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_MOEAD_DifferentialEvolution+pm.mat'));
-                boxColors = strcat(boxColors,'r');
-            elseif strcmp(MOEA{k},'eMOEA')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_eMOEA_SBX+PM.mat'));
+%             if strcmp(MOEA{k},'MOEAD')
+%                 [~,sig]=significance(res,strcat(res_path,filesep,probName,'_MOEAD_DifferentialEvolution+pm.mat'));
+%                 boxColors = strcat(boxColors,'r');
+%             elseif strcmp(MOEA{k},'eMOEA')
+%                 [~,sig]=significance(res,strcat(res_path,filesep,probName,'_eMOEA_SBX+PM.mat'));
                 boxColors = strcat(boxColors,'b');
-            end
-            extra = '';
-            if sig.IGD==1
-                extra = '(-)';
-                statsIGD(i,c,3) = 1;
-            elseif sig.IGD==-1
-                extra = '(+)';
-                statsIGD(i,c,1) = 1;
-            else
-                statsIGD(i,c,2) = 1;
-            end
-            if strcmp(MOEA{k},'MOEAD')
-                label_names_IGD = [label_names_IGD,strcat('DRA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'eMOEA')
-                label_names_IGD = [label_names_IGD,strcat('\epsilonMOEA-',operatorName{j},extra)]; %concats the labels
-            end
-            
-            extra = '';
-           if sig.fHV==1
-                extra = '(+)';
-                statsfHV(i,c,1) = 1;
-            elseif sig.fHV==-1
-                extra = '(-)';
-                statsfHV(i,c,3) = 1;
-            else
-                statsfHV(i,c,2) = 1;
-           end
-            if strcmp(MOEA{k},'MOEAD')
-                label_names_fHV = [label_names_fHV,strcat('DRA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'eMOEA')
-                label_names_fHV = [label_names_fHV,strcat('\epsilonMOEA-',operatorName{j},extra)]; %concats the labels
-            end
-            
+%             end
+%             extra = '';
+%             if sig.IGD==1
+%                 extra = '(-)';
+%                 statsIGD(i,c,3) = 1;
+%             elseif sig.IGD==-1
+%                 extra = '(+)';
+%                 statsIGD(i,c,1) = 1;
+%             else
+%                 statsIGD(i,c,2) = 1;
+%             end
+%             if strcmp(MOEA{k},'MOEAD')
+%                 label_names_IGD = [label_names_IGD,strcat('DRA-',operatorName{j},extra)]; %concats the labels
+%             elseif strcmp(MOEA{k},'eMOEA')
+%                 label_names_IGD = [label_names_IGD,strcat('\epsilonMOEA-',operatorName{j},extra)]; %concats the labels
+%             end
+label_names_IGD = [label_names_IGD,strcat('IBEA-',operatorName{j})]; %concats the labels
+%             
+%             extra = '';
+%            if sig.fHV==1
+%                 extra = '(+)';
+%                 statsfHV(i,c,1) = 1;
+%             elseif sig.fHV==-1
+%                 extra = '(-)';
+%                 statsfHV(i,c,3) = 1;
+%             else
+%                 statsfHV(i,c,2) = 1;
+%            end
+%             if strcmp(MOEA{k},'MOEAD')
+%                 label_names_fHV = [label_names_fHV,strcat('DRA-',operatorName{j},extra)]; %concats the labels
+%             elseif strcmp(MOEA{k},'eMOEA')
+%                 label_names_fHV = [label_names_fHV,strcat('\epsilonMOEA-',operatorName{j},extra)]; %concats the labels
+%             end
+            label_names_finalHV = [label_names_finalHV,strcat('IBEA-',operatorName{j})]; %concats the labels
         end
     end
     
@@ -136,9 +137,9 @@ for i=1:length(problemName)
     end
     
     figure(h2)
-    [~,ind]=max(mean(datafHV,1));
-    label_names_fHV{ind} = strcat('\bf{',label_names_fHV{ind},'}');
-    boxplot(hsubplot2{i},datafHV,label_names_fHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
+    [~,ind]=max(mean(datafinalHV,1));
+    label_names_finalHV{ind} = strcat('\bf{',label_names_finalHV{ind},'}');
+    boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
     title(hsubplot2{i},probName)
     set(hsubplot2{i},'TickLabelInterpreter','tex');
     set(hsubplot2{i},'XTickLabelRotation',90);

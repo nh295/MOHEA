@@ -23,6 +23,7 @@ import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
@@ -114,6 +115,10 @@ public class TestRunBenchmark extends TestRun {
                 FastHypervolume fHV = new FastHypervolume(problem, ProblemFactory.getInstance().getReferenceSet(probName), new Solution(refPointObj));
                 double hv = fHV.evaluate(ndPop);
                 writer.append("Final HV, " + hv + "\n");
+                //also record the final IGD
+                InvertedGenerationalDistance igd = new InvertedGenerationalDistance(problem, ProblemFactory.getInstance().getReferenceSet(probName));
+                double figd = igd.evaluate(ndPop);
+                writer.append("Final IGD, " + figd + "\n");
 
                 writer.flush();
             } catch (IOException ex) {

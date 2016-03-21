@@ -22,11 +22,11 @@ finalHV = zeros(nfiles,1);
 
 for i=1:nfiles
     [tAEI,tGD,tfHV,tIGD,tfinalHV,tET] = getMOEAIndicators(strcat(path,filesep,files(i).name));
-    AEI(i,:) = tAEI;
-    GD(i,:) = tGD;
-    fHV(i,:) = tfHV;
-    IGD(i,:) = tIGD;
-    ET(i,:) = tET;
+%     AEI(i,:) = tAEI;
+%     GD(i,:) = tGD;
+%     fHV(i,:) = tfHV;
+%     IGD(i,:) = tIGD;
+%     ET(i,:) = tET;
     finalHV(i) = tfinalHV;
 end
 end
