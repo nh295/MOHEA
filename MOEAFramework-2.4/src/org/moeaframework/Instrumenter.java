@@ -452,18 +452,25 @@ public class Instrumenter extends ProblemBuilder {
 	}
 
 	@Override
-	public Instrumenter withReferenceSet(File referenceSetFile) {
-		return (Instrumenter)super.withReferenceSet(referenceSetFile);
+	public Instrumenter withReferenceSetFile(File referenceSetFile) {
+		return (Instrumenter)super.withReferenceSetFile(referenceSetFile);
 	}
 	
 	@Override
 	public Instrumenter withEpsilon(double... epsilon) {
 		return (Instrumenter)super.withEpsilon(epsilon);
 	}
+        
+        public Instrumenter withReferenceSet(NondominatedPopulation referenceSet){
+            return (Instrumenter)super.withReferenseSet(referenceSet);
+        }
 	
 	@Override
 	public NondominatedPopulation getReferenceSet() {
+            if(referenceSet == null)
 		return super.getReferenceSet();
+            else
+                return referenceSet;
 	}
 
 	/**
@@ -527,7 +534,8 @@ public class Instrumenter extends ProblemBuilder {
 			}
 		} else if ((type.getPackage() != null) && 
 				(!type.getPackage().getName().startsWith("org.moeaframework")&&
-                                 !type.getPackage().getName().startsWith("hh."))) {
+                                 !type.getPackage().getName().startsWith("hh.")&&
+                        !type.getPackage().getName().startsWith("moea"))) {
 			//do not visit objects which are not within this framework
 			return;
 		}

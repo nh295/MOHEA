@@ -32,12 +32,12 @@ while(~feof(fid))
 end
 fclose(fid);
 %get end of run indicator values
-AEI = AEI(end);
+AEI = [];% AEI(end);
 % Inj = Inj(end);
-GD = GD(end);
-IGD = IGD(end);
-fHV = fHV(end);
-ET = ET(end);
+GD = [];%GD(end);
+IGD = [];%IGD(end);
+fHV = [];%fHV(end);
+ET = [];%ET(end);
 end
 
 function [out] = readLine(line)

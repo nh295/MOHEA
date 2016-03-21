@@ -3,8 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package hh.experiment;
+
 import hh.hyperheuristics.IHyperHeuristic;
 import java.io.File;
 import java.io.FileWriter;
@@ -23,6 +23,7 @@ import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
@@ -36,8 +37,21 @@ public class TestRunBenchmark extends TestRun {
     private final String algorithm;
     private final TypedProperties prop;
 
-    public TestRunBenchmark(String path, Problem problem, String probName, TypedProperties properties, String algorithm, int maxEvaluations) {
-        super(path, problem, probName, properties, null, maxEvaluations);
+    /**
+     *
+     * @param path
+     * @param problem
+     * @param probName
+     * @param referenceSet reference set to use to compute indicator values such
+     * as IGD
+     * @param maxObjectiveValues the maximum objective values in the reference
+     * set (assuming minimization problem)
+     * @param properties
+     * @param algorithm
+     * @param maxEvaluations
+     */
+    public TestRunBenchmark(String path, Problem problem, String probName, NondominatedPopulation referenceSet, double[] maxObjectiveValues, TypedProperties properties, String algorithm, int maxEvaluations) {
+        super(path, problem, probName, referenceSet, maxObjectiveValues, properties, null, maxEvaluations);
         this.algorithm = algorithm;
         this.prop = properties;
     }
@@ -53,20 +67,8 @@ public class TestRunBenchmark extends TestRun {
 
         StandardAlgorithms sa = new StandardAlgorithms();
         Algorithm alg = sa.getAlgorithm(algorithm, prop.getProperties(), problem);
-        
-        double[] refPointObj = new double[problem.getNumberOfObjectives()];
-        Arrays.fill(refPointObj, 1.1);
-        
-        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations/100)
-                .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeJmetalCollector(new Solution(refPointObj))
-                .withEpsilon(epsilonDouble)
-                .attachElapsedTimeCollector();
 
-        Algorithm instAlgorithm = instrumenter.instrument(alg);
+        InstrumentedAlgorithm instAlgorithm = super.instrument(alg);
 
         // run the executor using the listener to collect results
         String operatorName = prop.getProperties().getProperty("operator");
@@ -74,52 +76,21 @@ public class TestRunBenchmark extends TestRun {
         long startTime = System.currentTimeMillis();
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();
-            if(Math.floorMod(instAlgorithm.getNumberOfEvaluations(), 1000)==0){
+            if (Math.floorMod(instAlgorithm.getNumberOfEvaluations(), 1000) == 0) {
                 System.out.println(instAlgorithm.getNumberOfEvaluations());
             }
         }
         alg.terminate();
-        
+
         long finishTime = System.currentTimeMillis();
         System.out.println("Done with optimization. Execution time: " + ((finishTime - startTime) / 1000) + "s");
 
-        Accumulator accum = ((InstrumentedAlgorithm) instAlgorithm).getAccumulator();
         String name = String.valueOf(System.nanoTime());
 
         String filename = path + File.separator + prop.getProperties().getProperty("saveFolder") + File.separator + problem.getName() + "_"
                 + algorithm + "_" + operatorName + "_" + name;
-        
-        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
-            File results = new File(filename + ".res");
-            System.out.println("Saving results");
 
-            try (FileWriter writer = new FileWriter(results)) {
-                Set<String> keys = accum.keySet();
-                Iterator<String> keyIter = keys.iterator();
-                while (keyIter.hasNext()) {
-                    String key = keyIter.next();
-                    int dataSize = accum.size(key);
-                    writer.append(key).append(",");
-                    for (int i = 0; i < dataSize; i++) {
-                        writer.append(accum.get(key, i).toString());
-                        if (i + 1 < dataSize) {
-                            writer.append(",");
-                        }
-                    }
-                    writer.append("\n");
-                }
-                
-                //also record the final HV
-                NondominatedPopulation ndPop = instAlgorithm.getResult();
-                FastHypervolume fHV = new FastHypervolume(problem, ProblemFactory.getInstance().getReferenceSet(probName), new Solution(refPointObj));
-                double hv = fHV.evaluate(ndPop);
-                writer.append("Final HV, " + hv + "\n");
-
-                writer.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        super.saveIndicatorValues(instAlgorithm, filename);
 
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveFinalPopulation"))) {
             NondominatedPopulation ndPop = instAlgorithm.getResult();
@@ -129,7 +100,7 @@ public class TestRunBenchmark extends TestRun {
                 Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         return null;
     }
 

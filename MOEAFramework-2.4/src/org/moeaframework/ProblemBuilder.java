@@ -72,6 +72,13 @@ class ProblemBuilder {
 	 * individual approximation sets.
 	 */
 	File referenceSetFile;
+        
+        /**
+	 * The reference set to be used by this builder; or
+	 * {@code null} if the reference set should be aggregated from all
+	 * individual approximation sets.
+	 */
+	NondominatedPopulation referenceSet;
 	
 	/**
 	 * Constructs a new problem builder.
@@ -190,11 +197,16 @@ class ProblemBuilder {
 	 * @param referenceSetFile the reference set file
 	 * @return a reference to this builder
 	 */
-	ProblemBuilder withReferenceSet(File referenceSetFile) {
+	ProblemBuilder withReferenceSetFile(File referenceSetFile) {
 		this.referenceSetFile = referenceSetFile;
 		
 		return this;
 	}
+        
+        ProblemBuilder withReferenseSet(NondominatedPopulation referenceSet){
+            this.referenceSet = referenceSet;
+            return this;
+        }
 	
 	/**
 	 * Returns an empty non-dominated population or &epsilon;-box dominance
@@ -216,7 +228,7 @@ class ProblemBuilder {
 	 * Returns the reference set used by this builder.  The reference set is
 	 * generated as follows:
 	 * <ol>
-	 *   <li>If {@link #withReferenceSet(File)} has been set, the contents of 
+	 *   <li>If {@link #withReferenceSetFile(File)} has been set, the contents of 
 	 *       the reference set file are returned;
 	 *   <li>If the problem factory provides a reference set via the
 	 *       {@link ProblemFactory#getReferenceSet(String)} method, this
