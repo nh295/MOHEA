@@ -452,18 +452,25 @@ public class Instrumenter extends ProblemBuilder {
 	}
 
 	@Override
-	public Instrumenter withReferenceSet(File referenceSetFile) {
-		return (Instrumenter)super.withReferenceSet(referenceSetFile);
+	public Instrumenter withReferenceSetFile(File referenceSetFile) {
+		return (Instrumenter)super.withReferenceSetFile(referenceSetFile);
 	}
 	
 	@Override
 	public Instrumenter withEpsilon(double... epsilon) {
 		return (Instrumenter)super.withEpsilon(epsilon);
 	}
+        
+        public Instrumenter withReferenceSet(NondominatedPopulation referenceSet){
+            return (Instrumenter)super.withReferenseSet(referenceSet);
+        }
 	
 	@Override
 	public NondominatedPopulation getReferenceSet() {
+            if(referenceSet == null)
 		return super.getReferenceSet();
+            else
+                return referenceSet;
 	}
 
 	/**

@@ -41,6 +41,7 @@ import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 import org.moeaframework.core.comparator.DominanceComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
+import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
@@ -63,8 +64,22 @@ public class TestRun implements Callable {
     protected double[] epsilonDouble;
     protected int maxEvaluations;
     private final Collection<Variation> heuristics;
+    protected final NondominatedPopulation referenceSet;
+    protected final double[] maxObjectiveValues;
+    protected Solution refPointObj;
 
-    public TestRun(String path, Problem problem, String probName, TypedProperties properties,
+    /**
+     *
+     * @param path
+     * @param problem
+     * @param probName
+     * @param referenceSet
+     * @param maxObjectiveValues
+     * @param properties
+     * @param heuristics
+     * @param maxEvaluations
+     */
+    public TestRun(String path, Problem problem, String probName, NondominatedPopulation referenceSet, double[] maxObjectiveValues, TypedProperties properties,
             Collection<Variation> heuristics, int maxEvaluations) {
 
         this.heuristics = heuristics;
@@ -75,6 +90,9 @@ public class TestRun implements Callable {
         this.probName = probName;
         this.maxEvaluations = maxEvaluations;
         this.path = path;
+
+        this.referenceSet = referenceSet;
+        this.maxObjectiveValues = maxObjectiveValues;
     }
 
     /**
@@ -109,7 +127,6 @@ public class TestRun implements Callable {
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
-
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
                 initialization, selector, rewardDef, injectionRate, lagWindow);
 
@@ -139,7 +156,6 @@ public class TestRun implements Callable {
 
         int updateUtility = properties.getInt("updateUtility", 50);
 
-        
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization,
@@ -164,28 +180,17 @@ public class TestRun implements Callable {
         } catch (IOException ex) {
             Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if(rewardDef.getFitnessType()==CreditFitnessFunctionType.De)
-             hh = newMOEADHH();
-        else
+
+        if (rewardDef.getFitnessType() == CreditFitnessFunctionType.De) {
+            hh = newMOEADHH();
+        } else {
             hh = newHeMOEA();
-        
-        double[] refPointObj = new double[problem.getNumberOfObjectives()];
-        Arrays.fill(refPointObj, 1.1);
-
-        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations / 100)
-                .withProblem(probName)
-                .attachAdditiveEpsilonIndicatorCollector()
-                .attachGenerationalDistanceCollector()
-                .attachInvertedGenerationalDistanceCollector()
-                .attachHypervolumeJmetalCollector(new Solution(refPointObj))
-                .withEpsilon(epsilonDouble)
-                .attachElapsedTimeCollector();
-
-        InstrumentedAlgorithm instAlgorithm = instrumenter.instrument(hh);
-
-        // run the executor using the listener to collect results
+        }
         System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + probName + " with pop size: " + properties.getDouble("populationSize", 600));
+        
+        InstrumentedAlgorithm instAlgorithm = instrument(hh);
+        
+        // run the executor using the listener to collect results
         long startTime = System.currentTimeMillis();
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();
@@ -195,45 +200,14 @@ public class TestRun implements Callable {
         long finishTime = System.currentTimeMillis();
         System.out.println("Done with optimization. Execution time: " + ((finishTime - startTime) / 1000) + "s");
 
-        Accumulator accum = instAlgorithm.getAccumulator();
+        saveIndicatorValues(instAlgorithm, probName);
 
         hh.setName(String.valueOf(System.nanoTime()));
 
         String filename = path + File.separator + properties.getProperties().getProperty("saveFolder") + File.separator + probName + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 
-        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
-            File results = new File(filename + ".res");
-            System.out.println("Saving results");
-
-            try (FileWriter writer = new FileWriter(results)) {
-                Set<String> keys = accum.keySet();
-                Iterator<String> keyIter = keys.iterator();
-                while (keyIter.hasNext()) {
-                    String key = keyIter.next();
-                    int dataSize = accum.size(key);
-                    writer.append(key).append(",");
-                    for (int i = 0; i < dataSize; i++) {
-                        writer.append(accum.get(key, i).toString());
-                        if (i + 1 < dataSize) {
-                            writer.append(",");
-                        }
-                    }
-                    writer.append("\n");
-                }
-
-                //also record the final HV
-                NondominatedPopulation ndPop = instAlgorithm.getResult();
-                Arrays.fill(refPointObj, 1.1);
-                FastHypervolume fHV = new FastHypervolume(problem, ProblemFactory.getInstance().getReferenceSet(probName), new Solution(refPointObj));
-                double hv = fHV.evaluate(ndPop);
-                writer.append("Final HV, " + hv + "\n");
-
-                writer.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+       
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveFinalPopulation"))) {
             NondominatedPopulation ndPop = instAlgorithm.getResult();
             try {
@@ -257,7 +231,76 @@ public class TestRun implements Callable {
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorQualityHistory"))) {
             IOQualityHistory.saveHistory(((IHyperHeuristic) hh).getQualityHistory(), filename + ".qual");
         }
-        
+
         return hh;
+    }
+
+    /**
+     * Attaches the collectors to the instrumented algorithm
+     * @param alg
+     * @return 
+     */
+    protected InstrumentedAlgorithm instrument(Algorithm alg) {
+        refPointObj = problem.newSolution();
+        for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+            refPointObj.setObjective(i, maxObjectiveValues[i] * 1.1);
+        }
+
+        Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations / 100)
+                .withProblem(probName)
+                .attachAdditiveEpsilonIndicatorCollector()
+                .attachGenerationalDistanceCollector()
+                .attachInvertedGenerationalDistanceCollector()
+                .attachHypervolumeJmetalCollector(refPointObj)
+                .withEpsilon(epsilonDouble)
+                .withReferenceSet(referenceSet)
+                .attachElapsedTimeCollector();
+
+        return instrumenter.instrument(alg);
+    }
+    
+    /**
+     * Saves the indicator values collected during the run.
+     * @param instAlgorithm
+     * @param filename 
+     */
+    protected void saveIndicatorValues(InstrumentedAlgorithm instAlgorithm, String filename){
+         Accumulator accum = instAlgorithm.getAccumulator();
+         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
+            File results = new File(filename + ".res");
+            System.out.println("Saving results");
+
+            try (FileWriter writer = new FileWriter(results)) {
+                Set<String> keys = accum.keySet();
+                Iterator<String> keyIter = keys.iterator();
+                while (keyIter.hasNext()) {
+                    String key = keyIter.next();
+                    int dataSize = accum.size(key);
+                    writer.append(key).append(",");
+                    for (int i = 0; i < dataSize; i++) {
+                        writer.append(accum.get(key, i).toString());
+                        if (i + 1 < dataSize) {
+                            writer.append(",");
+                        }
+                    }
+                    writer.append("\n");
+                }
+
+                //also record the final HV
+                NondominatedPopulation ndPop = instAlgorithm.getResult();
+                FastHypervolume fHV = new FastHypervolume(problem, referenceSet, refPointObj);
+                double hv = fHV.evaluate(ndPop);
+                writer.append("Final HV, " + hv + "\n");
+
+                //also record the final IGD
+                InvertedGenerationalDistance igd = new InvertedGenerationalDistance(problem, referenceSet);
+                double figd = igd.evaluate(ndPop);
+                writer.append("Final IGD, " + figd + "\n");
+
+                writer.flush();
+            } catch (Exception ex) {
+                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

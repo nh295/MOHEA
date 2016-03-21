@@ -205,8 +205,8 @@ public class Analyzer extends ProblemBuilder {
 	}
 	
 	@Override
-	public Analyzer withReferenceSet(File referenceSetFile) {
-		return (Analyzer)super.withReferenceSet(referenceSetFile);
+	public Analyzer withReferenceSetFile(File referenceSetFile) {
+		return (Analyzer)super.withReferenceSetFile(referenceSetFile);
 	}
 	
 	/**
@@ -600,7 +600,7 @@ public class Analyzer extends ProblemBuilder {
 	 * Returns the reference set used by this analyzer.  The reference set is
 	 * generated as follows:
 	 * <ol>
-	 *   <li>If {@link #withReferenceSet(File)} has been set, the contents of 
+	 *   <li>If {@link #withReferenceSetFile(File)} has been set, the contents of 
 	 *       the reference set file are returned;
 	 *   <li>If the problem factory provides a reference set via the
 	 *       {@link ProblemFactory#getReferenceSet(String)} method, this
