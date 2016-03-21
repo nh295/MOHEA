@@ -33,15 +33,14 @@ import org.moeaframework.core.operator.TournamentSelection;
  */
 public class SteadyStateNSGAII extends NSGAII {
 
-    private SteadyStateFastNonDominatedSorting enlu;
-    
-    ParallelPRNG pprng;
+    protected SteadyStateFastNonDominatedSorting enlu;
+
+    private ParallelPRNG pprng;
 
     public SteadyStateNSGAII(Problem problem, NondominatedSortingPopulation population,
             EpsilonBoxDominanceArchive archive, Selection selection, Variation variation, Initialization initialization) {
         super(problem, population, archive,
-                new TournamentSelection(new ChainedComparator(new RankComparator(), new CrowdingComparator())),
-                variation, initialization);
+                selection, variation, initialization);
         pprng = new ParallelPRNG();
 
     }
@@ -69,36 +68,44 @@ public class SteadyStateNSGAII extends NSGAII {
 
         for (Solution child : offspring) {
             enlu.addSolution(child, population);
-
-            int removeIndex = -1;
-            Collection<Integer> lastFront = enlu.getLastFront();
-            if (lastFront.size() <= 2) {
-                Iterator<Integer> iter = lastFront.iterator();
-                int rand = pprng.nextInt(lastFront.size());
-                for(int i = 0; i<lastFront.size(); i++){
-                    int index = iter.next();
-                    if(i==rand){
-                        removeIndex = index;
-                    }
-                }
-            } else {
-                Population lastFrontPop = new Population();
-                for (Integer index : enlu.getLastFront()) {
-                    lastFrontPop.add(population.get(index));
-                }
-                enlu.updateCrowdingDistance(lastFrontPop);
-
-                //find solution with lowest crowding distance
-                double minCrowdingDist = Double.POSITIVE_INFINITY;
-                for (Integer index : enlu.getLastFront()) {
-                    double dist = (double) population.get(index).getAttribute(CROWDING_ATTRIBUTE);
-                    if (dist < minCrowdingDist) {
-                        minCrowdingDist = dist;
-                        removeIndex = index;
-                    }
-                }
-            }
+            int removeIndex = findWorstSolution();
             population.remove(removeIndex);
         }
+    }
+
+    /**
+     * Gets the solution to remove from the population. The solution that is the
+     * most crowded in the last front will be removed
+     */
+    protected int findWorstSolution() {
+        int removeIndex = -1;
+        Collection<Integer> lastFront = enlu.getLastFront();
+        if (lastFront.size() <= 2) {
+            Iterator<Integer> iter = lastFront.iterator();
+            int rand = pprng.nextInt(lastFront.size());
+            for (int i = 0; i < lastFront.size(); i++) {
+                int index = iter.next();
+                if (i == rand) {
+                    removeIndex = index;
+                }
+            }
+        } else {
+            Population lastFrontPop = new Population();
+            for (Integer index : enlu.getLastFront()) {
+                lastFrontPop.add(population.get(index));
+            }
+            enlu.updateCrowdingDistance(lastFrontPop);
+
+            //find solution with lowest crowding distance
+            double minCrowdingDist = Double.POSITIVE_INFINITY;
+            for (Integer index : enlu.getLastFront()) {
+                double dist = (double) population.get(index).getAttribute(CROWDING_ATTRIBUTE);
+                if (dist < minCrowdingDist) {
+                    minCrowdingDist = dist;
+                    removeIndex = index;
+                }
+            }
+        }
+        return removeIndex;
     }
 }

@@ -27,10 +27,8 @@ public class SteadyStateIBEA extends IBEA {
     @Override
     protected void iterate() {
         Population offspring = new Population();
-        int populationSize = population.size();
 
-        Solution[] parents = selection.select(variation.getArity(),
-                population);
+        Solution[] parents = selection.select(variation.getArity(), population);
         Solution[] children = variation.evolve(parents);
 
         offspring.addAll(children);

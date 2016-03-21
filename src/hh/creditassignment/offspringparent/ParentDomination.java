@@ -7,11 +7,9 @@ package hh.creditassignment.offspringparent;
 
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.CreditDefinedOn;
-import org.moeaframework.core.ParallelPRNG;
+import org.moeaframework.core.FastNondominatedSorting;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
-import org.moeaframework.core.comparator.DominanceComparator;
-import org.moeaframework.core.comparator.ParetoDominanceComparator;
 
 /**
  * This credit definition compares offspring to its parents
@@ -37,26 +35,6 @@ public class ParentDomination extends AbstractOffspringParent {
     private final double creditNoOneDominates;
 
     /**
-     * The inputType of dominance comparator to be used
-     */
-    private final DominanceComparator comparator;
-
-    /**
-     * Constructor to specify the amount of reward that will be assigned. A
-     * default dominance comparator will be used: ParetoDominanceComparator
-     *
-     * @param rewardOffspringDominates Reward that is assigned if the offspring
-     * dominates parent
-     * @param rewardParentDominates Reward that is assigned if the parent
-     * dominates offspring
-     * @param rewardNoOneDominates Reward that is assigned if neither the
-     * offspring or parent dominates the other
-     */
-    public ParentDomination(double rewardOffspringDominates, double rewardNoOneDominates, double rewardParentDominates) {
-        this(rewardOffspringDominates, rewardNoOneDominates, rewardParentDominates, new ParetoDominanceComparator());
-    }
-
-    /**
      * Constructor to specify the amount of reward that will be assigned and the
      * dominance comparator to be used
      *
@@ -66,16 +44,14 @@ public class ParentDomination extends AbstractOffspringParent {
      * dominates offspring
      * @param rewardNoOneDominates Reward that is assigned if neither the
      * offspring or parent dominates the other
-     * @param comparator the comparator to be used that defines dominance
      */
-    public ParentDomination(double rewardOffspringDominates, double rewardNoOneDominates, double rewardParentDominates, DominanceComparator comparator) {
+    public ParentDomination(double rewardOffspringDominates, double rewardNoOneDominates, double rewardParentDominates) {
         super();
         operatesOn = CreditDefinedOn.PARENT;
         fitType = CreditFitnessFunctionType.Do;
         this.creditOffspringDominates = rewardOffspringDominates;
         this.creditParentDominates = rewardParentDominates;
         this.creditNoOneDominates = rewardNoOneDominates;
-        this.comparator = comparator;
     }
 
     /**
@@ -93,15 +69,14 @@ public class ParentDomination extends AbstractOffspringParent {
      */
     @Override
     public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
-        switch (comparator.compare(parent, offspring)) {
-            case -1:
-                return creditParentDominates;
-            case 0:
-                return creditNoOneDominates;
-            case 1:
-                return creditOffspringDominates;
-            default:
-                throw new Error("Comparator returned invalid value: " + comparator.compare(parent, offspring));
+        int parentRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
+        int offspringRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
+        if (parentRank > offspringRank) {
+            return creditOffspringDominates;
+        } else if (parentRank == offspringRank) {
+            return creditNoOneDominates;
+        } else {
+            return creditParentDominates;
         }
     }
 

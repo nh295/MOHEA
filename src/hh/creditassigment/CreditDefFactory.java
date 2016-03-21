@@ -11,9 +11,11 @@ import hh.creditassignment.fitnessindicator.R2Indicator;
 import hh.creditassignment.offspringparent.OPBinaryIndicator;
 import hh.creditassignment.offspringparent.ParentDecomposition;
 import hh.creditassignment.offspringparent.ParentDomination;
-import hh.creditassignment.offspringpopulation.OffspringEArchive;
+import hh.creditassignment.offspringparent.ParentIndicator;
+import hh.creditassignment.offspringpopulation.MeanIndicatorImprovement;
+import hh.creditassignment.offspringpopulation.OffspringArchiveDominance;
 import hh.creditassignment.offspringpopulation.OffspringNeighborhood;
-import hh.creditassignment.offspringpopulation.OffspringParetoFront;
+import hh.creditassignment.offspringpopulation.OffspringParetoFrontDominance;
 import hh.creditassignment.offspringpopulation.OffspringPopulationIndicator;
 import hh.creditassignment.populationcontribution.DecompositionContribution;
 import hh.creditassignment.populationcontribution.EArchiveContribution;
@@ -87,6 +89,9 @@ public class CreditDefFactory {
             case "OPDo": //offspring dominates parent
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
+            case "OPI" :
+                credDef = new ParentIndicator();
+                break;
             case "OPIAE": //offspring parent additive epsilon indicator using pareto front
                 credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa,problem);
                 break;
@@ -96,44 +101,36 @@ public class CreditDefFactory {
             case "OPIR2": //offspring parent hypervolume indicator using pareto front
                 credDef = new OPBinaryIndicator(new R2Indicator(numObj,numVec), kappa,problem);
                 break;
-//            case "OPIR3": //offspring parent hypervolume indicator using pareto front
-//                credDef = new IBEABinaryIndicator(new BinaryR3Indicator(numObj,numVec), kappa, new Solution(idealPoint));
-//                break;
             case "SIDe": //
                 credDef = new OffspringNeighborhood();
                 break;
             case "SIDoPF": //in pareto front
-                credDef = new OffspringParetoFront(satisfy, disatisfy);
+                credDef = new OffspringParetoFrontDominance(satisfy, disatisfy);
                 break;
             case "SIDoA": //in epsilon archive
-                credDef = new OffspringEArchive(satisfy, disatisfy);
+                credDef = new OffspringArchiveDominance(satisfy, disatisfy);
                 break;
             case "SIAEPF": //offpsring improvement to additive epsilon indicator value for pareto front
                 credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),CreditDefinedOn.PARETOFRONT);
                 break;
-            case "SIHVPF":
-                //offpsring improvement to hypervolume of pareto front
+            case "SIHVPF": //offpsring improvement to hypervolume of pareto front
                 credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem),CreditDefinedOn.PARETOFRONT);
                 break;
             case "SIR2PF": //offpsring improvement to R2 indicator value for pareto front
                 credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.PARETOFRONT);
                 break;
-//            case "OPopIPFR3": //offpsring improvement to R3 indicator value for pareto front
-//                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj,numVec),CreditDefinedOn.PARETOFRONT,new Solution(idealPoint));
-//                break;
             case "SIAEA": //offpsring improvement to additive epsilon indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new AdditiveEpsilonIndicator(),CreditDefinedOn.ARCHIVE);
                 break;
-            case "SIHVA":
-                //offpsring improvement to hypervolume of pareto front
+            case "SIHVA":  //offpsring improvement to hypervolume of pareto front
                 credDef = new OffspringPopulationIndicator(new HypervolumeIndicator(problem), CreditDefinedOn.ARCHIVE);
                 break;
             case "SIR2A": //offpsring improvement to R2 indicator value for epsilon archive
                 credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.ARCHIVE);
                 break;
-//            case "OPopIEAR3": //offpsring improvement to R3 indicator value for epsilon archive
-//                credDef = new OffspringPopulationIndicator(new BinaryR3Indicator(numObj, numVec),CreditDefinedOn.ARCHIVE,new Solution(idealPoint));
-//                break;
+            case "SIIPop" : //offspring improvement to the mean indicator-based fitness value
+                credDef = new MeanIndicatorImprovement();
+                break;
             case "CSDe": //contribution to the subproblem's neighborhood
                 credDef = new DecompositionContribution(satisfy, disatisfy);
                 break;
@@ -143,17 +140,11 @@ public class CreditDefFactory {
             case "CSDoA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
-            case "CSHVPF": //Contribution to HV of Pareto front
-                credDef = new IndicatorContribution(new HypervolumeIndicator(problem), CreditDefinedOn.PARETOFRONT);
+            case "CSIPF": //Contribution to indicator fitness of Pareto front
+                credDef = new IndicatorContribution(CreditDefinedOn.PARETOFRONT);
                 break;
-            case "CSHVA": //Contribution to HV of epsilon archive
-                credDef = new IndicatorContribution(new HypervolumeIndicator(problem), CreditDefinedOn.ARCHIVE);
-                break;
-            case "CSR2PF": //Contribution to R2 of Pareto front
-                credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), CreditDefinedOn.PARETOFRONT);
-                break;
-            case "CSR2A": //Contribution to R2 of epsilon archive
-                credDef = new IndicatorContribution(new R2Indicator(numObj,numVec), CreditDefinedOn.ARCHIVE);
+            case "CSIPop": //Contribution to indicator fitness of entire population
+                credDef = new IndicatorContribution(CreditDefinedOn.POPULATION);
                 break;
             default:
                 throw new IllegalArgumentException("No such credit defintion: " + name);

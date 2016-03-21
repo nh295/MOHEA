@@ -305,7 +305,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(paretoFront, childrenInPF, removedFromPF, heuristics, this.numberOfEvaluations);
+                                compute(paretoFront, heuristics, this.numberOfEvaluations);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;
@@ -314,7 +314,7 @@ public class HeMOEA extends EpsilonMOEA implements IHyperHeuristic {
                         popContRewards = reusePrevPopContRewards();
                     } else {
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(archive, childrenInArchive, removedFromArchive, heuristics, this.numberOfEvaluations);
+                                compute(archive, heuristics, this.numberOfEvaluations);
                         prevPopContRewards = popContRewards; //update prevPopContRewards for future iterations
                     }
                     break;

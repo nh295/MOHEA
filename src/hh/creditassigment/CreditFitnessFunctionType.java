@@ -20,7 +20,7 @@ public enum CreditFitnessFunctionType {
      */
     De,
     /**
-     * If the fitness is based on the R2 indicator
+     * If the fitness is based on an indicator
      */
-    R2
+    I
 }

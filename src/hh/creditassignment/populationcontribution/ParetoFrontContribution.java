@@ -53,17 +53,16 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
     public String toString() {
         return "CS-Do-PF";
     }
+    
     /**
      * 
      * @param population for this implementation it should be the pareto front
-     * @param enteringSolutions not used
-     * * @param removedSolutions not used
      * @param operators
      * @param iteration
      * @return 
      */
     @Override
-    public HashMap<Variation, Credit> compute(Population population,Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions, Collection<Variation> operators, int iteration) {
+    public HashMap<Variation, Credit> compute(Population population,Collection<Variation> operators, int iteration) {
         HashMap<String,Double> rewards = new HashMap();
         //give all operators 0 credits first
         for(Variation op:operators){
@@ -73,9 +72,7 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
         for(Solution soln:population){
             if(soln.hasAttribute("heuristic")){
                 String opName = ((SerializableVal)soln.getAttribute("heuristic")).getSval();
-                int createdIteration = ((SerializableVal)soln.getAttribute("iteration")).getIval();
-                Credit r = new Credit(createdIteration,1);
-                rewards.put(opName,rewards.get(opName) + rewardInPF*r.fractionOriginalVal(iteration));
+                rewards.put(opName,rewards.get(opName) + rewardInPF);
             }
         }
         

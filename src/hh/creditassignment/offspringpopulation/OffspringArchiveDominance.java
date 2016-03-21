@@ -17,7 +17,7 @@ import org.moeaframework.core.Solution;
  * in the epsilon archive. Credit is only assigned to the specified solution.
  * @author nozomihitomi
  */
-public class OffspringEArchive extends AbstractOffspringPopulation{
+public class OffspringArchiveDominance extends AbstractOffspringPopulation{
     /**
      * Credit received if a new solution is in the archive 
      */
@@ -34,7 +34,7 @@ public class OffspringEArchive extends AbstractOffspringPopulation{
      * @param inArchive credit to assign when solution is in the archive 
      * @param notInArchive credit to assign when solution is not in the archive 
      */
-    public OffspringEArchive(double inArchive, double notInArchive) {
+    public OffspringArchiveDominance(double inArchive, double notInArchive) {
         operatesOn = CreditDefinedOn.ARCHIVE;
         this.notInArchive = notInArchive;
         this.inArchive = inArchive;

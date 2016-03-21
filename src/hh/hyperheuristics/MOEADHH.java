@@ -217,7 +217,7 @@ public class MOEADHH extends MOEAD implements IHyperHeuristic {
                         child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                     }
                     DecompositionContribution CDe = ((DecompositionContribution) creditDef);
-                    HashMap<Variation, Credit> contRewards = CDe.compute(getNeighborhoodSolutions(index), null, null, heuristics, iteration);
+                    HashMap<Variation, Credit> contRewards = CDe.compute(getNeighborhoodSolutions(index), heuristics, iteration);
                     Iterator<Variation> iter = contRewards.keySet().iterator();
                     while (iter.hasNext()) {
                         Variation operator_i = iter.next();

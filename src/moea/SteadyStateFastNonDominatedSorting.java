@@ -31,6 +31,8 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
     
     private HashSet<Integer> lastFront;
     
+    private HashSet<Integer> paretoFront;
+    
     public SteadyStateFastNonDominatedSorting() {
         super();
     }
@@ -53,9 +55,14 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
         for(int i=0; i< rankIdx_[numRanks-1].length; i++){
             if(rankIdx_[numRanks-1][i]==1)
                 lastFront.add(i);
+            if(rankIdx_[0][i]==1)
+                paretoFront.add(i);
         }
+        //also check the new offspring
         if((int)individual.getAttribute(RANK_ATTRIBUTE)==numRanks-1)
             lastFront.add(population.size()-1);
+        if((int)individual.getAttribute(RANK_ATTRIBUTE)==0)
+            paretoFront.add(population.size()-1);
     }
     
     /**
@@ -65,7 +72,15 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
     public Collection<Integer> getLastFront(){
         return lastFront;
     }
-
+    
+    /**
+     * Returns the indices of the solutions in the pareto front
+     * @return the indices of the solutions in the pareto front
+     */
+    public Collection<Integer> getParetoFront(){
+        return lastFront;
+    }
+    
     /**
      *
      * @param individual individual to add to population

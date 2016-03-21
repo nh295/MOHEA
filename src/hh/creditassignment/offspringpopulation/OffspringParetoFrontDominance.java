@@ -9,7 +9,7 @@ package hh.creditassignment.offspringpopulation;
 import hh.creditassigment.CreditFunctionInputType;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.CreditDefinedOn;
-import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.FastNondominatedSorting;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
@@ -18,7 +18,7 @@ import org.moeaframework.core.Solution;
  * Pareto front. Credit is only assigned to the specified solution
  * @author Nozomi
  */
-public class OffspringParetoFront extends AbstractOffspringPopulation{
+public class OffspringParetoFrontDominance extends AbstractOffspringPopulation{
 
     /**
      * Credit received if a new solution is nondominated with respect to the population
@@ -37,7 +37,7 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
      * @param creditNonDominated credit to assign when solution is nondominated with respect to the given population
      * @param creditDominated credit to assign when solution is dominated with respect to the given population
      */
-    public OffspringParetoFront(double creditNonDominated,double creditDominated) {
+    public OffspringParetoFrontDominance(double creditNonDominated,double creditDominated) {
         operatesOn = CreditDefinedOn.PARETOFRONT;
         inputType = CreditFunctionInputType.SI;
         fitType = CreditFitnessFunctionType.Do;
@@ -53,10 +53,7 @@ public class OffspringParetoFront extends AbstractOffspringPopulation{
      */
     @Override
     public double compute(Solution offspring, Population population) {
-        if(population.getClass()!=NondominatedPopulation.class)
-            throw new ClassCastException("Need to be NondominatedPopulation: " + population.getClass());
-        NondominatedPopulation ndpop = (NondominatedPopulation)population;
-        if(ndpop.add(offspring))
+        if((int)offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE)==0)
             return creditNonDominated;
         else
             return creditDominated;

@@ -56,7 +56,7 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
         this.kappa = kappa;
         //has to be the population because parent may not lie on PF or in archive
         this.operatesOn = CreditDefinedOn.PARENT;
-        this.fitType = CreditFitnessFunctionType.R2;
+        this.fitType = CreditFitnessFunctionType.I;
 
         if (indicator.getClass().equals(HypervolumeIndicator.class)) {
             double[] hvRefPoint = new double[prob.getNumberOfObjectives()];

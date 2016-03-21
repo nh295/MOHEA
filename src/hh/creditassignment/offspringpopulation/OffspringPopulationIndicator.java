@@ -52,7 +52,7 @@ public class OffspringPopulationIndicator extends AbstractOffspringPopulation {
     public OffspringPopulationIndicator(IIndicator indicator, CreditDefinedOn operatesOn) {
         this.indicator = indicator;
         this.operatesOn = operatesOn;
-        fitType = CreditFitnessFunctionType.R2;
+        fitType = CreditFitnessFunctionType.I;
         inputType = CreditFunctionInputType.SI;
         if (!this.operatesOn.equals(CreditDefinedOn.ARCHIVE) && !this.operatesOn.equals(CreditDefinedOn.PARETOFRONT)) {
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");

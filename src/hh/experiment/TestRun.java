@@ -16,6 +16,8 @@ import hh.nextheuristic.INextHeuristic;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.ICreditAssignment;
 import hh.creditassigment.CreditDefFactory;
+import hh.hyperheuristics.AOSIBEA;
+import hh.hyperheuristics.AOSNSGAII;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,17 +32,22 @@ import org.moeaframework.Instrumenter;
 import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.InstrumentedAlgorithm;
 import org.moeaframework.analysis.sensitivity.EpsilonHelper;
-import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.NondominatedSortingPopulation;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
+import org.moeaframework.core.comparator.ChainedComparator;
+import org.moeaframework.core.comparator.CrowdingComparator;
 import org.moeaframework.core.comparator.DominanceComparator;
+import org.moeaframework.core.comparator.FitnessComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
+import org.moeaframework.core.fitness.HypervolumeFitnessEvaluator;
+import org.moeaframework.core.fitness.IndicatorFitnessEvaluator;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
@@ -59,7 +66,7 @@ public class TestRun implements Callable {
     protected Problem problem;
     protected String probName;
     protected String path;
-    private ICreditAssignment rewardDef;
+    private ICreditAssignment creditDef;
     protected double[] epsilonDouble;
     protected int maxEvaluations;
     private final Collection<Variation> heuristics;
@@ -75,6 +82,57 @@ public class TestRun implements Callable {
         this.probName = probName;
         this.maxEvaluations = maxEvaluations;
         this.path = path;
+    }
+    
+    /**
+     * Returns a new instance of AOSIBEA
+     * @return 
+     */
+    private IHyperHeuristic newAOSIBEA(){
+        int populationSize = (int) properties.getDouble("populationSize", 600);
+
+        Initialization initialization = new RandomInitialization(problem,
+                populationSize);
+
+        Population population = new Population();
+        
+        IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
+
+        FitnessComparator fitnessComparator = new FitnessComparator(fitnesseval.areLargerValuesPreferred());
+		TournamentSelection selection = new TournamentSelection(fitnessComparator);
+
+        //all other properties use default parameters
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+
+        AOSIBEA aosibea = new AOSIBEA(problem, population, null, selection,
+                initialization, fitnesseval, selector, creditDef);
+
+        return aosibea;
+    }
+    
+    /**
+     * Returns a new instance of AOSNSGAII
+     * @return 
+     */
+    private IHyperHeuristic newAOSNSGAII(){
+        int populationSize = (int) properties.getDouble("populationSize", 600);
+
+        Initialization initialization = new RandomInitialization(problem,
+                populationSize);
+
+        NondominatedSortingPopulation population = new NondominatedSortingPopulation();
+        
+        TournamentSelection selection = new TournamentSelection(2, 
+				new ChainedComparator(new ParetoDominanceComparator(),
+						new CrowdingComparator()));
+
+        //all other properties use default parameters
+        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+
+        AOSNSGAII aosnsgaii = new AOSNSGAII(problem, population, null, selection,
+                initialization, selector, creditDef);
+
+        return aosnsgaii;
     }
 
     /**
@@ -111,7 +169,7 @@ public class TestRun implements Callable {
 
 
         HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-                initialization, selector, rewardDef, injectionRate, lagWindow);
+                initialization, selector, creditDef, injectionRate, lagWindow);
 
         return hemoea;
     }
@@ -143,7 +201,7 @@ public class TestRun implements Callable {
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
         MOEADHH moeadhh = new MOEADHH(problem, neighborhoodSize, initialization,
-                delta, eta, updateUtility, selector, rewardDef);
+                delta, eta, updateUtility, selector, creditDef);
 
         return moeadhh;
     }
@@ -160,15 +218,19 @@ public class TestRun implements Callable {
     public IHyperHeuristic call() throws Exception {
         IHyperHeuristic hh;
         try {
-            rewardDef = CreditDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
+            creditDef = CreditDefFactory.getInstance().getCreditDef(properties.getString("CredDef", null), properties, problem);
         } catch (IOException ex) {
             Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        if(rewardDef.getFitnessType()==CreditFitnessFunctionType.De)
+        if(creditDef.getFitnessType()==CreditFitnessFunctionType.De)
              hh = newMOEADHH();
+        else if(creditDef.getFitnessType()==CreditFitnessFunctionType.Do)
+            hh = newAOSNSGAII();
+        else if(creditDef.getFitnessType()==CreditFitnessFunctionType.I)
+            hh = newAOSIBEA();
         else
-            hh = newHeMOEA();
+            throw new IllegalArgumentException("Credit fitness type " + creditDef.getFitnessType() + "not recognized");
         
         double[] refPointObj = new double[problem.getNumberOfObjectives()];
         Arrays.fill(refPointObj, 1.1);
@@ -185,7 +247,7 @@ public class TestRun implements Callable {
         InstrumentedAlgorithm instAlgorithm = instrumenter.instrument(hh);
 
         // run the executor using the listener to collect results
-        System.out.println("Starting " + hh.getNextHeuristicSupplier() + rewardDef + " on " + probName + " with pop size: " + properties.getDouble("populationSize", 600));
+        System.out.println("Starting " + hh.getNextHeuristicSupplier() + creditDef + " on " + probName + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
         while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
             instAlgorithm.step();

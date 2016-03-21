@@ -12,7 +12,6 @@ import hh.creditassigment.Credit;
 import java.util.Collection;
 import java.util.HashMap;
 import org.moeaframework.core.Population;
-import org.moeaframework.core.Solution;
 import org.moeaframework.core.Variation;
 
 /**
@@ -28,12 +27,10 @@ public abstract class AbstractPopulationContribution extends AbstractRewardDefin
     /**
      * Computes all the credits received for each heuristic and returns the Credits they earn
      * @param population
-     * @param enteringSolutions solutions that entered the nondominated set
-     * @param removedSolutions solutions that were removed after offspring were added to nondominated set
      * @param heuristics
      * @param iteration
      * @return 
      */
     public abstract HashMap<Variation, Credit> compute(Population population,
-            Collection<Solution> enteringSolutions,Collection<Solution> removedSolutions,Collection<Variation> heuristics,int iteration);
+            Collection<Variation> heuristics,int iteration);
 }
