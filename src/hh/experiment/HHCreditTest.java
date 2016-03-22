@@ -179,14 +179,6 @@ public class HHCreditTest {
 
 //                        heuristics.add(of.getVariation(op, heuristicProp, prob));
                     NondominatedPopulation refSet = ProblemFactory.getInstance().getReferenceSet(probName);
-                    //find max objective values in reference set for HV calculation
-                    double[] max = new double[refSet.get(0).getNumberOfObjectives()];
-                    Arrays.fill(max, Double.NEGATIVE_INFINITY);
-                    for (Solution ind : refSet) {
-                        for (int i = 0; i < max.length; i++) {
-                            max[i] = Math.max(max[i], ind.getObjective(i));
-                        }
-                    }
 
                     TypedProperties typeProp = new TypedProperties(prop);
 //                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
@@ -198,7 +190,7 @@ public class HHCreditTest {
                     System.out.println(op);
                     prop.put("operator", op);
                     typeProp = new TypedProperties(prop);
-                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet, max,
+                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
                             typeProp, "IBEA", maxEvaluations);
                     futures.add(pool.submit(test));
                 }

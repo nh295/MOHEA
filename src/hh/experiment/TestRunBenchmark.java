@@ -7,25 +7,15 @@ package hh.experiment;
 
 import hh.hyperheuristics.IHyperHeuristic;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.moeaframework.Instrumenter;
 import org.moeaframework.algorithm.StandardAlgorithms;
-import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.InstrumentedAlgorithm;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.PopulationIO;
 import org.moeaframework.core.Problem;
-import org.moeaframework.core.Solution;
-import org.moeaframework.core.indicator.InvertedGenerationalDistance;
-import org.moeaframework.core.indicator.jmetal.FastHypervolume;
-import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -44,14 +34,12 @@ public class TestRunBenchmark extends TestRun {
      * @param probName
      * @param referenceSet reference set to use to compute indicator values such
      * as IGD
-     * @param maxObjectiveValues the maximum objective values in the reference
-     * set (assuming minimization problem)
      * @param properties
      * @param algorithm
      * @param maxEvaluations
      */
-    public TestRunBenchmark(String path, Problem problem, String probName, NondominatedPopulation referenceSet, double[] maxObjectiveValues, TypedProperties properties, String algorithm, int maxEvaluations) {
-        super(path, problem, probName, referenceSet, maxObjectiveValues, properties, null, maxEvaluations);
+    public TestRunBenchmark(String path, Problem problem, String probName, NondominatedPopulation referenceSet, TypedProperties properties, String algorithm, int maxEvaluations) {
+        super(path, problem, probName, referenceSet, properties, null, maxEvaluations);
         this.algorithm = algorithm;
         this.prop = properties;
     }

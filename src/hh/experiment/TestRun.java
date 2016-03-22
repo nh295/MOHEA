@@ -21,7 +21,6 @@ import hh.hyperheuristics.AOSNSGAII;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -53,7 +52,6 @@ import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
-import org.moeaframework.core.spi.ProblemFactory;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -73,7 +71,6 @@ public class TestRun implements Callable {
     protected int maxEvaluations;
     private final Collection<Variation> heuristics;
     protected final NondominatedPopulation referenceSet;
-    protected final double[] maxObjectiveValues;
     protected Solution refPointObj;
 
     /**
@@ -82,12 +79,11 @@ public class TestRun implements Callable {
      * @param problem
      * @param probName
      * @param referenceSet
-     * @param maxObjectiveValues
      * @param properties
      * @param heuristics
      * @param maxEvaluations
      */
-    public TestRun(String path, Problem problem, String probName, NondominatedPopulation referenceSet, double[] maxObjectiveValues, TypedProperties properties,
+    public TestRun(String path, Problem problem, String probName, NondominatedPopulation referenceSet, TypedProperties properties,
             Collection<Variation> heuristics, int maxEvaluations) {
 
         this.heuristics = heuristics;
@@ -100,7 +96,6 @@ public class TestRun implements Callable {
         this.path = path;
 
         this.referenceSet = referenceSet;
-        this.maxObjectiveValues = maxObjectiveValues;
     }
     
     /**
@@ -307,7 +302,7 @@ public class TestRun implements Callable {
     protected InstrumentedAlgorithm instrument(Algorithm alg) {
         refPointObj = problem.newSolution();
         for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-            refPointObj.setObjective(i, maxObjectiveValues[i] * 1.1);
+            refPointObj.setObjective(i, 1.1);
         }
 
         Instrumenter instrumenter = new Instrumenter().withFrequency(maxEvaluations / 100)
