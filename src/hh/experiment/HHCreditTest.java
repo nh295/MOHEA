@@ -81,8 +81,8 @@ public class HHCreditTest {
 //            String[] creditDefs = new String[]{"OPDo","SIDoPF","CSDoPF"};
 
             //for single operator MOEA
-            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-//            String[] ops = new String[]{"sbx+pm"};
+//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
+            String[] ops = new String[]{"sbx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -118,7 +118,7 @@ public class HHCreditTest {
                             popSize = "100";
                         }
                         if (prob.getNumberOfObjectives() == 3) {
-                            maxEvaluations = 25000;
+                            maxEvaluations = 30000;
                             popSize = "105";
                         }
                     }

@@ -45,6 +45,11 @@ public class Normalizer {
 	 * The maximum value for each objective.
 	 */
 	private final double[] maximum;
+        
+        /**
+         * The values of min and max where the difference is smaller than machine precision. 
+         */
+        private final boolean[] smallerThanMachinePrecision;
 	
 	/**
 	 * Constructs a normalizer for normalizing populations so that all 
@@ -62,6 +67,7 @@ public class Normalizer {
 		this.problem = problem;
 		this.minimum = new double[problem.getNumberOfObjectives()];
 		this.maximum = new double[problem.getNumberOfObjectives()];
+                this.smallerThanMachinePrecision = new boolean[problem.getNumberOfObjectives()]; 
 
 		calculateRanges(population);		
 		checkRanges();
@@ -81,7 +87,7 @@ public class Normalizer {
 		this.problem = problem;
 		this.minimum = minimum.clone();
 		this.maximum = maximum.clone();
-		
+		this.smallerThanMachinePrecision = new boolean[problem.getNumberOfObjectives()];
 		checkRanges();
 	}
 	
@@ -127,11 +133,13 @@ public class Normalizer {
 	 */
 	private void checkRanges() {
 		for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-			if (Math.abs(minimum[i] - maximum[i]) < Settings.EPS) {
-				throw new IllegalArgumentException(
-						"objective with empty range");
-			}
-		}
+                    if (Math.abs(minimum[i] - maximum[i]) < Settings.EPS) {
+                            smallerThanMachinePrecision[i] = true;
+//				throw new IllegalArgumentException(
+//						"objective with empty range");
+			}else
+                    smallerThanMachinePrecision[i] = false;
+                }
 	}
 	
 	/**
@@ -189,9 +197,12 @@ public class Normalizer {
 			Solution clone = solution.copy();
 	
 			for (int j = 0; j < problem.getNumberOfObjectives(); j++) {
+                            if(!smallerThanMachinePrecision[j]){
 				clone.setObjective(j,
 						(clone.getObjective(j) - minimum[j]) /
 						(maximum[j] - minimum[j]));
+                            }else
+                                clone.setObjective(j,(clone.getObjective(j)));
 			}
 	
 			normalizedSet.add(clone);

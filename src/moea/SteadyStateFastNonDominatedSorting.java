@@ -51,6 +51,7 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
         population.add(individual);
         
         lastFront = new HashSet<>();
+        paretoFront = new HashSet<>();
 
         for(int i=0; i< rankIdx_[numRanks-1].length; i++){
             if(rankIdx_[numRanks-1][i]==1)
