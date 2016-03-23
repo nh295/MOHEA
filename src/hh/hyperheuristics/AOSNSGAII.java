@@ -157,7 +157,6 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
                         case PARETOFRONT:
 
                             creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, getParetoFront());
-                            archive.add(child);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
@@ -207,11 +206,7 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
      * @return
      */
     private Population getParetoFront() {
-        Population paretoFront = new Population();
-        for (Integer index : enlu.getParetoFront()) {
-            paretoFront.add(population.get(index));
-        }
-        return paretoFront;
+        return enlu.getParetoFront();
     }
 
     /**
