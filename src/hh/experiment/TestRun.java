@@ -9,7 +9,7 @@ import hh.IO.IOCreditHistory;
 import hh.IO.IOQualityHistory;
 import hh.IO.IOSelectionHistory;
 import hh.hyperheuristics.HHFactory;
-import hh.hyperheuristics.HeMOEA;
+//import hh.hyperheuristics.HeMOEA;
 import hh.hyperheuristics.IHyperHeuristic;
 import hh.hyperheuristics.MOEADHH;
 import hh.nextheuristic.INextHeuristic;
@@ -149,43 +149,43 @@ public class TestRun implements Callable {
         return aosnsgaii;
     }
 
-    /**
-     * Returns a new Hyper eMOEA instance.
-     *
-     * @param properties the properties for customizing the new {@code eMOEA}
-     * instance
-     * @param problem the problem
-     * @return a new {@code eMOEA} instance
-     */
-    private IHyperHeuristic newHeMOEA() {
-
-        int populationSize = (int) properties.getDouble("populationSize", 600);
-
-        int injectionRate = (int) properties.getDouble("injectionRate", 0.25);
-
-        //for injection
-        int lagWindow = (int) properties.getDouble("lagWindow", 50);
-
-        Initialization initialization = new RandomInitialization(problem,
-                populationSize);
-
-        Population population = new Population();
-
-        DominanceComparator comparator = new ParetoDominanceComparator();
-
-        EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(epsilonDouble);
-
-        final TournamentSelection selection = new TournamentSelection(
-                2, comparator);
-
-        //all other properties use default parameters
-        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
-
-        HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
-                initialization, selector, creditDef, injectionRate, lagWindow);
-
-        return hemoea;
-    }
+//    /**
+//     * Returns a new Hyper eMOEA instance.
+//     *
+//     * @param properties the properties for customizing the new {@code eMOEA}
+//     * instance
+//     * @param problem the problem
+//     * @return a new {@code eMOEA} instance
+//     */
+//    private IHyperHeuristic newHeMOEA() {
+//
+//        int populationSize = (int) properties.getDouble("populationSize", 600);
+//
+//        int injectionRate = (int) properties.getDouble("injectionRate", 0.25);
+//
+//        //for injection
+//        int lagWindow = (int) properties.getDouble("lagWindow", 50);
+//
+//        Initialization initialization = new RandomInitialization(problem,
+//                populationSize);
+//
+//        Population population = new Population();
+//
+//        DominanceComparator comparator = new ParetoDominanceComparator();
+//
+//        EpsilonBoxDominanceArchive archive = new EpsilonBoxDominanceArchive(epsilonDouble);
+//
+//        final TournamentSelection selection = new TournamentSelection(
+//                2, comparator);
+//
+//        //all other properties use default parameters
+//        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+//
+//        HeMOEA hemoea = new HeMOEA(problem, population, archive, selection,
+//                initialization, selector, creditDef, injectionRate, lagWindow);
+//
+//        return hemoea;
+//    }
 
     /**
      * Returns a new Hyper eMOEA instance.

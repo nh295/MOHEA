@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -114,6 +114,24 @@ public class Controller {
 	 * {@code false} otherwise.
 	 */
 	private boolean includeContribution = true;
+	
+	/**
+	 * {@code true} if the R1 indicator collector is included; {@code false}
+	 * otherwise.
+	 */
+	private boolean includeR1 = false;
+	
+	/**
+	 * {@code true} if the R2 indicator collector is included; {@code false}
+	 * otherwise.
+	 */
+	private boolean includeR2 = true;
+	
+	/**
+	 * {@code true} if the R3 indicator collector is included; {@code false}
+	 * otherwise.
+	 */
+	private boolean includeR3 = false;
 	
 	/**
 	 * {@code true} if the &epsilon;-progress collector is included; 
@@ -483,6 +501,18 @@ public class Controller {
 				analyzer.includeContribution();
 			}
 			
+			if (getIncludeR1()) {
+				analyzer.includeR1();
+			}
+			
+			if (getIncludeR2()) {
+				analyzer.includeR2();
+			}
+			
+			if (getIncludeR3()) {
+				analyzer.includeR3();
+			}
+			
 			for (ResultKey key : selectedResults) {
 				for (Accumulator accumulator : get(key)) {
 					if (!accumulator.keySet().contains("Approximation Set")) {
@@ -510,8 +540,6 @@ public class Controller {
 			viewer.setLocationRelativeTo(frame);
 			viewer.setIconImages(frame.getIconImages());
 			viewer.setVisible(true);
-		} catch (IOException ex) {
-			ex.printStackTrace();
 		} finally {
 			if (problem != null) {
 				problem.close();
@@ -566,6 +594,18 @@ public class Controller {
 					
 					if (getIncludeContribution()) {
 						instrumenter.attachContributionCollector();
+					}
+					
+					if (getIncludeR1()) {
+						instrumenter.attachR1Collector();
+					}
+					
+					if (getIncludeR2()) {
+						instrumenter.attachR2Collector();
+					}
+					
+					if (getIncludeR3()) {
+						instrumenter.attachR3Collector();
 					}
 					
 					if (getIncludeEpsilonProgress()) {
@@ -828,6 +868,69 @@ public class Controller {
 	public void setIncludeContribution(boolean includeContribution) {
 		this.includeContribution = includeContribution;
 	}
+	
+	/**
+	 * Returns {@code true} if the R1 indicator collector is included;
+	 * {@code false} otherwise.
+	 * 
+	 * @return {@code true} if the R1 indicator collector is included;
+	 *         {@code false} otherwise
+	 */
+	public boolean getIncludeR1() {
+		return includeR1;
+	}
+	
+	/**
+	 * Sets the inclusion of the R1 indicator collector.
+	 * 
+	 * @param includeR1 {@code true} if the R1 indicator collector is included;
+	 *        {@code false} otherwise
+	 */
+	public void setIncludeR1(boolean includeR1) {
+		this.includeR1 = includeR1;
+	}
+	
+	/**
+	 * Returns {@code true} if the R2 indicator collector is included;
+	 * {@code false} otherwise.
+	 * 
+	 * @return {@code true} if the R2 indicator collector is included;
+	 *         {@code false} otherwise
+	 */
+	public boolean getIncludeR2() {
+		return includeR2;
+	}
+	
+	/**
+	 * Sets the inclusion of the R2 indicator collector.
+	 * 
+	 * @param includeR2 {@code true} if the R2 indicator collector is included;
+	 *        {@code false} otherwise
+	 */
+	public void setIncludeR2(boolean includeR2) {
+		this.includeR2 = includeR2;
+	}
+	
+	/**
+	 * Returns {@code true} if the R3 indicator collector is included;
+	 * {@code false} otherwise.
+	 * 
+	 * @return {@code true} if the R3 indicator collector is included;
+	 *         {@code false} otherwise
+	 */
+	public boolean getIncludeR3() {
+		return includeR3;
+	}
+	
+	/**
+	 * Sets the inclusion of the R3 indicator collector.
+	 * 
+	 * @param includeR3 {@code true} if the R3 indicator collector is included;
+	 *        {@code false} otherwise
+	 */
+	public void setIncludeR3(boolean includeR3) {
+		this.includeR3 = includeR3;
+	}
 
 	/**
 	 * Returns {@code true} if the &epsilon;-progress collector is included;
@@ -1014,9 +1117,15 @@ public class Controller {
 	protected void handleException(Exception e) {
 		e.printStackTrace();
 		
+		String message = e.getMessage() == null ? e.toString() : e.getMessage();
+		
+		if (e.getCause() != null && e.getCause().getMessage() != null) {
+			message += " - " + e.getCause().getMessage();
+		}
+		
 		JOptionPane.showMessageDialog(
 				frame, 
-				e.getMessage() == null ? e.toString() : e.getMessage(), 
+				message, 
 				"Error", 
 				JOptionPane.ERROR_MESSAGE);
 	}

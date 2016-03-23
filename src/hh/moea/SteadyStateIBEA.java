@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package moea;
+package hh.moea;
 
 import org.moeaframework.algorithm.IBEA;
 import org.moeaframework.core.Initialization;
@@ -35,7 +35,8 @@ public class SteadyStateIBEA extends IBEA {
 
         evaluateAll(offspring);
         for(Solution child : offspring){
-            fitnessEvaluator.addAndUpdate(population, child);
+            population.add(child);
+            fitnessEvaluator.evaluate(population);
             
             int worstIndex = findWorstIndex();
             fitnessEvaluator.removeAndUpdate(population, worstIndex);

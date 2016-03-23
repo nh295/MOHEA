@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -39,15 +39,21 @@ class ProblemBuilder {
 
 	/**
 	 * The problem name.  If {@code null}, the problem is specified by
-	 * {@code problemClass}.
+	 * {@code problemClass} or {@code problemInstance}.
 	 */
 	String problemName;
 	
 	/**
 	 * The problem class.  If {@code null}, the problem is specified by
-	 * {@code problemName}.
+	 * {@code problemName} or {@code problemInstance}.
 	 */
 	Class<?> problemClass;
+	
+	/**
+	 * The specific instance of the problem.  If {@code null}, the problem is
+	 * specified by {@code problemName} or {@code problemClass}.
+	 */
+	Problem problemInstance;
 	
 	/**
 	 * The arguments used when constructing an instance of the problem class.
@@ -72,8 +78,8 @@ class ProblemBuilder {
 	 * individual approximation sets.
 	 */
 	File referenceSetFile;
-        
-        /**
+	
+	/**
 	 * The reference set to be used by this builder; or
 	 * {@code null} if the reference set should be aggregated from all
 	 * individual approximation sets.
@@ -98,6 +104,7 @@ class ProblemBuilder {
 	ProblemBuilder withSameProblemAs(ProblemBuilder builder) {
 		this.problemName = builder.problemName;
 		this.problemClass = builder.problemClass;
+		this.problemInstance = builder.problemInstance;
 		this.problemArguments = builder.problemArguments;
 		this.problemFactory = builder.problemFactory;
 		this.epsilon = builder.epsilon;
@@ -127,6 +134,24 @@ class ProblemBuilder {
 	ProblemBuilder withProblem(String problemName) {
 		this.problemName = problemName;
 		this.problemClass = null;
+		this.problemInstance = null;
+		
+		return this;
+	}
+	
+	/**
+	 * Sets the problem instance used by this builder.  Until the other
+	 * {@code withProblem} methods, using a problem instance will not close the
+	 * problem.  It is the responsibility of the user to ensure any problems
+	 * holding resources are properly closed.
+	 * 
+	 * @param problemInstance the problem instance
+	 * @return a reference to this builder
+	 */
+	ProblemBuilder withProblem(Problem problemInstance) {
+		this.problemInstance = problemInstance;
+		this.problemName = null;
+		this.problemClass = null;
 		
 		return this;
 	}
@@ -147,6 +172,7 @@ class ProblemBuilder {
 		this.problemClass = problemClass;
 		this.problemArguments = problemArguments;
 		this.problemName = null;
+		this.problemInstance = null;
 		
 		return this;
 	}
@@ -202,7 +228,7 @@ class ProblemBuilder {
 		
 		return this;
 	}
-        
+	
         ProblemBuilder withReferenseSet(NondominatedPopulation referenceSet){
             this.referenceSet = referenceSet;
             return this;
@@ -228,7 +254,7 @@ class ProblemBuilder {
 	 * Returns the reference set used by this builder.  The reference set is
 	 * generated as follows:
 	 * <ol>
-	 *   <li>If {@link #withReferenceSetFile(File)} has been set, the contents of 
+	 *   <li>If {@link #withReferenceSet(File)} has been set, the contents of 
 	 *       the reference set file are returned;
 	 *   <li>If the problem factory provides a reference set via the
 	 *       {@link ProblemFactory#getReferenceSet(String)} method, this
@@ -249,8 +275,8 @@ class ProblemBuilder {
 			
 			if (problemName != null) {
 				if (problemFactory == null) {
-					factorySet = ProblemFactory.getInstance()
-							.getReferenceSet(problemName);
+					factorySet = ProblemFactory.getInstance().getReferenceSet(
+							problemName);
 				} else {
 					factorySet = problemFactory.getReferenceSet(problemName);
 				}
@@ -290,11 +316,14 @@ class ProblemBuilder {
 	 *         {@link NoSuchMethodException}.
 	 */
 	Problem getProblemInstance() {
-		if ((problemName == null) && (problemClass == null)) {
+		if ((problemName == null) && (problemClass == null) &&
+				(problemInstance == null)) {
 			throw new IllegalArgumentException("no problem specified");
 		}
 		
-		if (problemClass != null) {
+		if (problemInstance != null) {
+			return problemInstance;
+		} else if (problemClass != null) {
 			try {
 				return (Problem)ConstructorUtils.invokeConstructor(problemClass,
 						problemArguments);
