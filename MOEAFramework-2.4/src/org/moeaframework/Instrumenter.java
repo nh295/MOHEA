@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -27,11 +27,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+
 import org.moeaframework.analysis.collector.Accumulator;
 import org.moeaframework.analysis.collector.AdaptiveMultimethodVariationCollector;
 import org.moeaframework.analysis.collector.AdaptiveTimeContinuationCollector;
 import org.moeaframework.analysis.collector.ApproximationSetCollector;
-import org.moeaframework.analysis.collector.ArchiveInjectionCollector;
 import org.moeaframework.analysis.collector.Collector;
 import org.moeaframework.analysis.collector.ElapsedTimeCollector;
 import org.moeaframework.analysis.collector.EpsilonProgressCollector;
@@ -41,13 +41,18 @@ import org.moeaframework.analysis.collector.PopulationSizeCollector;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
+import org.moeaframework.core.Settings;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.indicator.AdditiveEpsilonIndicator;
 import org.moeaframework.core.indicator.Contribution;
 import org.moeaframework.core.indicator.GenerationalDistance;
 import org.moeaframework.core.indicator.Hypervolume;
 import org.moeaframework.core.indicator.InvertedGenerationalDistance;
+import org.moeaframework.core.indicator.R1Indicator;
+import org.moeaframework.core.indicator.R2Indicator;
+import org.moeaframework.core.indicator.R3Indicator;
 import org.moeaframework.core.indicator.Spacing;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.spi.ProblemFactory;
@@ -61,6 +66,7 @@ import org.moeaframework.core.spi.ProblemFactory;
  * the collection of runtime information as the algorithm is executed.  Lastly,
  * the {@code InstrumentedAlgorithm} stores the runtime information, which can
  * subsequently be accessed and analyzed.
+ * <p>
  * <pre>
  *   Instrumenter instrumenter = new Instrumenter()
  *     .withProblem(problemName)
@@ -83,8 +89,8 @@ public class Instrumenter extends ProblemBuilder {
 	 * otherwise.
 	 */
 	private boolean includeHypervolume;
-        
-        /**
+	
+	/**
 	 * {@code true} if the hypervolumejmetal collector is included; {@code false}
 	 * otherwise.
 	 */
@@ -121,16 +127,25 @@ public class Instrumenter extends ProblemBuilder {
 	private boolean includeContribution;
 	
 	/**
+	 * {@code true} if the R1 collector is included; {@code false} otherwise.
+	 */
+	private boolean includeR1;
+	
+	/**
+	 * {@code true} if the R2 collector is included; {@code false} otherwise.
+	 */
+	private boolean includeR2;
+	
+	/**
+	 * {@code true} if the R3 collector is included; {@code false} otherwise.
+	 */
+	private boolean includeR3;
+	
+	/**
 	 * {@code true} if the &epsilon;-progress collector is included;
 	 * {@code false} otherwise.
 	 */
 	private boolean includeEpsilonProgress;
-        
-        /**
-	 * {@code true} if the injection counter collector is included;
-	 * {@code false} otherwise.
-	 */
-        private boolean includeInjectionIndicator;
 	
 	/**
 	 * {@code true} if the adaptive multimethod variation collector is included;
@@ -161,8 +176,8 @@ public class Instrumenter extends ProblemBuilder {
 	 * otherwise.
 	 */
 	private boolean includePopulationSize;
-        
-        /**
+
+	/**
 	 * The frequency, in evaluations, that data is collected.
 	 */
 	private int frequency;
@@ -178,12 +193,16 @@ public class Instrumenter extends ProblemBuilder {
 	 * The accumulator from the last instrumented algorithm.
 	 */
 	private Accumulator lastAccumulator;
+	
+	/**
+	 * The packages that this instrumenter is allowed to access.
+	 */
+	private final List<String> allowedPackages;
         
         /**
-         * The reference point for the hypervolume calcuation
+         * reference point for HV
          */
         private Solution referencePointHV;
-        
 	
 	/**
 	 * Constructs a new instrumenter instance, initially with no collectors.
@@ -193,6 +212,10 @@ public class Instrumenter extends ProblemBuilder {
 		
 		frequency = 100;
 		customCollectors = new ArrayList<Collector>();
+		
+		allowedPackages = new ArrayList<String>();
+		allowedPackages.add("org.moeaframework");
+		allowedPackages.addAll(Arrays.asList(Settings.getAllowedPackages()));
 	}
 	
 	/**
@@ -207,7 +230,50 @@ public class Instrumenter extends ProblemBuilder {
 	}
 	
 	/**
+	 * Allows this instrumenter to visit classes in the given package.  Some
+	 * Java classes can not be readily visited/discovered by this instrumenter,
+	 * possibly resulting in a {@code NullPointerException} or a
+	 * {@code SecurityException}.  Therefore, the instrumenter can only visit
+	 * classes explicitly allowed by the user.  By default,
+	 * {@code org.moeaframework} is allowed.
+	 * 
+	 * @param packageName a package name or the package name prefix
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter addAllowedPackage(String packageName) {
+		allowedPackages.add(packageName);
+		
+		return this;
+	}
+	
+	/**
+	 * Removes one of the packages this instrumenter is allowed to visit.
+	 * Note that the given string must match the string passed to
+	 * {@link #addAllowedPackage(String)}.
+	 * 
+	 * @param packageName the package name or package name prefix to remove
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter removeAllowedPackage(String packageName) {
+		allowedPackages.remove(packageName);
+		
+		return this;
+	}
+	
+	/**
+	 * Returns all packages this instrumenter is allowed to visit.
+	 * 
+	 * @return the list of allowed package names
+	 */
+	public List<String> getAllowedPackages() {
+		return allowedPackages;
+	}
+	
+	/**
 	 * Sets the frequency, in evaluations, that data is collected.  
+	 * 
+	 * @param frequency the frequency
+	 * @return a reference to this instrumenter
 	 */
 	public Instrumenter withFrequency(int frequency) {
 		this.frequency = frequency;
@@ -237,8 +303,8 @@ public class Instrumenter extends ProblemBuilder {
 		
 		return this;
 	}
-        
-        /**
+	
+	/**
 	 * Includes the hypervolume collector from Jmetal when instrumenting algorithms.
 	 * 
          * @param referencePoint the reference point in the normalized space to use when computing the hypervolume
@@ -309,9 +375,43 @@ public class Instrumenter extends ProblemBuilder {
 	}
 	
 	/**
+	 * Includes the R1 collector when instrumenting algorithms.
+	 * 
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter attachR1Collector() {
+		includeR1 = true;
+		
+		return this;
+	}
+	
+	/**
+	 * Includes the R2 collector when instrumenting algorithms.
+	 * 
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter attachR2Collector() {
+		includeR2 = true;
+		
+		return this;
+	}
+	
+	/**
+	 * Includes the R3 collector when instrumenting algorithms.
+	 * 
+	 * @return a reference to this instrumenter
+	 */
+	public Instrumenter attachR3Collector() {
+		includeR3 = true;
+		
+		return this;
+	}
+	
+	/**
 	 * Includes all indicator collectors when instrumenting algorithms.  This
 	 * includes hypervolume, generational distance, inverted generational
-	 * distance, spacing, additive &epsilon;-indicator and contribution.
+	 * distance, spacing, additive &epsilon;-indicator, contribution, and the
+	 * R1, R2, and R3 indicators.
 	 * 
 	 * @return a reference to this instrumenter
 	 */
@@ -322,6 +422,9 @@ public class Instrumenter extends ProblemBuilder {
 		attachSpacingCollector();
 		attachAdditiveEpsilonIndicatorCollector();
 		attachContributionCollector();
+		attachR1Collector();
+		attachR2Collector();
+		attachR3Collector();
 		
 		return this;
 	}
@@ -333,17 +436,6 @@ public class Instrumenter extends ProblemBuilder {
 	 */
 	public Instrumenter attachEpsilonProgressCollector() {
 		includeEpsilonProgress = true;
-		
-		return this;
-	}
-        
-        /**
-	 * Includes the injection count collector when instrumenting algorithms
-	 * 
-	 * @return a reference to this instrumenter
-	 */
-	public Instrumenter attachInjectionCollector() {
-		includeInjectionIndicator = true;
 		
 		return this;
 	}
@@ -404,8 +496,8 @@ public class Instrumenter extends ProblemBuilder {
 		
 		return this;
 	}
-        
-        /**
+	
+	/**
 	 * Includes all collectors when instrumenting algorithms.
 	 * 
 	 * @return a reference to this instrumenter
@@ -436,6 +528,11 @@ public class Instrumenter extends ProblemBuilder {
 	public Instrumenter withProblem(String problemName) {
 		return (Instrumenter)super.withProblem(problemName);
 	}
+	
+	@Override
+	public Instrumenter withProblem(Problem problemInstance) {
+		return (Instrumenter)super.withProblem(problemInstance);
+	}
 
 	@Override
 	public Instrumenter withProblemClass(Class<?> problemClass, 
@@ -460,7 +557,7 @@ public class Instrumenter extends ProblemBuilder {
 	public Instrumenter withEpsilon(double... epsilon) {
 		return (Instrumenter)super.withEpsilon(epsilon);
 	}
-        
+	
         public Instrumenter withReferenceSet(NondominatedPopulation referenceSet){
             return (Instrumenter)super.withReferenseSet(referenceSet);
         }
@@ -532,12 +629,20 @@ public class Instrumenter extends ProblemBuilder {
 				instrument(algorithm, collectors, visited, parents, element, 
 						null);
 			}
-		} else if ((type.getPackage() != null) && 
-				(!type.getPackage().getName().startsWith("org.moeaframework")&&
-                                 !type.getPackage().getName().startsWith("hh.")&&
-                        !type.getPackage().getName().startsWith("moea"))) {
-			//do not visit objects which are not within this framework
-			return;
+		} else if (type.getPackage() != null) {
+			//do not visit objects that are in inaccessible packages
+			boolean allowed = false;
+			
+			for (String packageName : allowedPackages) {
+				if (type.getPackage().getName().startsWith(packageName)) {
+					allowed = true;
+					break;
+				}
+			}
+			
+			if (!allowed) {
+				return;
+			}
 		}
 		
 		if (!visited.contains(object)) {
@@ -593,9 +698,10 @@ public class Instrumenter extends ProblemBuilder {
 	public InstrumentedAlgorithm instrument(Algorithm algorithm) {
 		List<Collector> collectors = new ArrayList<Collector>();
 		
-		if (includeHypervolume || includeHypervolumeJmetal || includeGenerationalDistance || 
+		if (includeHypervolume || includeGenerationalDistance || 
 				includeInvertedGenerationalDistance || includeSpacing ||
-				includeAdditiveEpsilonIndicator || includeContribution) {
+				includeAdditiveEpsilonIndicator || includeContribution ||
+				includeR1 || includeR2 || includeR3) {
 			Problem problem = algorithm.getProblem();
 			NondominatedPopulation referenceSet = getReferenceSet();
 			EpsilonBoxDominanceArchive archive = null;
@@ -642,14 +748,34 @@ public class Instrumenter extends ProblemBuilder {
 						new Contribution(referenceSet, archive.getComparator()),
 						archive));
 			}
+			
+			if (includeR1) {
+				collectors.add(new IndicatorCollector(new R1Indicator(
+						problem,
+						R1Indicator.getDefaultSubdivisions(problem),
+						referenceSet),
+						archive));
+			}
+			
+			if (includeR2) {
+				collectors.add(new IndicatorCollector(new R2Indicator(
+						problem,
+						R2Indicator.getDefaultSubdivisions(problem),
+						referenceSet),
+						archive));
+			}
+			
+			if (includeR3) {
+				collectors.add(new IndicatorCollector(new R3Indicator(
+						problem,
+						R3Indicator.getDefaultSubdivisions(problem),
+						referenceSet),
+						archive));
+			}
 		}
 		
 		if (includeEpsilonProgress) {
 			collectors.add(new EpsilonProgressCollector());
-		}
-                
-                if (includeInjectionIndicator) {
-			collectors.add(new ArchiveInjectionCollector());
 		}
 		
 		if (includeAdaptiveMultimethodVariation) {

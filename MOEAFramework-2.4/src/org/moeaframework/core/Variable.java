@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -36,5 +36,11 @@ public interface Variable extends Serializable {
 	 * @return an independent copy of this decision variable
 	 */
 	public Variable copy();
+	
+	/**
+	 * Randomly assign the value of this variable.  In general, the
+	 * randomization should follow a uniform distribution.
+	 */
+	public void randomize();
 
 }

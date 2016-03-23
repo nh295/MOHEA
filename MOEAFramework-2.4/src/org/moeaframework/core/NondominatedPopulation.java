@@ -1,4 +1,4 @@
-/* Copyright 2009-2015 David Hadka
+/* Copyright 2009-2016 David Hadka
  *
  * This file is part of the MOEA Framework.
  *
@@ -17,8 +17,6 @@
  */
 package org.moeaframework.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.moeaframework.core.comparator.DominanceComparator;
@@ -31,26 +29,14 @@ import org.moeaframework.core.comparator.ParetoDominanceComparator;
  * solution are removed. If the new solution is dominated by any member of the
  * population, the new solution is not added.
  */
-public class NondominatedPopulation extends Population implements Cloneable {
+public class NondominatedPopulation extends Population {
 
 	/**
 	 * The dominance comparator used by this non-dominated population.
 	 */
-    private final DominanceComparator comparator;
+	protected final DominanceComparator comparator;
 	
-    protected boolean changedFlag;
-
 	/**
-     * Used after running add or addAndReturnRemovedSolutions to see if
-     * insertion of new solution changed population
-     *
-     * @return
-	 */
-    public boolean isChanged() {
-        return changedFlag;
-    }
-    
-    /**
 	 * If {@code true}, allow duplicate solutions in this non-dominated
 	 * population.  Duplicate solutions are those whose Euclidean distance
 	 * is smaller than {@code Settings.EPSILON}.
@@ -75,8 +61,8 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	public NondominatedPopulation(DominanceComparator comparator) {
 		this(comparator, false);
 	}
-        
-        /**
+	
+	/**
 	 * Constructs an empty non-dominated population using the specified 
 	 * dominance relation.
 	 * 
@@ -97,7 +83,7 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	 * and initialized with the specified solutions.
 	 * 
 	 * @param iterable the solutions used to initialize this non-dominated
-     * population
+	 *        population
 	 */
 	public NondominatedPopulation(Iterable<? extends Solution> iterable) {
 		this();
@@ -109,9 +95,9 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	 * comparator and initialized with the specified solutions.
 	 * 
 	 * @param comparator the dominance relation used by this non-dominated
-     * population
+	 *        population
 	 * @param iterable the solutions used to initialize this non-dominated
-     * population
+	 *        population
 	 */
 	public NondominatedPopulation(DominanceComparator comparator,
 			Iterable<? extends Solution> iterable) {
@@ -127,42 +113,26 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	 */
 	@Override
 	public boolean add(Solution newSolution) {
-        addAndReturnRemovedSolutions(newSolution);
-        return changedFlag;
+		Iterator<Solution> iterator = iterator();
+
+		while (iterator.hasNext()) {
+			Solution oldSolution = iterator.next();
+			int flag = comparator.compare(newSolution, oldSolution);
+
+			if (flag < 0) {
+				iterator.remove();
+			} else if (flag > 0) {
+				return false;
+			} else if (!allowDuplicates &&
+					distance(newSolution, oldSolution) < Settings.EPS) {
+				return false;
 			}
+		}
+
+		return super.add(newSolution);
+	}
 
 	/**
-     * If {@code newSolution} is dominates any solution or is non-dominated with
-     * all solutions in this population, the dominated solutions are removed and
-     * {@code newSolution} is added to this population. Otherwise,
-     * {@code newSolution} is dominated and is not added to this population.
-     *
-     * @return returns a collection of the solutions that are no longer in the
-     * nondominated population. If return an empty list, new solution enters
-     * nondominated set but doesn't replace any solutions. If return null, then
-     * new solution didn't enter nondominated set
-	 */
-    public Collection<Solution> addAndReturnRemovedSolutions(Solution newSolution) {
-        Iterator<Solution> iterator = iterator();
-        ArrayList<Solution> removed = new ArrayList<>();
-        while (iterator.hasNext()) {
-            Solution oldSolution = iterator.next();
-            int flag = comparator.compare(newSolution, oldSolution);
-
-            if (flag < 0) {
-                removed.add(oldSolution);
-                iterator.remove();
-            } else if (flag > 0) {
-                return null;
-            } else if (!allowDuplicates && distance(newSolution, oldSolution) < Settings.EPS) {
-                return null;
-            }
-        }
-        changedFlag = super.add(newSolution);
-        return removed;
-    }
-    
-    /**
 	 * Replace the solution at the given index with the new solution, but only
 	 * if the new solution is non-dominated.  To maintain non-dominance within
 	 * this population, any solutions dominated by the new solution will also
@@ -200,7 +170,7 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	 * @param newSolution the solution to be added
 	 * @return true if the population was modified as a result of this operation
 	 */
-        public boolean forceAddWithoutCheck(Solution newSolution) {
+	protected boolean forceAddWithoutCheck(Solution newSolution) {
 		return super.add(newSolution);
 	}
 
@@ -229,22 +199,5 @@ public class NondominatedPopulation extends Population implements Cloneable {
 	public DominanceComparator getComparator() {
 		return comparator;
 	}
-
-    /**
-     * Shallow clone that only copies the Solution instances to a new instance
-     * of a NondominatedPopulation
-     *
-     * @return
-     * @throws CloneNotSupportedException
-     */
-    @Override
-    public NondominatedPopulation clone() throws CloneNotSupportedException {
-        NondominatedPopulation ndPopClone = new NondominatedPopulation();
-        Iterator<Solution> iterator = iterator();
-        while (iterator.hasNext()) {
-            ndPopClone.forceAddWithoutCheck(iterator.next());
-    }
-        return ndPopClone;
-    }
 
 }

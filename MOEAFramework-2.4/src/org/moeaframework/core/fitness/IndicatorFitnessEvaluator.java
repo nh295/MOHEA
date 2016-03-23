@@ -185,7 +185,6 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
 		}
 
 		population.remove(removeIndex);
-                maxAbsIndicatorValue = findMaxIndicatorValue();
 	}
         
         /**
