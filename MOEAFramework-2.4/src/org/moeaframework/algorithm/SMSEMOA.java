@@ -19,7 +19,7 @@ package org.moeaframework.algorithm;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import moea.SteadyStateFastNonDominatedSorting;
+import hh.moea.SteadyStateFastNonDominatedSorting;
 
 import org.moeaframework.core.FastNondominatedSorting;
 import org.moeaframework.core.FitnessEvaluator;

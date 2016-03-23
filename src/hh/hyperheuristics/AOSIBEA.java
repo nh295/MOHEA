@@ -18,7 +18,7 @@ import hh.nextheuristic.INextHeuristic;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import moea.SteadyStateIBEA;
+import hh.moea.SteadyStateIBEA;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.ParallelPRNG;

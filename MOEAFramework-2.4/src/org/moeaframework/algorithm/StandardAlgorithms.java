@@ -18,9 +18,9 @@
 package org.moeaframework.algorithm;
 
 import java.util.Properties;
-import moea.R2MOEA;
-import moea.SteadyStateIBEA;
-import moea.SteadyStateNSGAII;
+import hh.moea.R2MOEA;
+import hh.moea.SteadyStateIBEA;
+import hh.moea.SteadyStateNSGAII;
 
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.moeaframework.algorithm.pso.OMOPSO;

@@ -215,6 +215,7 @@ public class Instrumenter extends ProblemBuilder {
 		
 		allowedPackages = new ArrayList<String>();
 		allowedPackages.add("org.moeaframework");
+                allowedPackages.add("hh");
 		allowedPackages.addAll(Arrays.asList(Settings.getAllowedPackages()));
 	}
 	
