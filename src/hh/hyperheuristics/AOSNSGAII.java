@@ -14,11 +14,15 @@ import hh.creditassignment.populationcontribution.AbstractPopulationContribution
 import hh.history.CreditHistory;
 import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
+import hh.moea.SteadyStateNSGAII;
 import hh.nextheuristic.INextHeuristic;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import hh.moea.SteadyStateNSGAII;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedSortingPopulation;
@@ -86,6 +90,12 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
      */
     private String name;
 
+    /**
+     * A temporary list to store solutions that are removed for the population
+     * in order to correctly update the Pareto front indices
+     */
+    private ArrayList<Integer> removedSolutions;
+
     public AOSNSGAII(Problem problem, NondominatedSortingPopulation population,
             EpsilonBoxDominanceArchive archive, Selection selection,
             Initialization initialization, INextHeuristic heuristicSelector,
@@ -100,6 +110,7 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
         this.qualityHistory = new OperatorQualityHistory(heuristics);
         this.creditHistory = new CreditHistory(heuristics);
         this.pprng = new ParallelPRNG();
+        this.removedSolutions = new ArrayList<>();
 
         //Initialize the stored pareto front
         super.initialize();
@@ -143,37 +154,43 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
         } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
-            double creditValue = 0.0;
-            for (Solution child : children) {
-                evaluate(child);
-                enlu.addSolution(child, population);
-                int worstIndex = findWorstSolution();
-                population.remove(worstIndex);
+            try{
+                double creditValue = 0.0;
+                for (Solution child : children) {
+                    removedSolutions.clear();
+                    evaluate(child);
+                    enlu.addSolution(child, population);
+                    int worstIndex = findWorstSolution();
+                    removedSolutions.add(worstIndex);
+                    population.remove(worstIndex);
 
-                if (worstIndex != population.size()) { //solution made it in population
-                    //credit definitions operating on PF and archive will 
-                    //modify the nondominated population by adding the child to the nondominated population.
-                    switch (creditDef.getOperatesOn()) {
-                        case PARETOFRONT:
+                    if (worstIndex != population.size()) { //solution made it in population
+                        //credit definitions operating on PF and archive will 
+                        //modify the nondominated population by adding the child to the nondominated population.
+                        switch (creditDef.getOperatesOn()) {
+                            case PARETOFRONT:
 
-                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, getParetoFront());
-                            archive.add(child);
-                            break;
-                        default:
-                            throw new NullPointerException("Credit definition not "
-                                    + "recognized. Used " + creditDef.getInputType() + ".");
+                                creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, getParetoFront());
+                                break;
+                            default:
+                                throw new NullPointerException("Credit definition not "
+                                        + "recognized. Used " + creditDef.getInputType() + ".");
+                        }
                     }
                 }
+                Credit reward = new Credit(this.numberOfEvaluations, creditValue);
+                operatorSelector.update(reward, operator);
+                creditHistory.add(operator, reward);
+            }catch(Exception e){
+                Logger.getLogger(AOSNSGAII.class.getName()).log(Level.SEVERE, null, e);
             }
-            Credit reward = new Credit(this.numberOfEvaluations, creditValue);
-            operatorSelector.update(reward, operator);
-            creditHistory.add(operator, reward);
         } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                 enlu.addSolution(child, population);
                 int worstIndex = findWorstSolution();
+                removedSolutions.add(worstIndex);
                 population.remove(worstIndex);
             }
             HashMap<Variation, Credit> popContRewards;
@@ -208,7 +225,24 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
      */
     private Population getParetoFront() {
         Population paretoFront = new Population();
-        for (Integer index : enlu.getParetoFront()) {
+        ArrayList<Integer> pfIndices = new ArrayList(enlu.getParetoFront());
+        ArrayList<Integer> newpfIndices = new ArrayList();
+        
+        //for every index that has been removed, update any Pareto front indices that are larger than it
+        //do not include any index belonging to both the Pareto front and the removed list (this can occur if the Pareto front is the only front)
+        for(Integer removedIndex : removedSolutions){
+            for(int i=0; i<pfIndices.size(); i++){
+                if(!(pfIndices.get(i).equals(removedIndex))){
+                    if(pfIndices.get(i) > removedIndex){
+                        newpfIndices.add(pfIndices.get(i)-1);
+                    }else{
+                        newpfIndices.add(pfIndices.get(i));
+                    }
+                }
+            }
+        }
+        
+        for (Integer index : newpfIndices) {
             paretoFront.add(population.get(index));
         }
         return paretoFront;

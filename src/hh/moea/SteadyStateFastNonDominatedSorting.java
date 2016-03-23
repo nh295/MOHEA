@@ -36,7 +36,7 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
     public SteadyStateFastNonDominatedSorting() {
         super();
     }
-
+    
     /**
      * update the non-domination level when adding a solution. Modified code
      * obtained from https://github.com/JerryI00/publication_codes.git
@@ -79,7 +79,7 @@ public class SteadyStateFastNonDominatedSorting extends FastNondominatedSorting 
      * @return the indices of the solutions in the pareto front
      */
     public Collection<Integer> getParetoFront(){
-        return lastFront;
+        return paretoFront;
     }
     
     /**

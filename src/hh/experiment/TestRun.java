@@ -259,13 +259,14 @@ public class TestRun implements Callable {
         long finishTime = System.currentTimeMillis();
         System.out.println("Done with optimization. Execution time: " + ((finishTime - startTime) / 1000) + "s");
 
-        saveIndicatorValues(instAlgorithm, probName);
 
         hh.setName(String.valueOf(System.nanoTime()));
 
         String filename = path + File.separator + properties.getProperties().getProperty("saveFolder") + File.separator + probName + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
 
+        
+        saveIndicatorValues(instAlgorithm, filename);
        
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveFinalPopulation"))) {
             NondominatedPopulation ndPop = instAlgorithm.getResult();
