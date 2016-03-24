@@ -16,11 +16,11 @@ import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
 import hh.moea.SteadyStateNSGAII;
 import hh.nextheuristic.INextHeuristic;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
@@ -154,7 +154,7 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
             operatorSelector.update(reward, operator);
             creditHistory.add(operator, reward);
         } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
-            try{
+            try {
                 double creditValue = 0.0;
                 for (Solution child : children) {
                     removedSolutions.clear();
@@ -170,7 +170,7 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
                         switch (creditDef.getOperatesOn()) {
                             case PARETOFRONT:
 
-                                creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, getParetoFront());
+                                creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, null);
                                 break;
                             default:
                                 throw new NullPointerException("Credit definition not "
@@ -181,10 +181,11 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
                 Credit reward = new Credit(this.numberOfEvaluations, creditValue);
                 operatorSelector.update(reward, operator);
                 creditHistory.add(operator, reward);
-            }catch(Exception e){
+            } catch (Exception e) {
                 Logger.getLogger(AOSNSGAII.class.getName()).log(Level.SEVERE, null, e);
             }
         } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
+            removedSolutions.clear();
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
@@ -226,23 +227,30 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
     private Population getParetoFront() {
         Population paretoFront = new Population();
         ArrayList<Integer> pfIndices = new ArrayList(enlu.getParetoFront());
-        ArrayList<Integer> newpfIndices = new ArrayList();
-        
+        HashMap<Integer, Integer> map = new HashMap(); //key is old index, value is new index
+        for (Integer index : pfIndices) {
+            map.put(index, index);
+        }
+        for(Integer removedIndex : removedSolutions){
+            map.remove(removedIndex);
+        }
+
         //for every index that has been removed, update any Pareto front indices that are larger than it
         //do not include any index belonging to both the Pareto front and the removed list (this can occur if the Pareto front is the only front)
-        for(Integer removedIndex : removedSolutions){
-            for(int i=0; i<pfIndices.size(); i++){
-                if(!(pfIndices.get(i).equals(removedIndex))){
-                    if(pfIndices.get(i) > removedIndex){
-                        newpfIndices.add(pfIndices.get(i)-1);
-                    }else{
-                        newpfIndices.add(pfIndices.get(i));
-                    }
+        Iterator<Integer> iter = map.keySet().iterator();
+        while (iter.hasNext()) {
+            int pfIndex = iter.next();
+            for (Integer removedIndex : removedSolutions) {
+                if (pfIndex > removedIndex) {
+                    map.put(pfIndex, map.get(pfIndex) - 1);
                 }
             }
         }
-        
-        for (Integer index : newpfIndices) {
+
+        for (Integer index : map.values()) {
+            if(index<0){
+                System.err.println("");
+            }
             paretoFront.add(population.get(index));
         }
         return paretoFront;
