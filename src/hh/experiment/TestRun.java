@@ -97,23 +97,24 @@ public class TestRun implements Callable {
 
         this.referenceSet = referenceSet;
     }
-    
+
     /**
      * Returns a new instance of AOSIBEA
-     * @return 
+     *
+     * @return
      */
-    private IHyperHeuristic newAOSIBEA(){
+    private IHyperHeuristic newAOSIBEA() {
         int populationSize = (int) properties.getDouble("populationSize", 600);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
 
         Population population = new Population();
-        
+
         IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
 
         FitnessComparator fitnessComparator = new FitnessComparator(fitnesseval.areLargerValuesPreferred());
-		TournamentSelection selection = new TournamentSelection(fitnessComparator);
+        TournamentSelection selection = new TournamentSelection(fitnessComparator);
 
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
@@ -123,22 +124,23 @@ public class TestRun implements Callable {
 
         return aosibea;
     }
-    
+
     /**
      * Returns a new instance of AOSNSGAII
-     * @return 
+     *
+     * @return
      */
-    private IHyperHeuristic newAOSNSGAII(){
+    private IHyperHeuristic newAOSNSGAII() {
         int populationSize = (int) properties.getDouble("populationSize", 600);
 
         Initialization initialization = new RandomInitialization(problem,
                 populationSize);
 
         NondominatedSortingPopulation population = new NondominatedSortingPopulation();
-        
-        TournamentSelection selection = new TournamentSelection(2, 
-				new ChainedComparator(new ParetoDominanceComparator(),
-						new CrowdingComparator()));
+
+        TournamentSelection selection = new TournamentSelection(2,
+                new ChainedComparator(new ParetoDominanceComparator(),
+                        new CrowdingComparator()));
 
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
@@ -186,7 +188,6 @@ public class TestRun implements Callable {
 //
 //        return hemoea;
 //    }
-
     /**
      * Returns a new Hyper eMOEA instance.
      *
@@ -234,25 +235,31 @@ public class TestRun implements Callable {
         } catch (IOException ex) {
             Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if(creditDef.getFitnessType()==CreditFitnessFunctionType.De)
-             hh = newMOEADHH();
-        else if(creditDef.getFitnessType()==CreditFitnessFunctionType.Do)
+
+        if (creditDef.getFitnessType() == CreditFitnessFunctionType.De) {
+            hh = newMOEADHH();
+        } else if (creditDef.getFitnessType() == CreditFitnessFunctionType.Do) {
             hh = newAOSNSGAII();
-        else if(creditDef.getFitnessType()==CreditFitnessFunctionType.I)
+        } else if (creditDef.getFitnessType() == CreditFitnessFunctionType.I) {
             hh = newAOSIBEA();
-        else
+        } else {
             throw new IllegalArgumentException("Credit fitness type " + creditDef.getFitnessType() + "not recognized");
-        
-        
-        
+        }
+
         InstrumentedAlgorithm instAlgorithm = instrument(hh);
 
         // run the executor using the listener to collect results
         System.out.println("Starting " + hh.getNextHeuristicSupplier() + creditDef + " on " + probName + " with pop size: " + properties.getDouble("populationSize", 600));
         long startTime = System.currentTimeMillis();
-        while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
-            instAlgorithm.step();
+        try {
+            while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
+                instAlgorithm.step();
+                if (instAlgorithm.getNumberOfEvaluations() % 1000 == 0) {
+                    System.out.println(instAlgorithm.getNumberOfEvaluations());
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         hh.terminate();
@@ -263,15 +270,15 @@ public class TestRun implements Callable {
 
         String filename = path + File.separator + properties.getProperties().getProperty("saveFolder") + File.separator + probName + "_" // + problem.getNumberOfObjectives()+ "_"
                 + hh.getNextHeuristicSupplier() + "_" + hh.getCreditDefinition() + "_" + hh.getName();
-        
+
         saveIndicatorValues(instAlgorithm, filename);
-       
+
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveFinalPopulation"))) {
             NondominatedPopulation ndPop = instAlgorithm.getResult();
             try {
                 PopulationIO.writeObjectives(new File(filename + ".NDpop"), ndPop);
             } catch (IOException ex) {
-                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -295,8 +302,9 @@ public class TestRun implements Callable {
 
     /**
      * Attaches the collectors to the instrumented algorithm
+     *
      * @param alg
-     * @return 
+     * @return
      */
     protected InstrumentedAlgorithm instrument(Algorithm alg) {
         refPointObj = problem.newSolution();
@@ -316,15 +324,16 @@ public class TestRun implements Callable {
 
         return instrumenter.instrument(alg);
     }
-    
+
     /**
      * Saves the indicator values collected during the run.
+     *
      * @param instAlgorithm
-     * @param filename 
+     * @param filename
      */
-    protected void saveIndicatorValues(InstrumentedAlgorithm instAlgorithm, String filename){
-         Accumulator accum = instAlgorithm.getAccumulator();
-         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
+    protected void saveIndicatorValues(InstrumentedAlgorithm instAlgorithm, String filename) {
+        Accumulator accum = instAlgorithm.getAccumulator();
+        if (Boolean.parseBoolean(properties.getProperties().getProperty("saveIndicators"))) {
             File results = new File(filename + ".res");
             System.out.println("Saving results");
 
@@ -357,7 +366,7 @@ public class TestRun implements Callable {
 
                 writer.flush();
             } catch (Exception ex) {
-                Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TestRun.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

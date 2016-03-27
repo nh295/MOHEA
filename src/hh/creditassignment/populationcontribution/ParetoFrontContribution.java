@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package hh.creditassignment.populationcontribution;
 
 import hh.hyperheuristics.SerializableVal;
@@ -19,28 +18,32 @@ import org.moeaframework.core.Variation;
 
 /**
  * This Credit definition gives credit to all solutions created by the specified
- heuristic, including the solution given, that lie on the Pareto front. 
+ * heuristic, including the solution given, that lie on the Pareto front.
+ *
  * @author Nozomi
  */
-public class ParetoFrontContribution extends AbstractPopulationContribution{
+public class ParetoFrontContribution extends AbstractPopulationContribution {
 
     /**
      * Penalty/reward for not being in the Pareto Front
      */
     private final double rewardNotInPF;
-    
+
     /**
      * Credit value for being in the Pareto Front
      */
     private final double rewardInPF;
-    
+
     /**
-     * Constructor to specify the rewards to give to the heuristic responsible 
+     * Constructor to specify the rewards to give to the heuristic responsible
      * for each solution on the Pareto front.
-     * @param rewardInPF reward to assign to each solution on the Pareto Front that the heuristic created
-     * @param rewardNotInPF reward to assign if there are no solutions on the Pareto Front created by the heuristic 
+     *
+     * @param rewardInPF reward to assign to each solution on the Pareto Front
+     * that the heuristic created
+     * @param rewardNotInPF reward to assign if there are no solutions on the
+     * Pareto Front created by the heuristic
      */
-    public ParetoFrontContribution(double rewardInPF,double rewardNotInPF) {
+    public ParetoFrontContribution(double rewardInPF, double rewardNotInPF) {
         super();
         this.operatesOn = CreditDefinedOn.PARETOFRONT;
         this.fitType = CreditFitnessFunctionType.Do;
@@ -48,18 +51,18 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
         this.rewardNotInPF = rewardNotInPF;
         this.rewardInPF = rewardInPF;
     }
-    
+
     @Override
     public String toString() {
         return "CS-Do-PF";
     }
-    
+
     /**
-     * 
+     *
      * @param population for this implementation it should be the pareto front
      * @param operators
      * @param iteration
-     * @return 
+     * @return
      */
     @Override
     public HashMap<Variation, Credit> compute(Population population,Collection<Variation> operators, int iteration) {
@@ -67,14 +70,14 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
         //give all operators 0 credits first
         for(Variation op:operators){
             rewards.put(op.toString(), 0.0);
-        }
+                    }
         //iterate through solutions in neighborhood
         for(Solution soln:population){
             if(soln.hasAttribute("heuristic")){
                 String opName = ((SerializableVal)soln.getAttribute("heuristic")).getSval();
                 rewards.put(opName,rewards.get(opName) + rewardInPF);
+                }
             }
-        }
         
         HashMap<Variation,Credit> out = new HashMap();
         for(Variation op:operators){
@@ -83,7 +86,7 @@ public class ParetoFrontContribution extends AbstractPopulationContribution{
                 out.put(op,new Credit(iteration, r));
             else
                 out.put(op, new Credit(iteration, rewardNotInPF));
-        }
+            }
         return out;
     }
 }
