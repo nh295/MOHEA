@@ -126,15 +126,9 @@ public class HHCreditTest {
                         throw new IllegalArgumentException("Problem not recognized: " + probName);
                     }
 
-                    if (prob.getNumberOfObjectives() == 2) {
-                        prop.put("r2.numberVectors", 50);
-                    } else if (prob.getNumberOfObjectives() == 3) {
-                        prop.put("r2.numberVectors", 91);
-                    }
-
                     prop.put("populationSize", popSize);
-                        prop.put("HH", selector);
-                        prop.put("CredDef", credDefStr);
+                    prop.put("HH", selector);
+                    prop.put("CredDef", credDefStr);
 
                     //saving results settings
                     prop.put("saveFolder", "results");
