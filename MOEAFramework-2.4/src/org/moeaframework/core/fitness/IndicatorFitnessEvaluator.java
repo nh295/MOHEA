@@ -265,36 +265,6 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
 //                }
 //
 //	}
-        
-        /**
-         * Finds the maximum indicator value already calculated
-         * @return 
-         */
-        protected double findMaxIndicatorValue(){
-                double max = Double.NEGATIVE_INFINITY;
-                
-                for(int i=0; i<fitcomp.length; i++){
-                        for(int j=0; j<fitcomp.length; j++){
-                                if (Math.abs(fitcomp[i][j]) > max) {
-					max = Math.abs(fitcomp[i][j]);
-				}
-                        }
-                }
-                return max;
-        }
-        
-        /**
-         * Normalizes solution using current upper and lower bounds
-         * @param solution
-         * @return 
-         */
-        private Solution normalize(Solution solution){
-            Solution out = solution.copy();
-            for(int i=0; i<problem.getNumberOfObjectives(); i++){
-                out.setObjective(i, (solution.getObjective(i)-lowerbound[i])/(upperbound[i]-lowerbound[i]));
-            }
-            return out;
-        }
 
 	/**
 	 * Returns the indicator value relative to the two solutions.
