@@ -42,7 +42,7 @@ public class ParentIndicator extends AbstractOffspringParent {
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         double parentFit = (double) parent.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         return Math.max((offspringFit - parentFit)/parentFit, 0.0);
-        }
+    }
 
     @Override
     public String toString() {

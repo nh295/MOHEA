@@ -185,13 +185,13 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
                 Logger.getLogger(AOSNSGAII.class.getName()).log(Level.SEVERE, null, e);
             }
         } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
+            removedSolutions.clear();
             for (Solution child : children) {
-                removedSolutions.clear();
                 evaluate(child);
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                 enlu.addSolution(child, population);
                 int worstIndex = findWorstSolution();
-                removedSolutions.add(worstIndex); //only need to keep track of the latest removal
+                removedSolutions.add(worstIndex);
                 population.remove(worstIndex);
             }
             HashMap<Variation, Credit> popContRewards;
