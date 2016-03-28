@@ -130,9 +130,8 @@ public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
             for (Solution child : children) {
                 Solution refParent = parents[pprng.nextInt(parents.length)];
                 evaluate(child);
-//                population.add(child);
-//                fitnessEvaluator.evaluate(population);
-                fitnessEvaluator.addAndUpdate(population, child);
+                population.add(child);
+                fitnessEvaluator.evaluate(population);
 
                 //credit definitions operating on population and archive does 
                 //NOT modify the population by adding the child to the population/archive
@@ -156,9 +155,8 @@ public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
             double creditValue = 0.0;
             for (Solution child : children) {
                 evaluate(child);
-//                population.add(child);
-//                fitnessEvaluator.evaluate(population);
-                fitnessEvaluator.addAndUpdate(population, child);
+                population.add(child);
+                fitnessEvaluator.evaluate(population);
                 int worstIndex = findWorstIndex();
 
                 if (worstIndex != population.size()) { //solution made it in population
@@ -188,8 +186,7 @@ public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
             for (Solution child : children) {
                 evaluate(child);
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
-//                fitnessEvaluator.evaluate(population);
-                fitnessEvaluator.addAndUpdate(population, child);
+                fitnessEvaluator.evaluate(population);
                 int worstIndex = findWorstIndex();
                 fitnessEvaluator.removeAndUpdate(population, worstIndex);
             }

@@ -186,7 +186,7 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
             }
         } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
             for (Solution child : children) {
-                removedSolutions.clear();
+            removedSolutions.clear();
                 evaluate(child);
                 child.setAttribute("heuristic", new SerializableVal(operator.toString()));
                 enlu.addSolution(child, population);
