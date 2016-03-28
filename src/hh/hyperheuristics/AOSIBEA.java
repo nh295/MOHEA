@@ -132,6 +132,7 @@ public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
                 evaluate(child);
                 population.add(child);
                 fitnessEvaluator.evaluate(population);
+//                fitnessEvaluator.addAndUpdate(population, child);
 
                 //credit definitions operating on population and archive does 
                 //NOT modify the population by adding the child to the population/archive
