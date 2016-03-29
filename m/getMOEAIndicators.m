@@ -1,6 +1,7 @@
-function [AEI,GD,fHV,IGD,finalHV,ET] = getMOEAIndicators(filename)
+function [fHV,IGD,finalHV,finalIGD,ET] = getMOEAIndicators(filename,npts)
 %reads the csv values starting from the 2nd column
 %filename must include path and extension
+%npts is the number of first readings desired
 %EI is the epsilon indicator
 %GD is the generational distnace
 %HV is the hypervolume
@@ -8,35 +9,36 @@ function [AEI,GD,fHV,IGD,finalHV,ET] = getMOEAIndicators(filename)
 
 % data = csvread(filename,0,1);
 fid = fopen(filename,'r');
+IGD = zeros(1,npts);
+fHV = zeros(1,npts);
+ET = zeros(1,npts);
 while(~feof(fid))
     line = strsplit(fgetl(fid),',');
     switch line{1}
-        case{'AdditiveEpsilonIndicator'}
-            AEI = readLine(line);
-        case{'GenerationalDistance'}
-            GD = readLine(line);
         case{'InvertedGenerationalDistance'}
-            IGD = readLine(line);
+            tIGD = readLine(line);
 %         case{'Number of Injections'}
 %             Inj = readLine(line);
 %         case{'NFE'}
         case{'Elapsed Time'}
-            ET = readLine(line);
+            tET = readLine(line);
         case{'FastHypervolume'}
-            fHV = readLine(line);
+            tfHV = readLine(line);
         case{'Final HV'}
             finalHV = readLine(line);
+        case{'Final IGD'}
+            finalIGD = readLine(line);
         otherwise
             continue;
     end
 end
 fclose(fid);
+len = length(tIGD);
 %get end of run indicator values
-AEI =  AEI(end);
-GD = GD(end);
-IGD = IGD(end);
-fHV = fHV(end);
-ET = ET(end);
+temp = min([len,npts]);
+IGD(1:temp) = tIGD(1:temp);
+fHV(1:temp) = tfHV(1:temp);
+ET(1:temp) = tET(1:temp);
 end
 
 function [out] = readLine(line)
