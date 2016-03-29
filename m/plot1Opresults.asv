@@ -4,8 +4,8 @@ function plot1Opresults
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
- problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
+%  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
 % MOEA =  {'MOEAD'};
 MOEA =  {'SSIBEA','SSNSGAII'};
 % MOEA =  {'eMOEA','MOEAD'};
@@ -78,7 +78,7 @@ for i=1:length(problemName)
             elseif strcmp(MOEA{k},'SSIBEA')
                 [~,sig]=significance(res,strcat(res_path,filesep,probName,'_SSIBEA_sbx+pm.mat'));
                 boxColors = strcat(boxColors,'b');
-            elseif strcmp(MOEA{k},'SSNSGAII')
+            elseif strcmp(MOEA{k},'SSIBEA')
                 [~,sig]=significance(res,strcat(res_path,filesep,probName,'_SSIBEA_sbx+pm.mat'));
                 boxColors = strcat(boxColors,'g');
             end
@@ -95,10 +95,9 @@ for i=1:length(problemName)
             if strcmp(MOEA{k},'MOEAD')
                 label_names_IGD = [label_names_IGD,strcat('DRA-',operatorName{j},extra)]; %concats the labels
             elseif strcmp(MOEA{k},'SSIBEA')
-                label_names_IGD = [label_names_IGD,strcat('IBEA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSNSGAII')
-                label_names_IGD = [label_names_IGD,strcat('NSGA-',operatorName{j},extra)]; %concats the labels
+                label_names_IGD = [label_names_IGD,strcat('\-',operatorName{j},extra)]; %concats the labels
             end
+              label_names_IGD = [label_names_IGD,strcat('IBEA-',operatorName{j})]; %concats the labels
             
             extra = '';
            if sig.finalHV==1
@@ -112,11 +111,10 @@ for i=1:length(problemName)
            end
             if strcmp(MOEA{k},'MOEAD')
                 label_names_finalHV = [label_names_finalHV,strcat('DRA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSIBEA')
-                label_names_finalHV = [label_names_finalHV,strcat('IBEA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSNSGAII')
-                label_names_finalHV = [label_names_finalHV,strcat('NSGA-',operatorName{j},extra)]; %concats the labels
+            elseif strcmp(MOEA{k},'eMOEA')
+                label_names_finalHV = [label_names_finalHV,strcat('\epsilonMOEA-',operatorName{j},extra)]; %concats the labels
             end
+            label_names_finalHV = [label_names_finalHV,strcat('IBEA-',operatorName{j})]; %concats the labels
         end
     end
     

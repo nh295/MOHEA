@@ -36,7 +36,7 @@ public class IndicatorContribution extends AbstractPopulationContribution {
         this.operatesOn = operatesOn;
         this.fitType = CreditFitnessFunctionType.I;
         this.inputType = CreditFunctionInputType.CS;
-        if (!this.operatesOn.equals(CreditDefinedOn.ARCHIVE) && !this.operatesOn.equals(CreditDefinedOn.PARETOFRONT)) {
+        if (!this.operatesOn.equals(CreditDefinedOn.ARCHIVE) && !this.operatesOn.equals(CreditDefinedOn.PARETOFRONT) && !this.operatesOn.equals(CreditDefinedOn.POPULATION)) {
             throw new IllegalArgumentException(this.operatesOn + " is invalid option. Needs to be archive or pareto front");
         }
     }
