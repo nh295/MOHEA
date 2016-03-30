@@ -501,8 +501,9 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		Initialization initialization = new RandomInitialization(problem,
 				populationSize);
 
+		String operator = properties.getString("operator", "de+pm");
 		Variation variation = OperatorFactory.getInstance().getVariation(
-				"de+pm", properties, problem);
+				operator, properties, problem);
 		
 		int neighborhoodSize = 20;
 		int eta = 2;

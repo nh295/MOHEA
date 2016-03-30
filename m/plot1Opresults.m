@@ -2,13 +2,13 @@ function plot1Opresults
 
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
-
-% problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+% 
+problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
- problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
-% MOEA =  {'MOEAD'};
-MOEA =  {'SSIBEA'};
-% MOEA =  {'eMOEA','MOEAD'};
+%  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+MOEA =  {'MOEAD'};
+% MOEA =  {'SSIBEA'};
+% MOEA =  {'SSNSGAII'};
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
@@ -66,8 +66,8 @@ for i=1:length(problemName)
             c = c+1;
             file = strcat(res_path,filesep,probName,'_',MOEA{k},'_',operator{j},'.mat');
             load(file); %assume that the reults stored in vairable named res
-            datafinalIGD(:,c) = res.finalIGD;
-            datafinalHV(:,c) = res.finalHV;
+            datafinalIGD(:,c) = res.IGD(:,end);
+            datafinalHV(:,c) = res.fHV(:,end);
             if(mean(datafinalIGD(:,c))<minIGD)
                 minIGD = mean(datafinalIGD(:,c));
             end

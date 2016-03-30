@@ -35,9 +35,9 @@ public class SteadyStateIBEA extends IBEA {
 
         evaluateAll(offspring);
         for(Solution child : offspring){
-            population.add(child);
-            fitnessEvaluator.evaluate(population);
-            
+//            population.add(child);
+//            fitnessEvaluator.evaluate(population);
+            fitnessEvaluator.addAndUpdate(population, child);
             int worstIndex = findWorstIndex();
             fitnessEvaluator.removeAndUpdate(population, worstIndex);
         }
