@@ -62,12 +62,16 @@ public class TestRunBenchmark extends TestRun {
         String operatorName = prop.getProperties().getProperty("operator");
         System.out.println("Starting " + algorithm + " on " + problem.getName() + " with " + operatorName);
         long startTime = System.currentTimeMillis();
-        while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
-            instAlgorithm.step();
-            if (instAlgorithm.getNumberOfEvaluations() % 1000 == 0) {
+        try {
+            while (!instAlgorithm.isTerminated() && (instAlgorithm.getNumberOfEvaluations() < maxEvaluations)) {
+                instAlgorithm.step();
+                if (instAlgorithm.getNumberOfEvaluations() % 1000 == 0) {
 //            if(instAlgorithm.getNumberOfEvaluations()>28000){
-                System.out.println(instAlgorithm.getNumberOfEvaluations());
+                    System.out.println(instAlgorithm.getNumberOfEvaluations());
+                }
             }
+        } catch (Exception ex) {
+            Logger.getLogger(TestRunBenchmark.class.getName()).log(Level.SEVERE, null, ex);
         }
         alg.terminate();
 

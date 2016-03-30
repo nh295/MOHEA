@@ -33,7 +33,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.util.MathArrays;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
@@ -275,6 +275,10 @@ public class MOEAD extends AbstractAlgorithm {
      */
     private List<Integer> objectiveSubProblems;
     
+    
+        
+     private ParallelPRNG pprng = new ParallelPRNG();
+    
 
     /**
      * Constructs the MOEA/D algorithm with the specified components. This
@@ -410,7 +414,7 @@ public class MOEAD extends AbstractAlgorithm {
             double[] weight = new double[numberOfObjectives];
 
             for (int j = 0; j < numberOfObjectives; j++) {
-                weight[j] = PRNG.nextDouble();
+                weight[j] = pprng.nextDouble();
             }
 
             double sum = StatUtils.sum(weight);
@@ -580,10 +584,10 @@ public class MOEAD extends AbstractAlgorithm {
             
             // return 1/5 of the indices chosen by their utility
             while(indices.size() < population.size()/5){
-                int index = PRNG.nextItem(candidates);
+                int index = pprng.nextItem(candidates);
 
                 for (int j = 1; j < 10; j++) {
-                    int temp = PRNG.nextItem(candidates);
+                    int temp = pprng.nextItem(candidates);
 
                     if (population.get(temp).getUtility()
                             > population.get(index).getUtility()) {
@@ -595,7 +599,7 @@ public class MOEAD extends AbstractAlgorithm {
             }
         }
 
-        PRNG.shuffle(indices);
+        pprng.shuffle(indices);
 
         return indices;
     }
@@ -611,7 +615,7 @@ public class MOEAD extends AbstractAlgorithm {
     protected List<Integer> getMatingIndices(int index) {
         List<Integer> matingIndices = new ArrayList<Integer>();
 
-        if (PRNG.nextDouble() <= delta) {
+        if (pprng.nextDouble() <= delta) {
             for (Individual individual : population.get(index).getNeighbors()) {
                 matingIndices.add(population.indexOf(individual));
             }
@@ -660,7 +664,7 @@ public class MOEAD extends AbstractAlgorithm {
     protected double updateSolution(Solution solution,
             List<Integer> matingIndices) {
         int c = 0;
-        PRNG.shuffle(matingIndices);
+        pprng.shuffle(matingIndices);
 
         double out = 0;
         for (int i = 0; i < matingIndices.size(); i++) {
@@ -713,7 +717,7 @@ public class MOEAD extends AbstractAlgorithm {
 
             if (variation.getArity() > 2) {
                 // mimic MOEA/D parent selection for differential evolution
-                PRNG.shuffle(matingIndices);
+                pprng.shuffle(matingIndices);
 
                 for (int i = 1; i < variation.getArity() - 1; i++) {
                     parents[i] = population.get(
@@ -725,7 +729,7 @@ public class MOEAD extends AbstractAlgorithm {
             } else {
                 for (int i = 1; i < variation.getArity(); i++) {
                     parents[i] = population.get(
-                            PRNG.nextItem(matingIndices)).getSolution();
+                            pprng.nextItem(matingIndices)).getSolution();
                 }
             }
 

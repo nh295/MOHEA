@@ -7,13 +7,13 @@ function plot1Opresults
 % problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
 % MOEA =  {'MOEAD'};
-MOEA =  {'SSIBEA','SSNSGAII'};
+MOEA =  {'SSIBEA'};
 % MOEA =  {'eMOEA','MOEAD'};
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
-% path = '/Users/nozomihitomi/Dropbox/MOHEA/';
-path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+path = '/Users/nozomihitomi/Dropbox/MOHEA/';
+% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
 res_path =strcat(path,'mResExperimentA');
 
@@ -46,11 +46,14 @@ height = 0.2;
 statsfinalIGD = zeros(length(problemName),b,3);
 statsfinalHV = zeros(length(problemName),b,3);
 
+bestOpsIGD = cell(length(problemName),1);
+bestOpsHV = cell(length(problemName),1);
+
 boxColors = '';
 
 for i=1:length(problemName)
     probName = problemName{i};
-    dataIGD = zeros(a,b);
+    datafinalIGD = zeros(a,b);
     datafinalHV = zeros(a,b);
     
     label_names_IGD={};
@@ -63,10 +66,10 @@ for i=1:length(problemName)
             c = c+1;
             file = strcat(res_path,filesep,probName,'_',MOEA{k},'_',operator{j},'.mat');
             load(file); %assume that the reults stored in vairable named res
-            dataIGD(:,c) = res.finalIGD;
+            datafinalIGD(:,c) = res.finalIGD;
             datafinalHV(:,c) = res.finalHV;
-            if(mean(dataIGD(:,c))<minIGD)
-                minIGD = mean(dataIGD(:,c));
+            if(mean(datafinalIGD(:,c))<minIGD)
+                minIGD = mean(datafinalIGD(:,c));
             end
             if(mean(datafinalHV(:,c))>maxHV)
                 maxHV = mean(datafinalHV(:,c));
@@ -126,9 +129,12 @@ for i=1:length(problemName)
     end
     
     figure(h1)
-    [~,ind]=min(mean(dataIGD,1));
+    [~,ind]=min(mean(datafinalIGD,1));
+    meanIGD = sprintf(' %0.3e',mean(datafinalIGD(:,ind)));
+    stdIGD = sprintf('%0.3e',std(datafinalIGD(:,ind)));
+    bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
-    boxplot(hsubplot1{i},dataIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
+    boxplot(hsubplot1{i},datafinalIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
     title(hsubplot1{i},probName)
     set(hsubplot1{i},'TickLabelInterpreter','tex');
     set(hsubplot1{i},'XTickLabelRotation',90);
@@ -142,6 +148,9 @@ for i=1:length(problemName)
     
     figure(h2)
     [~,ind]=max(mean(datafinalHV,1));
+    meanHV = sprintf(' %0.3e',mean(datafinalHV(:,ind)));
+    stdHV = sprintf('%0.3e',std(datafinalHV(:,ind)));
+    bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
     label_names_finalHV{ind} = strcat('\bf{',label_names_finalHV{ind},'}');
     boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
     title(hsubplot2{i},probName)
@@ -155,11 +164,20 @@ for i=1:length(problemName)
         set(hsubplot2{i},'Position',[leftPos+intervalPos*(i-6),bottomPos,width,height]);
     end
 end
-saveas(h1,strcat('Both','1opIGD'),'fig');
-saveas(h2,strcat('Both','1opHV'),'fig');
+% saveas(h1,strcat('Both','1opIGD'),'fig');
+% saveas(h2,strcat('Both','1opHV'),'fig');
 
 statsfinalIGD = squeeze(sum(statsfinalIGD,1))
 statsfinalHV = squeeze(sum(statsfinalHV,1))
+
+disp('Best in IGD')
+for i=1:length(problemName)
+   disp(bestOpsIGD{i});
+end
+disp('Best in HV')
+for i=1:length(problemName)
+   disp(bestOpsHV{i});
+end
 end
 
 function [p,sig] = significance(data,basecasefile)
