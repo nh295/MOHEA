@@ -2,14 +2,14 @@
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
-% problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
-problemName = {%'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
+% % problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+% % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
+problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
             'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',...
             'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-base = 'Do';
+base = 'De';
 
 switch base
     case {'De'}
@@ -113,13 +113,12 @@ for i=1:length(problemName)
     %check significance between rand and bestin IGD
      if strcmp(mode,'MOEAD')
         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalIGD');
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
     elseif strcmp(mode,'SSNSGAII')
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
-        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
     else strcmp(mode,'SSIBEA')
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
-        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
      end
     extra = '';
     if sig==1
@@ -133,13 +132,10 @@ for i=1:length(problemName)
     end
     if strcmp(mode,'MOEAD')
         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalHV');
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
     elseif strcmp(mode,'SSNSGAII')
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
-        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalHV');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
     else strcmp(mode,'SSIBEA')
-%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
-        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalHV');        
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
      end
     extra = '';
     if sig==1
@@ -167,16 +163,16 @@ for i=1:length(problemName)
             
             if strcmp(mode,'MOEAD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opMOEAD'),'MOEAD',probName,'finalIGD');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
             elseif strcmp(mode,'SSNSGAII')
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSNSGAII'),'Random_OP-Do',probName,'finalIGD');
             elseif strcmp(mode,'SSIBEA')
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalIGD');
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSIBEA'),'Random_OP-I',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSIBEA'),'Random_OP-I',probName,'finalIGD');
             end
             extra = '';
             if sig==1
@@ -195,9 +191,9 @@ for i=1:length(problemName)
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalHV');
             elseif strcmp(mode,'SSNSGAII')
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalHV');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSNSGAII'),'Random_OP-Do',probName,'finalHV');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSNSGAII'),'Random_OP-Do',probName,'finalHV');
             elseif strcmp(mode,'SSIBEA')
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalHV');
@@ -255,6 +251,9 @@ end
 
 statsIGD = squeeze(sum(statsIGD,1))
 statsfHV = squeeze(sum(statsfHV,1))
+disp('mean time')
+avgTime = squeeze(mean(dataET,1))';
+stdTime = squeeze(std(dataET,1))';
 % % 
 
 

@@ -5,11 +5,11 @@ function plot1Opresults
 % 
 % problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
- problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+%  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
 % MOEA =  {'SSNSGAII'};
-% MOEA =  {'MOEAD'};
+MOEA =  {'MOEAD'};
 % MOEA =  {'SSIBEA'};
-MOEA =  {'SSNSGAII'};
+% MOEA =  {'SSNSGAII'};
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
@@ -137,7 +137,7 @@ for i=1:length(problemName)
     stdIGD = sprintf('%0.3e',std(datafinalIGD(:,ind)));
 %     bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
-    boxplot(hsubplot1{i},datafinalIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot1{i},datafinalIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
     title(hsubplot1{i},probName)
     set(hsubplot1{i},'TickLabelInterpreter','tex');
     set(hsubplot1{i},'XTickLabelRotation',90);
@@ -155,7 +155,7 @@ for i=1:length(problemName)
     stdHV = sprintf('%0.3e',std(datafinalHV(:,ind)));
 %     bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
     label_names_finalHV{ind} = strcat('\bf{',label_names_finalHV{ind},'}');
-    boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','o')
     title(hsubplot2{i},probName)
     set(hsubplot2{i},'TickLabelInterpreter','tex');
     set(hsubplot2{i},'XTickLabelRotation',90);

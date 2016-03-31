@@ -79,11 +79,17 @@ public class ParetoFrontContribution extends AbstractPopulationContribution {
                 }
             }
         
+        //give all operators 0 credits first
+        double sum = 0.0;
+        for(Variation op:operators){
+            sum += rewards.get(op.toString());
+        }
+        
         HashMap<Variation,Credit> out = new HashMap();
         for(Variation op:operators){
             double r = rewards.get(op.toString());
             if(r>0)
-                out.put(op,new Credit(iteration, r));
+                out.put(op,new Credit(iteration, r/sum));
             else
                 out.put(op, new Credit(iteration, rewardNotInPF));
             }

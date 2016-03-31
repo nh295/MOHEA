@@ -45,17 +45,18 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF8","UF9","UF10"};//,"UF11","UF12","UF13"};
-          String[] problems = new String[]{"UF1"};
+//        String[] problems = new String[]{"UF5","UF6","UF7"};//,"UF11","UF12","UF13"};
+          String[] problems = new String[]{"DTLZ4_3", "DTLZ5_3","DTLZ6_3", "DTLZ7_3",
+            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WF6G_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 //        String[] problems = new String[]{
 //            "DTLZ1_3", "DTLZ2_3", "DTLZ3_3", "DTLZ4_3", "DTLZ5_3", "DTLZ6_3", "DTLZ7_3",
-//            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
+//            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WF6G_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 //            "UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1  );
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()  );
 //        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
@@ -70,28 +71,28 @@ public class HHCreditTest {
             }
             String probName = problem;
             System.out.println(probName);
-            int numberOfSeeds = 30;
+            int numberOfSeeds = 15;
 
             //Setup heuristic selectors
-//            String[] selectors = new String[]{"PM", "AP"};
-            String[] selectors = new String[]{"Random"};
+            String[] selectors = new String[]{"PM", "AP"};
+//            String[] selectors = new String[]{"PM"};
 //            setup credit definitions
 //            String[] creditDefs = new String[]{"OPDe"};//,"SIDe","CSDe","OPDo","SIDoPF","CSDoPF","OPI","SIIPop","CSIPop"};
 //            String[] creditDefs = new String[]{"OPI","SIIPop","CSIPop"};
-            String[] creditDefs = new String[]{"OPDe"};
+            String[] creditDefs = new String[]{"CSDoPF","CSDe"};
 
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-            String[] ops = new String[]{"spx+pm"};
+//            String[] ops = new String[]{"um"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
-//            for (String selector : selectors) {
-//                for (String credDefStr : creditDefs) {
+            for (String selector : selectors) {
+                for (String credDefStr : creditDefs) {
             //parallel process all runs
             futures.clear();
 
-            for (String op : ops) {
+//            for (String op : ops) {
                 for (int k = 0; k < numberOfSeeds; k++) {
 
                     Problem prob = ProblemFactory.getInstance().getProblem(probName);
@@ -133,8 +134,8 @@ public class HHCreditTest {
                     }
 
                     prop.put("populationSize", popSize);
-//                        prop.put("HH", selector);
-//                        prop.put("CredDef", credDefStr);
+                        prop.put("HH", selector);
+                        prop.put("CredDef", credDefStr);
 
                     //saving results settings
                     prop.put("saveFolder", "resultsMac");
@@ -181,18 +182,18 @@ public class HHCreditTest {
                     NondominatedPopulation refSet = ProblemFactory.getInstance().getReferenceSet(probName);
 
                     TypedProperties typeProp = new TypedProperties(prop);
-//                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-//                        TestRun test = new TestRun(path, prob, probName,refSet,
-//                                typeProp, heuristics, maxEvaluations);
-//                        futures.add(pool.submit(test));
+                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
+                        TestRun test = new TestRun(path, prob, probName,refSet,
+                                typeProp, heuristics, maxEvaluations);
+                        futures.add(pool.submit(test));
 
                     //benchmark built-in MOEA
-                    System.out.println(op);
-                    prop.put("operator", op);
-                    typeProp = new TypedProperties(prop);
-                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
-                            typeProp, "MOEAD", maxEvaluations);
-                    futures.add(pool.submit(test));
+//                    System.out.println(op);
+//                    prop.put("operator", op);
+//                    typeProp = new TypedProperties(prop);
+//                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
+//                            typeProp, "MOEAD", maxEvaluations);
+//                    futures.add(pool.submit(test));
                 }
                 for (Future<IHyperHeuristic> run : futures) {
                     try {
@@ -202,7 +203,7 @@ public class HHCreditTest {
                     }
                 }
             }
-//        }
+        }
         }
         pool.shutdown();
     }
