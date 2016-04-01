@@ -285,7 +285,7 @@ public class StandardOperators extends OperatorProvider {
 		if (name.equalsIgnoreCase("sbx")) {
 			return new SBX(
 					typedProperties.getDouble("sbx.rate", 1.0), 
-					typedProperties.getDouble("sbx.distributionIndex", 15.0));
+					typedProperties.getDouble("sbx.distributionIndex", 20.0));
 		} else if (name.equalsIgnoreCase("pm")) {
 			return new PM(
 					typedProperties.getDouble("pm.rate", 
@@ -293,11 +293,11 @@ public class StandardOperators extends OperatorProvider {
 							typedProperties.getDouble("pm.distributionIndex", 20.0));
 		} else if (name.equalsIgnoreCase("de")) {	
 			return new DifferentialEvolution(
-					typedProperties.getDouble("de.crossoverRate", 0.1), 
+					typedProperties.getDouble("de.crossoverRate", 1.0), 
 					typedProperties.getDouble("de.stepSize", 0.5));
 		} else if (name.equalsIgnoreCase("pcx")) {
 			return new PCX(
-					(int)typedProperties.getDouble("pcx.parents", 10),
+					(int)typedProperties.getDouble("pcx.parents", 3),
 					(int)typedProperties.getDouble("pcx.offspring", 2), 
 					typedProperties.getDouble("pcx.eta", 0.1), 
 					typedProperties.getDouble("pcx.zeta", 0.1));
@@ -308,7 +308,7 @@ public class StandardOperators extends OperatorProvider {
 					typedProperties.getDouble("spx.epsilon", 3));
 		} else if (name.equalsIgnoreCase("undx")) {
 			return new UNDX(
-					(int)typedProperties.getDouble("undx.parents", 10),
+					(int)typedProperties.getDouble("undx.parents", 3),
 					(int)typedProperties.getDouble("undx.offspring", 2), 
 					typedProperties.getDouble("undx.zeta", 0.5), 
 					typedProperties.getDouble("undx.eta", 0.35));

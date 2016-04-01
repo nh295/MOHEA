@@ -45,18 +45,17 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String[] problems = new String[]{"UF5","UF6","UF7"};//,"UF11","UF12","UF13"};
-          String[] problems = new String[]{"DTLZ4_3", "DTLZ5_3","DTLZ6_3", "DTLZ7_3",
-            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WF6G_2", "WFG7_2", "WFG8_2", "WFG9_2"};
+        String[] problems = new String[]{"WFG7_2"};//,"UF11","UF12,""UF13"};
+//          String[] problems = new String[]{"WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 //        String[] problems = new String[]{
 //            "DTLZ1_3", "DTLZ2_3", "DTLZ3_3", "DTLZ4_3", "DTLZ5_3", "DTLZ6_3", "DTLZ7_3",
-//            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WF6G_2", "WFG7_2", "WFG8_2", "WFG9_2"};
+//            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 //            "UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 
-        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()  );
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1 );
 //        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
@@ -74,25 +73,25 @@ public class HHCreditTest {
             int numberOfSeeds = 15;
 
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM", "AP"};
+//            String[] selectors = new String[]{"PM", "AP"};
 //            String[] selectors = new String[]{"PM"};
 //            setup credit definitions
 //            String[] creditDefs = new String[]{"OPDe"};//,"SIDe","CSDe","OPDo","SIDoPF","CSDoPF","OPI","SIIPop","CSIPop"};
 //            String[] creditDefs = new String[]{"OPI","SIIPop","CSIPop"};
-            String[] creditDefs = new String[]{"CSDoPF","CSDe"};
+//            String[] creditDefs = new String[]{"CSDoPF"};
 
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-//            String[] ops = new String[]{"um"};
+            String[] ops = new String[]{"undx+pm","pcx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
-            for (String selector : selectors) {
-                for (String credDefStr : creditDefs) {
+//            for (String selector : selectors) {
+//                for (String credDefStr : creditDefs) {
             //parallel process all runs
             futures.clear();
 
-//            for (String op : ops) {
+            for (String op : ops) {
                 for (int k = 0; k < numberOfSeeds; k++) {
 
                     Problem prob = ProblemFactory.getInstance().getProblem(probName);
@@ -127,15 +126,9 @@ public class HHCreditTest {
                         throw new IllegalArgumentException("Problem not recognized: " + probName);
                     }
 
-                    if (prob.getNumberOfObjectives() == 2) {
-                        prop.put("r2.numberVectors", 50);
-                    } else if (prob.getNumberOfObjectives() == 3) {
-                        prop.put("r2.numberVectors", 91);
-                    }
-
                     prop.put("populationSize", popSize);
-                        prop.put("HH", selector);
-                        prop.put("CredDef", credDefStr);
+//                        prop.put("HH", selector);
+//                        prop.put("CredDef", credDefStr);
 
                     //saving results settings
                     prop.put("saveFolder", "resultsMac");
@@ -148,52 +141,30 @@ public class HHCreditTest {
                     //Choose heuristics to be applied. Use default values (probabilities)
                     ArrayList<Variation> heuristics = new ArrayList<>();
                     OperatorFactory of = OperatorFactory.getInstance();
-                    Properties heuristicProp = new Properties();
-                    heuristicProp.put("um.rate", 1.0 / prob.getNumberOfVariables());
 
-                    heuristicProp.put("sbx.rate", 1.0);
-                    heuristicProp.put("sbx.distributionIndex", 20.0);
-
-                    heuristicProp.put("de.crossoverRate", 1.0);
-                    heuristicProp.put("de.stepSize", 0.5);
-
-                    heuristicProp.put("pcx.parents", 3);
-                    heuristicProp.put("pcx.eta", 0.1);
-                    heuristicProp.put("pcx.zeta", 0.1);
-
-                    heuristicProp.put("undx.zeta", 0.5);
-                    heuristicProp.put("undx.eta", 0.35);
-                    heuristicProp.put("undx.parents", 3);
-
-                    heuristicProp.put("spx.epsilon", 1.0);
-                    heuristicProp.put("spx.parents", 3);
-
-                    heuristicProp.put("pm.rate", 1.0 / prob.getNumberOfVariables());
-                    heuristicProp.put("pm.distributionIndex", 20.0);
-
-                    heuristics.add(of.getVariation("um", heuristicProp, prob));
-                    heuristics.add(of.getVariation("sbx+pm", heuristicProp, prob));
-                    heuristics.add(of.getVariation("de+pm", heuristicProp, prob));
-                    heuristics.add(of.getVariation("pcx+pm", heuristicProp, prob));
-                    heuristics.add(of.getVariation("undx+pm", heuristicProp, prob));
-                    heuristics.add(of.getVariation("spx+pm", heuristicProp, prob));
+                    heuristics.add(of.getVariation("um", prop, prob));
+                    heuristics.add(of.getVariation("sbx+pm", prop, prob));
+                    heuristics.add(of.getVariation("de+pm", prop, prob));
+                    heuristics.add(of.getVariation("pcx+pm", prop, prob));
+                    heuristics.add(of.getVariation("undx+pm", prop, prob));
+                    heuristics.add(of.getVariation("spx+pm", prop, prob));
 
 //                        heuristics.add(of.getVariation(op, heuristicProp, prob));
                     NondominatedPopulation refSet = ProblemFactory.getInstance().getReferenceSet(probName);
 
                     TypedProperties typeProp = new TypedProperties(prop);
-                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-                        TestRun test = new TestRun(path, prob, probName,refSet,
-                                typeProp, heuristics, maxEvaluations);
-                        futures.add(pool.submit(test));
+//                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
+//                        TestRun test = new TestRun(path, prob, probName,refSet,
+//                                typeProp, heuristics, maxEvaluations);
+//                        futures.add(pool.submit(test));
 
                     //benchmark built-in MOEA
-//                    System.out.println(op);
-//                    prop.put("operator", op);
-//                    typeProp = new TypedProperties(prop);
-//                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
-//                            typeProp, "MOEAD", maxEvaluations);
-//                    futures.add(pool.submit(test));
+                    System.out.println(op);
+                    prop.put("operator", op);
+                    typeProp = new TypedProperties(prop);
+                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
+                            typeProp, "MOEAD", maxEvaluations);
+                    futures.add(pool.submit(test));
                 }
                 for (Future<IHyperHeuristic> run : futures) {
                     try {
@@ -203,7 +174,7 @@ public class HHCreditTest {
                     }
                 }
             }
-        }
+//        }
         }
         pool.shutdown();
     }
