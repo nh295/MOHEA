@@ -3,38 +3,32 @@ function creditAnalysis(mode)
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'UF10'};
+problemName = {'WFG7_2'};
 selectors = {'Probability'};
-% creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
-%     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
-%     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-% shortCreditName = {'OP-De','SI-De','CS-De',...
-%    'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A',...
-%     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
-creditDef = {'OPop_BIR2PARETOFRONT'};
-shortCreditName = {'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A'};
+creditDef = {'OP-De','SI-De','CS-De'};
+% creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
 path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
 % respath = strcat(path,'results');
-respath = strcat(path,'resultsCreditsNew');
+respath = strcat(path,'credits');
 origin = cd(respath);
 ops = {'SBX+PM','DifferentialEvolution+PM', 'UM','UNDX+PM','SPX+PM','PCX+PM'};
 nops = length(ops);
 labels = {'SBX','DE', 'UM','UNDX','SPX','PCX'};
-
+close all
 switch mode
     case 1 %read in the credit csv files
-        nFiles = length(problemName)*length(selectors)*length(shortCreditName);
+        nFiles = length(problemName)*length(selectors)*length(creditDef);
         filesProcessed = 0;
         h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
             filesProcessed = filesProcessed + 1;
             waitbar(filesProcessed/nFiles);
             for b=1:length(selectors)
-                for c=1:length(shortCreditName)
+                for c=1:length(creditDef)
                     fileType =strcat(problemName{a},'*',selectors{b},'*', creditDef{c},'*.creditcsv');
                     files = dir(fileType);
-                    if(length(files)~=1)
+                    if(length(files)~=30)
                         error('Missing some files. Only found %f files. Looking for 30 files',length(files));
                     end
                     allcredits  = cell(length(files),1);
@@ -50,12 +44,12 @@ switch mode
                                 op_data(j,2)=str2double(raw_credits{j}); %credit
                             end
                             expData.put(raw_credits{1},op_data);
-                            end20*pi/180
+                        end
                         fclose(fid);
                         allcredits{i} = expData;
                     end
                     %save files
-                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit.mat'),'allcredits');
+                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'_credit.mat'),'allcredits');
                 end
             end
         end
@@ -65,22 +59,22 @@ switch mode
         
     case 2 %analyze the files. mode 1 already assumed run
         nepochs = 100;
-        maxEval = 300000;
+        maxEval = 25000;
         epochLength = maxEval/nepochs;
-        nFiles = length(problemName)*length(selectors)*length(shortCreditName);
+        nFiles = length(problemName)*length(selectors)*length(creditDef);
         filesProcessed = 0;
         h = waitbar(filesProcessed/nFiles,'Processing files...');
         for a=1:length(problemName)
             for b=1:length(selectors)
-                for c=1:length(shortCreditName)
+                for c=1:length(creditDef)
                     filesProcessed = filesProcessed + 1;
                     waitbar(filesProcessed/nFiles);
-                    load(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit.mat'));
+                    load(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'_credit.mat'));
                     eraCreditsAllOp = java.util.HashMap;
                     eraCreditVel = java.util.HashMap;
                     eraSelectionFreq = java.util.HashMap;
                     maximumCreditValue = 0;
-                    allcredits= cred;
+%                      allcredits = cred;
                     for i=1:length(allcredits)
                         iter = allcredits{i}.keySet.iterator;
                         totalEpochSelection = zeros(nepochs,1);
@@ -88,6 +82,7 @@ switch mode
                         maxCredit = -inf;
                         minCredit = inf;
                         rawEraCredits = java.util.HashMap;
+                        %go through the operators
                         while iter.hasNext
                             operator = iter.next;
                             data = allcredits{i}.get(operator);
@@ -160,31 +155,31 @@ switch mode
                     
                     h1=figure(1);
                     subplot(1,nFiles,filesProcessed)
-                    semilogy(cred);
-                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_credit','.mat'),'cred');
+                    plot(cred);
+                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'_credit','.mat'),'cred','labels','allcredits');
                     legend(labels)
                     xlabel('Epoch')
                     ylabel('Average credits earned in epoch')
-                    title(strcat(problemName{a},'  ',shortCreditName{c},' credit'))
+                    title(strcat(problemName{a},'  ',creditDef{c},' credit','allcredits'))
                     
                     h2=figure(2);
                     subplot(1,nFiles,filesProcessed)
                     plot(abs(credVel));
-                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_creditVel','.mat'),'credVel');
+                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'_creditVel','.mat'),'credVel','labels');
                     xlabel('Epoch')
                     ylabel('Speed in the change of the average credits earned in epoch')
                     legend(labels)
-                    title(strcat(problemName{a},'  ',shortCreditName{c},' velocity'))
+                    title(strcat(problemName{a},'  ',creditDef{c},' velocity'))
                     
                     h3=figure(3);
                     subplot(1,nFiles,filesProcessed)
                     area(sel);
-                    save(strcat(problemName{a},'_',selectors{b},'_',shortCreditName{c},'_sel','.mat'),'sel');
+                    save(strcat(problemName{a},'_',selectors{b},'_',creditDef{c},'_sel','.mat'),'sel','labels');
                     axis([0,nepochs,0,1.5])
                     xlabel('Epoch')
                     ylabel('Average rate of selection in epoch')
                     legend(labels)
-                    title(strcat(problemName{a},'  ',shortCreditName{c},' select'))
+                    title(strcat(problemName{a},'  ',creditDef{c},' select'))
                     %create textbox that shows selection frequency
 %                     t = annotation('textbox');
 %                     t.String = sprintf(subtitle);
@@ -196,13 +191,13 @@ switch mode
         end
         close(h)
         
-        plotName = strcat(problemName{a},'_',shortCreditName{c});
+        plotName = strcat(problemName{a},'_',creditDef{c});
         saveas(h1,strcat(plotName,'_credit'),'fig');
-        saveas(h1,strcat(plotName,'_credit'),'jpeg');
+        saveas(h1,strcat(plotName,'_credit'),'png');
         saveas(h2,strcat(plotName,'_velocity'),'fig');
-        saveas(h2,strcat(plotName,'_velocity'),'jpeg');
+        saveas(h2,strcat(plotName,'_velocity'),'png');
         saveas(h3,strcat(plotName,'_select'),'fig');
-        saveas(h3,strcat(plotName,'_select'),'jpeg');
+        saveas(h3,strcat(plotName,'_select'),'png');
         clf(h1)
         clf(h2)
         clf(h3)

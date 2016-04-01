@@ -48,7 +48,7 @@ public class RealVariable implements Variable {
 	 * The upper bound of this decision variable.
 	 */
 	private final double upperBound;
-
+        
 	/**
 	 * Constructs a real variable in the range {@code lowerBound <= x <=
 	 * upperBound} with an uninitialized value.

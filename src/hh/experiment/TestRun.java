@@ -284,7 +284,7 @@ public class TestRun implements Callable {
 
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorCreditHistory"))) {
             IOCreditHistory ioch = new IOCreditHistory();
-            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), filename + ".credit");
+            ioch.saveHistory(((IHyperHeuristic) hh).getCreditHistory(), filename + ".creditcsv",",");
         }
 
         if (Boolean.parseBoolean(properties.getProperties().getProperty("saveOperatorSelectionHistory"))) {

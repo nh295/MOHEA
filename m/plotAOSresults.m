@@ -2,43 +2,30 @@
 %(jmetal) and the additive epsilon values for each algorithm
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
-% problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ7_',};
+% problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+% problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
+problemName = {%'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
+            'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',...
+            'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
 selectors = {'Probability','Adaptive'};
 selectorShort = {'PM','AP'};
-base = 'test';
+base = 'Do';
 
 switch base
     case {'De'}
-        creditDef = {'ParentDec','Neighbor','DecompositionContribution'};
-        creditShort = {'OP-De','SI-De','CS-De'};
+        creditDef = {'OP-De','SI-De','CS-De'};
         mode = 'MOEAD';
     case{'Do'}
-        creditDef = {'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution'};
-        creditShort = {'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
-        mode = 'eMOEA';
-    case{'R2'}
-        creditDef = {'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-        creditShort = {'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
-%         creditDef = {'OPa_BIR2PARENT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-%         creditShort = {'OP-R2','SI-R2-A','CS-R2-PF','CS-R2-A'};
-        mode = 'eMOEA';
-    case{'test'}
-        creditDef = {'OPop_BIR2ARCHIVE'};
-        creditShort = {'SI-R2-A'};
-        mode = 'eMOEA';
+        creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
+        mode = 'SSNSGAII';
+    case{'I'}
+        creditDef = {'OP-I','SI-I','CS-I'};
+        mode = 'SSIBEA';
 end
-
-% creditDef = {'ParentDec','Neighbor','DecompositionContribution',...
-%     'ParentDom','OffspringParetoFront','OffspringEArchive','ParetoFrontContribution','EArchiveContribution',...
-%     'OPa_BIR2PARENT','OPop_BIR2PARETOFRONT','OPop_BIR2ARCHIVE','CNI_BIR2PARETOFRONT','CNI_BIR2ARCHIVE'};
-% creditShort = {'OP-De','SI-De','CS-De',...
-%     'OP-Do','SI-Do-PF','SI-Do-A','CS-Do-PF','CS-Do-A','OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A',...
-%     'OP-R2','SI-R2-PF','SI-R2-A','CS-R2-PF','CS-R2-A'};
 
 path = '/Users/nozomihitomi/Dropbox/MOHEA';
 % path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
-mres_path =strcat(path,filesep,'mRes6opsInjectionNew');
+mres_path =strcat(path,filesep,'mResExperimentB');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
 b = length(selectors)*length(creditDef);
@@ -48,14 +35,14 @@ clf(h1)
 set(h1,'Position',[150, 300, 1200,600]);
 hsubplot1 = cell(length(problemName),1);
 for i=1:length(problemName)
-    hsubplot1{i}=subplot(2,5,i);
+    hsubplot1{i}=subplot(2,13,i);
 end
 h2 = figure(2); %fHV
 clf(h2)
 set(h2,'Position',[150, 100, 1200,600]);
 hsubplot2 = cell(length(problemName),1);
 for i=1:length(problemName)
-    hsubplot2{i}=subplot(2,5,i);
+    hsubplot2{i}=subplot(2,13,i);
 end
 
 leftPos = 0.03;
@@ -72,8 +59,8 @@ dataET = zeros(30,6,length(problemName));
 
 for i=1:length(problemName)
     probName = problemName{i};
-    [benchmarkDataIGD,label_names] = getBenchmarkVals(path,probName,'IGD',mode);
-    [benchmarkDatafHV,~] = getBenchmarkVals(path,probName,'fHV',mode);
+    [benchmarkDataIGD,label_names] = getBenchmarkVals(path,probName,'finalIGD',mode);
+    [benchmarkDatafHV,~] = getBenchmarkVals(path,probName,'finalHV',mode);
     [a,c] = size(benchmarkDataIGD);
     %box plot colors for benchmarks
     boxColors = 'rkm';
@@ -84,27 +71,37 @@ for i=1:length(problemName)
     label_names_IGD=label_names;
     label_names_fHV=label_names;
     
-    %check significance between best and default
+    %check significance between best and default in IGD
     if strcmp(mode,'MOEAD')
-        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'MOEADDRA'),'','','best1opMOEAD',probName);
-    else
-        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'eMOEA'),'','','best1opeMOEA',probName);
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD','de+pm',strcat(mres_path,filesep,'finalIGDbest1opMOEAD'),'MOEAD',probName,'finalIGD');
+    elseif strcmp(mode,'SSNSGAII')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII','sbx+pm',strcat(mres_path,filesep,'finalIGDbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+    else strcmp(mode,'SSIBEA')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA','sbx+pm',strcat(mres_path,filesep,'finalIGDbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
     end
     extra = '';
-    if sig.IGD==1
+    if sig==1
         extra = '(-)';
         statsIGD(i,1,3) = 1;
-    elseif sig.IGD==-1
+    elseif sig==-1
         extra = '(+)';
         statsIGD(i,1,1) = 1;
     else
         statsIGD(i,1,2) = 1;
     end
+    %check significance between best and default in HV
+     if strcmp(mode,'MOEAD')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD','de+pm',strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalHV');
+    elseif strcmp(mode,'SSNSGAII')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII','sbx+pm',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
+    else strcmp(mode,'SSIBEA')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA','sbx+pm',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
+    end
     extra = '';
-    if sig.fHV==1
+    if sig==1
         extra = '(+)';
         statsfHV(i,1,1) = 1;
-    elseif sig.fHV==-1
+    elseif sig==-1
         extra = '(-)';
         statsfHV(i,1,3) = 1;
     else
@@ -113,27 +110,42 @@ for i=1:length(problemName)
     label_names_IGD{1} = strcat(label_names_IGD{1},extra);
     label_names_fHV{1} = strcat(label_names_fHV{1},extra);
     
-    %check significance between rand and best
-    if strcmp(mode,'MOEAD')
-        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'Random',mode),'','','best1opMOEAD',probName);
-    else
-        [p,sig] = runMWUsignificance(path,strcat(path,filesep,'Benchmarks',filesep,'Random',mode),'','','best1opeMOEA',probName);
-    end
+    %check significance between rand and bestin IGD
+     if strcmp(mode,'MOEAD')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalIGD');
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
+    elseif strcmp(mode,'SSNSGAII')
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+    else strcmp(mode,'SSIBEA')
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalIGD');
+     end
     extra = '';
-    if sig.IGD==1
+    if sig==1
         extra = '(-)';
         statsIGD(i,3,3) = 1;
-    elseif sig.IGD==-1
+    elseif sig==-1
         extra = '(+)';
         statsIGD(i,3,1) = 1;
     else
         statsIGD(i,3,2) = 1;
     end
+    if strcmp(mode,'MOEAD')
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalHV');
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomMOEAD'),'Random','OP-De',strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
+    elseif strcmp(mode,'SSNSGAII')
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSNSGAII'),'Random','OP-Do',strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalHV');
+    else strcmp(mode,'SSIBEA')
+%         [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
+        [p,sig] = runMWUsignificance(strcat(mres_path,filesep,'RandomSSIBEA'),'Random','OP-I',strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalHV');        
+     end
     extra = '';
-    if sig.fHV==1
+    if sig==1
         extra = '(+)';
         statsfHV(i,3,1) = 1;
-    elseif sig.fHV==-1
+    elseif sig==-1
         extra = '(-)';
         statsfHV(i,3,3) = 1;
     else
@@ -142,47 +154,66 @@ for i=1:length(problemName)
     label_names_IGD{3} = strcat(label_names_IGD{3},extra);
     label_names_fHV{3} = strcat(label_names_fHV{3},extra);
     
-    
     for j=1:length(selectors)
         for k=1:length(creditDef)
             c = c+1;
-            file = strcat(mres_path,filesep,probName,'_',selectors{j},'_',creditDef{k},'.mat');
-            load(file,'res'); %assume that the reults stored in vairable named res
-            dataIGD(:,c) = res.IGD;
-            datafHV(:,c) = res.fHV;
-            dataET(:,c-3,i) = res.ET;
+            origin = cd(mres_path);
+            file = dir(strcat(probName,'*',selectors{j},'*',creditDef{k},'.mat'));
+            load(file.name,'res'); %assume that the reults stored in vairable named res
+            cd(origin);
             
-            %             dataInj(:,c-size(benchmarkDataIGD,2)) = res.Inj;
-            if strcmp(mode,'MOEAD')
-%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opMOEAD',probName);
-                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomMOEAD',probName);
-            else
-%                 [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'best1opeMOEA',probName);
-%                 [p,sig] = runMWUsignificance(path,selectors{j},creditDef{k},'eMOEA',probName);
-                [p,sig] = runMWUsignificance(path,mres_path,selectors{j},creditDef{k},'RandomeMOEA',probName);
+            dataIGD(:,c) = res.finalIGD;
+            datafHV(:,c) = res.finalHV;
+            
+            if strcmp(mode,'MOEAD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opMOEAD'),'MOEAD',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
+            elseif strcmp(mode,'SSNSGAII')
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSNSGAII'),'Random_OP-Do',probName,'finalIGD');
+            elseif strcmp(mode,'SSIBEA')
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSIBEA'),'SSIBEA',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSIBEA'),'Random_OP-I',probName,'finalIGD');
             end
             extra = '';
-            if sig.IGD==1
+            if sig==1
                 extra = '(-)';
                 statsIGD(i,c,3) = 1;
-            elseif sig.IGD==-1
+            elseif sig==-1
                 extra = '(+)';
                 statsIGD(i,c,1) = 1;
             else
                 statsIGD(i,c,2) = 1;
             end
-            label_names_IGD = [label_names_IGD,strcat(selectorShort{j},'-',creditShort{k},extra)]; %concats the labels
+            label_names_IGD = [label_names_IGD,strcat(selectorShort{j},'-',creditDef{k},extra)]; %concats the labels
+            
+            if strcmp(mode,'MOEAD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalHV');
+            elseif strcmp(mode,'SSNSGAII')
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSNSGAII'),'Random_OP-Do',probName,'finalHV');
+            elseif strcmp(mode,'SSIBEA')
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSIBEA'),'SSIBEA',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSIBEA'),'SSIBEA',probName,'finalHV');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomSSIBEA'),'Random_OP-I',probName,'finalHV');
+            end
             extra = '';
-            if sig.fHV==1
+            if sig==1
                 extra = '(+)';
                 statsfHV(i,c,1) = 1;
-            elseif sig.fHV==-1
+            elseif sig==-1
                 extra = '(-)';
                 statsfHV(i,c,3) = 1;
             else
                 statsfHV(i,c,2) = 1;
             end
-            label_names_fHV = {label_names_fHV{:},strcat(selectorShort{j},'-',creditShort{k},extra)}; %concats the labels
+            label_names_fHV = {label_names_fHV{:},strcat(selectorShort{j},'-',creditDef{k},extra)}; %concats the labels
             boxColors = strcat(boxColors,'b');
         end
     end
@@ -194,7 +225,7 @@ for i=1:length(problemName)
     figure(h1) 
     [~,ind]=min(mean(dataIGD,1));
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
-    boxplot(hsubplot1{i},dataIGD(:,3:end),label_names_IGD(:,3:end),'colors',boxColors(:,3:end),'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot1{i},dataIGD(:,1:end),label_names_IGD(:,1:end),'colors',boxColors(:,1:end),'boxstyle','filled','medianstyle','target','symbol','+')
     set(hsubplot1{i},'TickLabelInterpreter','tex');
     set(hsubplot1{i},'XTickLabelRotation',90);
     set(hsubplot1{i},'FontSize',13)
@@ -209,7 +240,7 @@ for i=1:length(problemName)
     figure(h2)
     [~,ind]=max(mean(datafHV,1));
     label_names_fHV{ind} = strcat('\bf{',label_names_fHV{ind},'}');
-    boxplot(hsubplot2{i},datafHV(:,3:end),label_names_fHV(:,3:end),'colors',boxColors(:,3:end),'boxstyle','filled','medianstyle','target','symbol','+')
+    boxplot(hsubplot2{i},datafHV(:,1:end),label_names_fHV(:,1:end),'colors',boxColors(:,1:end),'boxstyle','filled','medianstyle','target','symbol','+')
     set(hsubplot2{i},'TickLabelInterpreter','tex');
     set(hsubplot2{i},'XTickLabelRotation',90);
     set(hsubplot2{i},'FontSize',13);
@@ -224,11 +255,8 @@ end
 
 statsIGD = squeeze(sum(statsIGD,1))
 statsfHV = squeeze(sum(statsfHV,1))
-disp('mean time')
-avgTime = squeeze(mean(dataET,1))';
-stdTime = squeeze(std(dataET,1))';
 % % 
 
 
-saveas(h1,strcat(base,'_IGD'),'fig');
-saveas(h2,strcat(base,'_HV'),'fig');
+% saveas(h1,strcat(base,'_IGD'),'fig');
+% saveas(h2,strcat(base,'_HV'),'fig');

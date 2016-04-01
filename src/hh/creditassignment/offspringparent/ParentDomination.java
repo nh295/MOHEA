@@ -70,7 +70,7 @@ public class ParentDomination extends AbstractOffspringParent {
     @Override
     public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
         int parentRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
-        int offspringRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
+        int offspringRank = (int) offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
         if (parentRank > offspringRank) {
             return creditOffspringDominates;
         } else if (parentRank == offspringRank) {
