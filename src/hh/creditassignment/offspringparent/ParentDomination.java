@@ -10,6 +10,8 @@ import hh.creditassigment.CreditDefinedOn;
 import org.moeaframework.core.FastNondominatedSorting;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.ParetoConstraintComparator;
+import org.moeaframework.core.comparator.ParetoDominanceComparator;
 
 /**
  * This credit definition compares offspring to its parents
@@ -33,6 +35,8 @@ public class ParentDomination extends AbstractOffspringParent {
      * other
      */
     private final double creditNoOneDominates;
+    
+    private final ParetoDominanceComparator comp;
 
     /**
      * Constructor to specify the amount of reward that will be assigned and the
@@ -52,6 +56,7 @@ public class ParentDomination extends AbstractOffspringParent {
         this.creditOffspringDominates = rewardOffspringDominates;
         this.creditParentDominates = rewardParentDominates;
         this.creditNoOneDominates = rewardNoOneDominates;
+        this.comp = new ParetoDominanceComparator();
     }
 
     /**
@@ -69,11 +74,19 @@ public class ParentDomination extends AbstractOffspringParent {
      */
     @Override
     public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
-        int parentRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
-        int offspringRank = (int) offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
-        if (parentRank > offspringRank) {
+//        int parentRank = (int) parent.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
+//        int offspringRank = (int) offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE);
+//        if (parentRank > offspringRank) {
+//            return creditOffspringDominates;
+//        } else if (parentRank == offspringRank) {
+//            return creditNoOneDominates;
+//        } else {
+//            return creditParentDominates;
+//        }
+        int dom = comp.compare(offspring, parent);
+        if (dom==-1) {
             return creditOffspringDominates;
-        } else if (parentRank == offspringRank) {
+        } else if (dom == 0) {
             return creditNoOneDominates;
         } else {
             return creditParentDominates;

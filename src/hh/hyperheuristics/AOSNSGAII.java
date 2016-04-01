@@ -14,17 +14,15 @@ import hh.creditassignment.populationcontribution.AbstractPopulationContribution
 import hh.history.CreditHistory;
 import hh.history.OperatorQualityHistory;
 import hh.history.OperatorSelectionHistory;
-import hh.moea.SteadyStateNSGAII;
 import hh.nextheuristic.INextHeuristic;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.moeaframework.algorithm.NSGAII;
 import org.moeaframework.core.EpsilonBoxDominanceArchive;
 import org.moeaframework.core.Initialization;
+import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.NondominatedSortingPopulation;
 import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Population;
@@ -39,7 +37,7 @@ import org.moeaframework.core.Variation;
  *
  * @author SEAK2
  */
-public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
+public class AOSNSGAII extends NSGAII implements IHyperHeuristic {
 
     /**
      * The type of heuristic selection method
@@ -91,6 +89,11 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
     private String name;
 
     /**
+     * Pareto front
+     */
+    private NondominatedPopulation paretofront;
+
+    /**
      * A temporary list to store solutions that are removed for the population
      * in order to correctly update the Pareto front indices
      */
@@ -119,141 +122,97 @@ public class AOSNSGAII extends SteadyStateNSGAII implements IHyperHeuristic {
     @Override
     public void iterate() {
 
-        //select next heuristic
-        Variation operator = operatorSelector.nextHeuristic();
-        operatorSelectionHistory.add(operator, this.numberOfEvaluations);
+        NondominatedSortingPopulation population = getPopulation();
+        paretofront = new NondominatedPopulation(getPopulation());
+        Population offspring = new Population();
+        int populationSize = population.size();
 
-        //create new offspring
-        Solution[] parents = selection.select(operator.getArity(), population);
-        Solution[] children = operator.evolve(parents);
+        while (offspring.size() < populationSize) {
 
-        if (creditDef.getInputType() == CreditFunctionInputType.OP) {
-            double creditValue = 0.0;
-            for (Solution child : children) {
-                Solution refParent = parents[pprng.nextInt(parents.length)];
-                evaluate(child);
-                enlu.addSolution(child, population);
+            //select next heuristic
+            Variation operator = operatorSelector.nextHeuristic();
+            operatorSelectionHistory.add(operator, this.numberOfEvaluations);
 
-                //credit definitions operating on population and archive does 
-                //NOT modify the population by adding the child to the population/archive
-                switch (creditDef.getOperatesOn()) {
-                    case PARENT:
-                        creditValue += ((AbstractOffspringParent) creditDef).compute(child, refParent, population, null);
-                        break;
-                    default:
-                        throw new NullPointerException("Credit definition not "
-                                + "recognized. Used " + creditDef.getInputType() + ".");
+            Solution[] parents = selection.select(operator.getArity(),
+                    population);
+            Solution[] children = operator.evolve(parents);
 
+            offspring.addAll(children);
+
+            evaluateAll(children);
+
+            if (creditDef.getInputType() == CreditFunctionInputType.OP) {
+                double creditValue = 0.0;
+                for (Solution child : children) {
+                    Solution refParent = parents[pprng.nextInt(parents.length)];
+
+                    //credit definitions operating on population and archive does 
+                    //NOT modify the population by adding the child to the population/archive
+                    switch (creditDef.getOperatesOn()) {
+                        case PARENT:
+                            creditValue += ((AbstractOffspringParent) creditDef).compute(child, refParent, population, null);
+                            break;
+                        default:
+                            throw new NullPointerException("Credit definition not "
+                                    + "recognized. Used " + creditDef.getInputType() + ".");
+                    }
                 }
 
-                int worstIndex = findWorstSolution();
-                population.remove(worstIndex);
-            }
-
-            Credit reward = new Credit(this.numberOfEvaluations, creditValue);
-            operatorSelector.update(reward, operator);
-            creditHistory.add(operator, reward);
-        } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
-            try {
+                Credit reward = new Credit(this.numberOfEvaluations, creditValue);
+                operatorSelector.update(reward, operator);
+                creditHistory.add(operator, reward);
+            } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
                 double creditValue = 0.0;
                 for (Solution child : children) {
                     removedSolutions.clear();
-                    evaluate(child);
-                    enlu.addSolution(child, population);
-                    int worstIndex = findWorstSolution();
-                    removedSolutions.add(worstIndex);
-                    population.remove(worstIndex);
-
-                    if (worstIndex != population.size()) { //solution made it in population
-                        //credit definitions operating on PF and archive will 
-                        //modify the nondominated population by adding the child to the nondominated population.
-                        switch (creditDef.getOperatesOn()) {
-                            case PARETOFRONT:
-
-                                creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, null);
-                                break;
-                            default:
-                                throw new NullPointerException("Credit definition not "
-                                        + "recognized. Used " + creditDef.getInputType() + ".");
-                        }
+                    //credit definitions operating on PF and archive will 
+                    //modify the nondominated population by adding the child to the nondominated population.
+                    switch (creditDef.getOperatesOn()) {
+                        case PARETOFRONT:
+                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, paretofront);
+                            break;
+                        default:
+                            throw new NullPointerException("Credit definition not "
+                                    + "recognized. Used " + creditDef.getInputType() + ".");
                     }
                 }
                 Credit reward = new Credit(this.numberOfEvaluations, creditValue);
                 operatorSelector.update(reward, operator);
                 creditHistory.add(operator, reward);
-            } catch (Exception e) {
-                Logger.getLogger(AOSNSGAII.class.getName()).log(Level.SEVERE, null, e);
-            }
-        } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
-            for (Solution child : children) {
-            removedSolutions.clear();
-                evaluate(child);
-                child.setAttribute("heuristic", new SerializableVal(operator.toString()));
-                enlu.addSolution(child, population);
-                int worstIndex = findWorstSolution();
-                removedSolutions.add(worstIndex); //only need to keep track of the latest removal
-                population.remove(worstIndex);
-            }
-            HashMap<Variation, Credit> popContRewards;
-            switch (creditDef.getOperatesOn()) {
-                case PARETOFRONT:
-
-                    popContRewards = ((AbstractPopulationContribution) creditDef).
-                            compute(getParetoFront(), heuristics, this.numberOfEvaluations);
-
-                    break;
-                default:
-                    throw new NullPointerException("Credit definition not "
-                            + "recognized. Used " + creditDef.getInputType() + ".");
-            }
-            Iterator<Variation> iter = popContRewards.keySet().iterator();
-            while (iter.hasNext()) {
-                Variation operator_i = iter.next();
-                operatorSelector.update(popContRewards.get(operator_i), operator_i);
-                creditHistory.add(operator_i, new Credit(this.numberOfEvaluations, popContRewards.get(operator_i).getValue()));
-            }
-        } else {
-            throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
-        }
-//        updateQualityHistory();
-    }
-
-    /**
-     * Finds the Pareto front using the Pareto rank from the efficient
-     * nondomination update level method
-     *
-     * @return
-     */
-    private Population getParetoFront() {
-        Population paretoFront = new Population();
-        ArrayList<Integer> pfIndices = new ArrayList(enlu.getParetoFront());
-        HashMap<Integer, Integer> map = new HashMap(); //key is old index, value is new index
-        for (Integer index : pfIndices) {
-            map.put(index, index);
-        }
-        for(Integer removedIndex : removedSolutions){
-            map.remove(removedIndex);
-        }
-
-        //for every index that has been removed, update any Pareto front indices that are larger than it
-        //do not include any index belonging to both the Pareto front and the removed list (this can occur if the Pareto front is the only front)
-        Iterator<Integer> iter = map.keySet().iterator();
-        while (iter.hasNext()) {
-            int pfIndex = iter.next();
-            for (Integer removedIndex : removedSolutions) {
-                if (pfIndex > removedIndex) {
-                    map.put(pfIndex, map.get(pfIndex) - 1);
+            } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
+                for (Solution child : children) {
+                    child.setAttribute("heuristic", new SerializableVal(operator.toString()));
+                    paretofront.addAll(children);
                 }
+                HashMap<Variation, Credit> popContRewards;
+                switch (creditDef.getOperatesOn()) {
+                    case PARETOFRONT:
+
+                        popContRewards = ((AbstractPopulationContribution) creditDef).
+                                compute(paretofront, heuristics, this.numberOfEvaluations);
+
+                        break;
+                    default:
+                        throw new NullPointerException("Credit definition not "
+                                + "recognized. Used " + creditDef.getInputType() + ".");
+                }
+                Iterator<Variation> iter = popContRewards.keySet().iterator();
+                while (iter.hasNext()) {
+                    Variation operator_i = iter.next();
+                    operatorSelector.update(popContRewards.get(operator_i), operator_i);
+                    creditHistory.add(operator_i, new Credit(this.numberOfEvaluations, popContRewards.get(operator_i).getValue()));
+                }
+            } else {
+                throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
             }
+//        updateQualityHistory();
+
         }
 
-        for (Integer index : map.values()) {
-            if(index<0){
-                System.err.println("");
-            }
-            paretoFront.add(population.get(index));
-        }
-        return paretoFront;
+        population.addAll(offspring);
+
+        population.truncate(populationSize);
+
     }
 
     /**
