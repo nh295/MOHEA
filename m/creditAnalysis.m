@@ -5,8 +5,8 @@ function creditAnalysis(mode)
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
 problemName = {'WFG7_2'};
 selectors = {'Probability'};
-creditDef = {'OP-De','SI-De','CS-De'};
-% creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
+% creditDef = {'OP-De','SI-De','CS-De'};
+creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
 path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
 % respath = strcat(path,'results');
@@ -58,7 +58,7 @@ switch mode
         
         
     case 2 %analyze the files. mode 1 already assumed run
-        nepochs = 100;
+        nepochs = 50;
         maxEval = 25000;
         epochLength = maxEval/nepochs;
         nFiles = length(problemName)*length(selectors)*length(creditDef);
