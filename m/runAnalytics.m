@@ -1,6 +1,7 @@
 %runs the post-run analysis
 %reads .res file and puts all results data into one mfile
 
+
 % problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
 %     'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7',...
 %     'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
@@ -10,11 +11,13 @@ problemName = {%'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};,.
 % problemName = {'WFG1_2'};
 selectors = {'Probability','Adaptive'};
 % selectors = {'Adaptive'};
+
 % selectors = {'Random'};
 % selectors = {'MOEAD'};
 creditDef = { 'OP-Do','SI-PF','CS-Do-PF','OP-I','SI-I','CS-I','OP-De','SI-De','CS-De'};
 % creditDef = {'OP-De','SI-De','CS-De'};
 % creditDef = {'OP-De'};
+
 % creditDef = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 
 % path ='/Users/nozomihitomi/Dropbox/MOHEA';
@@ -28,7 +31,8 @@ for j=1:length(selectors)
     for i=1:length(creditDef)
 %         figure
         for k=1:length(problemName)
-            [fHV,IGD,finalHV,finalIGD,ET] = getAllResults(strcat(path,filesep,'results2'),selectors{j},creditDef{i},problemName{k});
+            [fHV,IGD,finalHV,finalIGD,ET] = getAllResults(strcat(path,filesep,'temp'),selectors{j},creditDef{i},problemName{k});
+
             if(isempty(ET))
                 disp(strcat(problemName{k},selectors{j},creditDef{i}))
             end

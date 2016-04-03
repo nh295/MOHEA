@@ -53,7 +53,8 @@ public class OffspringParetoFrontDominance extends AbstractOffspringPopulation{
      */
     @Override
     public double compute(Solution offspring, Population population) {
-        if((int)offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE)==0)
+//        if((int)offspring.getAttribute(FastNondominatedSorting.RANK_ATTRIBUTE)==0)
+        if(population.add(offspring))
             return creditNonDominated;
         else
             return creditDominated;

@@ -1,9 +1,9 @@
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 
-problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
-% problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
+problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
 % problemName = {%'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
 %             'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',...
 %             'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
@@ -23,9 +23,9 @@ switch base
         mode = 'SSIBEA';
 end
 
-path = '/Users/nozomihitomi/Dropbox/MOHEA';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
-mres_path =strcat(path,filesep,'mResExperimentB');
+% path = '/Users/nozomihitomi/Dropbox/MOHEA';
+path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+mres_path =strcat(path,filesep,'mResExperimentB2');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
 b = length(selectors)*length(creditDef);
@@ -167,8 +167,8 @@ for i=1:length(problemName)
             
             if strcmp(mode,'MOEAD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opMOEAD'),'MOEAD',probName,'finalIGD');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
             elseif strcmp(mode,'SSNSGAII')
                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opSSNSGAII'),'SSNSGAII',probName,'finalIGD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalIGD');
@@ -192,8 +192,8 @@ for i=1:length(problemName)
             
             if strcmp(mode,'MOEAD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opMOEAD'),'MOEAD',probName,'finalHV');
-%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
-                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalHV');
+                [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalHV');
+%                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalHV');
             elseif strcmp(mode,'SSNSGAII')
                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opSSNSGAII'),'SSNSGAII',probName,'finalHV');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultSSNSGAII'),'SSNSGAII',probName,'finalHV');

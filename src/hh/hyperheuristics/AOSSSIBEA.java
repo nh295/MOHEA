@@ -37,7 +37,7 @@ import org.moeaframework.core.fitness.IndicatorFitnessEvaluator;
  *
  * @author SEAK2
  */
-public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
+public class AOSSSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
 
     /**
      * The type of heuristic selection method
@@ -93,7 +93,7 @@ public class AOSIBEA extends SteadyStateIBEA implements IHyperHeuristic {
      */
     private String name;
 
-    public AOSIBEA(Problem problem, Population population,
+    public AOSSSIBEA(Problem problem, Population population,
             NondominatedPopulation archive, Selection selection,
             Initialization initialization, IndicatorFitnessEvaluator fitnessEvaluator, INextHeuristic heuristicSelector,
             ICreditAssignment creditDef) {

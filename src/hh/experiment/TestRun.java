@@ -16,8 +16,9 @@ import hh.nextheuristic.INextHeuristic;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.ICreditAssignment;
 import hh.creditassigment.CreditDefFactory;
-import hh.hyperheuristics.AOSIBEA;
 import hh.hyperheuristics.AOSNSGAII;
+import hh.hyperheuristics.AOSSSIBEA;
+import hh.hyperheuristics.AOSSSNSGAII;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -119,12 +120,38 @@ public class TestRun implements Callable {
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
-        AOSIBEA aosibea = new AOSIBEA(problem, population, null, selection,
+        AOSSSIBEA aosibea = new AOSSSIBEA(problem, population, null, selection,
                 initialization, fitnesseval, selector, creditDef);
 
         return aosibea;
     }
 
+//    /**
+//     * Returns a new instance of AOSNSGAII
+//     *
+//     * @return
+//     */
+//    private IHyperHeuristic newAOSSSNSGAII() {
+//        int populationSize = (int) properties.getDouble("populationSize", 600);
+//
+//        Initialization initialization = new RandomInitialization(problem,
+//                populationSize);
+//
+//        NondominatedSortingPopulation population = new NondominatedSortingPopulation();
+//
+//        TournamentSelection selection = new TournamentSelection(2,
+//                new ChainedComparator(new ParetoDominanceComparator(),
+//                        new CrowdingComparator()));
+//
+//        //all other properties use default parameters
+//        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+//
+//        AOSSSNSGAII aosnsgaii = new AOSSSNSGAII(problem, population, null, selection,
+//                initialization, selector, creditDef);
+//
+//        return aosnsgaii;
+//    }
+    
     /**
      * Returns a new instance of AOSNSGAII
      *
