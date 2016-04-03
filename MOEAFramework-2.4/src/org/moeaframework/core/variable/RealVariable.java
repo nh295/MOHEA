@@ -21,7 +21,7 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.moeaframework.core.PRNG;
+import org.moeaframework.core.ParallelPRNG;
 import org.moeaframework.core.Variable;
 
 /**
@@ -48,6 +48,8 @@ public class RealVariable implements Variable {
 	 * The upper bound of this decision variable.
 	 */
 	private final double upperBound;
+        
+        private final ParallelPRNG pprng;
         
 	/**
 	 * Constructs a real variable in the range {@code lowerBound <= x <=
@@ -80,6 +82,7 @@ public class RealVariable implements Variable {
 			throw new IllegalArgumentException(MessageFormat.format(
 					VALUE_OUT_OF_BOUNDS, value, lowerBound, upperBound));
 		}
+                pprng = new ParallelPRNG();
 	}
 
 	/**
@@ -163,7 +166,7 @@ public class RealVariable implements Variable {
 
 	@Override
 	public void randomize() {
-		setValue(PRNG.nextDouble(lowerBound, upperBound));
+		setValue(pprng.nextDouble(lowerBound, upperBound));
 	}
 
 }

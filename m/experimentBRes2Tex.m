@@ -1,14 +1,14 @@
 
 
 problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',...
-%     'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
+     'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
     'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 selector = {'Probability','Adaptive'};
 type = {'OP','SI','CS'};
-fitness = 'Do';
-path = '/Users/nozomihitomi/Dropbox/MOHEA/mResExperimentB';
-% indicator = 'finalHV';
-indicator = 'finalIGD';
+fitness = 'De';
+path = '/Users/nozomihitomi/Dropbox/MOHEA/mResExperimentB2';
+indicator = 'finalHV';
+% indicator = 'finalIGD';
 origin = cd(path);
 
 string = '';
@@ -23,15 +23,15 @@ for i=1:length(problemName)
         end
     elseif strcmp(fitness,'Do')
         if strcmp(indicator,'finalIGD')
-            cd(strcat(path,filesep,'finalIGDbest1opSSNSGAII'))
+            cd(strcat(path,filesep,'finalIGDbest1opNSGAII'))
         elseif strcmp(indicator,'finalHV')
-            cd(strcat(path,filesep,'finalHVbest1opSSNSGAII'))
+            cd(strcat(path,filesep,'finalHVbest1opNSGAII'))
         end
     elseif strcmp(fitness,'I')
         if strcmp(indicator,'finalIGD')
-            cd(strcat(path,filesep,'finalIGDbest1opSSIBEA'))
+            cd(strcat(path,filesep,'finalIGDbest1opIBEA'))
         elseif strcmp(indicator,'finalHV')
-            cd(strcat(path,filesep,'finalHVbest1opSSIBEA'))
+            cd(strcat(path,filesep,'finalHVbest1opIBEA'))
         end
     end
     files = dir(strcat(problemName{i},'*'));
@@ -43,9 +43,9 @@ for i=1:length(problemName)
     if strcmp(fitness,'De')
         cd(strcat(path,filesep,'RandomMOEAD'))
     elseif strcmp(fitness,'Do')
-        cd(strcat(path,filesep,'RandomSSNSGAII'))
+        cd(strcat(path,filesep,'RandomNSGAII'))
     elseif strcmp(fitness,'I')
-        cd(strcat(path,filesep,'RandomSSIBEA'))
+        cd(strcat(path,filesep,'RandomIBEA'))
     end
     files = dir(strcat(problemName{i},'*'));
     load(files.name);

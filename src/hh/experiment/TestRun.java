@@ -16,6 +16,7 @@ import hh.nextheuristic.INextHeuristic;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.ICreditAssignment;
 import hh.creditassigment.CreditDefFactory;
+import hh.hyperheuristics.AOSIBEA;
 import hh.hyperheuristics.AOSNSGAII;
 import hh.hyperheuristics.AOSSSIBEA;
 import hh.hyperheuristics.AOSSSNSGAII;
@@ -99,6 +100,33 @@ public class TestRun implements Callable {
         this.referenceSet = referenceSet;
     }
 
+//    /**
+//     * Returns a new instance of AOSIBEA
+//     *
+//     * @return
+//     */
+//    private IHyperHeuristic newAOSIBEA() {
+//        int populationSize = (int) properties.getDouble("populationSize", 600);
+//
+//        Initialization initialization = new RandomInitialization(problem,
+//                populationSize);
+//
+//        Population population = new Population();
+//
+//        IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
+//
+//        FitnessComparator fitnessComparator = new FitnessComparator(fitnesseval.areLargerValuesPreferred());
+//        TournamentSelection selection = new TournamentSelection(fitnessComparator);
+//
+//        //all other properties use default parameters
+//        INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
+//
+//        AOSSSIBEA aosibea = new AOSSSIBEA(problem, population, null, selection,
+//                initialization, fitnesseval, selector, creditDef);
+//
+//        return aosibea;
+//    }
+    
     /**
      * Returns a new instance of AOSIBEA
      *
@@ -120,7 +148,7 @@ public class TestRun implements Callable {
         //all other properties use default parameters
         INextHeuristic selector = HHFactory.getInstance().getHeuristicSelector(properties.getString("HH", null), properties, heuristics);
 
-        AOSSSIBEA aosibea = new AOSSSIBEA(problem, population, null, selection,
+        AOSIBEA aosibea = new AOSIBEA(problem, population, null, selection,
                 initialization, fitnesseval, selector, creditDef);
 
         return aosibea;
