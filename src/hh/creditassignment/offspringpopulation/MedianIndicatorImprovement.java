@@ -8,6 +8,7 @@ package hh.creditassignment.offspringpopulation;
 import hh.creditassigment.CreditFunctionInputType;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.CreditDefinedOn;
+import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 import org.moeaframework.core.FitnessEvaluator;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
@@ -18,15 +19,18 @@ import org.moeaframework.core.Solution;
  *
  * @author Nozomi
  */
-public class MeanIndicatorImprovement extends AbstractOffspringPopulation {
+public class MedianIndicatorImprovement extends AbstractOffspringPopulation {
+    
+    private final Percentile medianCompute;
 
     /**
      * Constructor for indicator based set improvement credit assignment
      */
-    public MeanIndicatorImprovement() {
-        operatesOn = CreditDefinedOn.PARETOFRONT;
+    public MedianIndicatorImprovement() {
+        operatesOn = CreditDefinedOn.POPULATION;
         inputType = CreditFunctionInputType.SI;
         fitType = CreditFitnessFunctionType.I;
+        medianCompute = new Percentile(50.0);
     }
 
     /**
@@ -40,14 +44,15 @@ public class MeanIndicatorImprovement extends AbstractOffspringPopulation {
      */
     @Override
     public double compute(Solution offspring, Population population) {
-        double sum = 0;
+        
+        double[] fitnessvals = new double[population.size()];
         //find sum of the fitness minus the offspring
         for (int i = 0; i < population.size() - 1; i++) {
-            sum += (double) population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
+            fitnessvals[i] = (double) population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         }
-        double mean = sum / (population.size() - 1);
+        double median = medianCompute.evaluate(fitnessvals, 50.0);
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
-        return Math.max((offspringFit - mean)/mean, 0.0);
+        return Math.max((offspringFit - median)/median, 0.0);
     }
 
     @Override

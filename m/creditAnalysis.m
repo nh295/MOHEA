@@ -3,7 +3,7 @@ function creditAnalysis(mode)
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'WFG7_2'};
+problemName = {'DTLZ7_3'};
 selectors = {'Probability'};
 % creditDef = {'OP-De','SI-De','CS-De'};
 creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
@@ -58,7 +58,7 @@ switch mode
         
         
     case 2 %analyze the files. mode 1 already assumed run
-        nepochs = 50;
+        nepochs = 100;
         maxEval = 25000;
         epochLength = maxEval/nepochs;
         nFiles = length(problemName)*length(selectors)*length(creditDef);

@@ -3,20 +3,30 @@ function plot1Opresults
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 % 
+problemName = {'DTLZ7'};
 % problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
+<<<<<<< HEAD
 problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 %  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
 MOEA =  {'MOEAD'};
 % MOEA =  {'SSIBEA'};
 % MOEA =  {'eMOEA','MOEAD'};
 
+=======
+% problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
+%  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
+% MOEA =  {'MOEAD','NSGAII'};
+% MOEA =  {'MOEAD'};
+MOEA =  {'IBEA'};
+% MOEA =  {'NSGAII'};
+>>>>>>> 5eb1f4f2a93994febe9793349a0ae8880a88aa18
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
 
 % path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
-res_path =strcat(path,'mResExperimentA');
+res_path =strcat(path,'mResExperimentA2');
 
 a = 30; %number of trials
 b = length(MOEA)*length(operator);
@@ -81,11 +91,11 @@ for i=1:length(problemName)
             if strcmp(MOEA{k},'MOEAD')
                 [~,sig]=significance(res,strcat(res_path,filesep,probName,'_MOEAD_de+pm.mat'));
                 boxColors = strcat(boxColors,'r');
-            elseif strcmp(MOEA{k},'SSIBEA')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_SSIBEA_sbx+pm.mat'));
+            elseif strcmp(MOEA{k},'IBEA')
+                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_IBEA_sbx+pm.mat'));
                 boxColors = strcat(boxColors,'b');
-            elseif strcmp(MOEA{k},'SSNSGAII')
-                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_SSNSGAII_sbx+pm.mat'));
+            elseif strcmp(MOEA{k},'NSGAII')
+                [~,sig]=significance(res,strcat(res_path,filesep,probName,'_NSGAII_sbx+pm.mat'));
                 boxColors = strcat(boxColors,'g');
             end
             extra = '';
@@ -100,9 +110,9 @@ for i=1:length(problemName)
             end
             if strcmp(MOEA{k},'MOEAD')
                 label_names_IGD = [label_names_IGD,strcat('DRA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSIBEA')
+            elseif strcmp(MOEA{k},'IBEA')
                 label_names_IGD = [label_names_IGD,strcat('IBEA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSNSGAII')
+            elseif strcmp(MOEA{k},'NSGAII')
                 label_names_IGD = [label_names_IGD,strcat('NSGA-',operatorName{j},extra)]; %concats the labels
             end
             
@@ -118,9 +128,9 @@ for i=1:length(problemName)
            end
             if strcmp(MOEA{k},'MOEAD')
                 label_names_finalHV = [label_names_finalHV,strcat('DRA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSIBEA')
+            elseif strcmp(MOEA{k},'IBEA')
                 label_names_finalHV = [label_names_finalHV,strcat('IBEA-',operatorName{j},extra)]; %concats the labels
-            elseif strcmp(MOEA{k},'SSNSGAII')
+            elseif strcmp(MOEA{k},'NSGAII')
                 label_names_finalHV = [label_names_finalHV,strcat('NSGA-',operatorName{j},extra)]; %concats the labels
             end
         end
@@ -135,7 +145,7 @@ for i=1:length(problemName)
     [~,ind]=min(mean(datafinalIGD,1));
     meanIGD = sprintf(' %0.3e',mean(datafinalIGD(:,ind)));
     stdIGD = sprintf('%0.3e',std(datafinalIGD(:,ind)));
-%     bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
+    bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
     boxplot(hsubplot1{i},datafinalIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
     title(hsubplot1{i},probName)
@@ -153,7 +163,7 @@ for i=1:length(problemName)
     [~,ind]=max(mean(datafinalHV,1));
     meanHV = sprintf(' %0.3e',mean(datafinalHV(:,ind)));
     stdHV = sprintf('%0.3e',std(datafinalHV(:,ind)));
-%     bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
+    bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
     label_names_finalHV{ind} = strcat('\bf{',label_names_finalHV{ind},'}');
     boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
     title(hsubplot2{i},probName)

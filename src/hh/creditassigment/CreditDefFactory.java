@@ -12,7 +12,7 @@ import hh.creditassignment.fitnessindicator.R2Indicator;
 import hh.creditassignment.offspringparent.ParentDecomposition;
 import hh.creditassignment.offspringparent.ParentDomination;
 import hh.creditassignment.offspringparent.ParentIndicator;
-import hh.creditassignment.offspringpopulation.MeanIndicatorImprovement;
+import hh.creditassignment.offspringpopulation.MedianIndicatorImprovement;
 import hh.creditassignment.offspringpopulation.OffspringArchiveDominance;
 import hh.creditassignment.offspringpopulation.OffspringNeighborhood;
 import hh.creditassignment.offspringpopulation.OffspringParetoFrontDominance;
@@ -90,7 +90,7 @@ public class CreditDefFactory {
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPI" :
-                credDef = new ParentIndicator();
+                credDef = new ParentIndicator(problem);
                 break;
 //            case "OPIAE": //offspring parent additive epsilon indicator using pareto front
 //                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa,problem);
@@ -129,7 +129,7 @@ public class CreditDefFactory {
 //                credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.ARCHIVE);
 //                break;
             case "SIIPop" : //offspring improvement to the mean indicator-based fitness value
-                credDef = new MeanIndicatorImprovement();
+                credDef = new MedianIndicatorImprovement();
                 break;
             case "CSDe": //contribution to the subproblem's neighborhood
                 credDef = new DecompositionContribution(satisfy, disatisfy);

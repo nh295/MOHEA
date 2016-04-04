@@ -5,13 +5,13 @@ function [vals,out] = getBenchmarkVals(path,prob_name,indicator,mode)
 %returns the indicator valsues for each benchmark for specified indicator
 %and the labels of the names of each benchmark algorithm
 
-path2benchmark = strcat(path,filesep,'mResExperimentB');
+path2benchmark = strcat(path,filesep,'mResExperimentB2');
 if strcmp(mode,'MOEAD')
     benchmark_names = {'MOEAD','best1opMOEAD','RandomMOEAD'};
-elseif strcmp(mode,'SSNSGAII')
-    benchmark_names = {'SSNSGAII','best1opSSNSGAII','RandomSSNSGAII'};
-elseif strcmp(mode,'SSIBEA')
-    benchmark_names = {'SSIBEA','best1opSSIBEA','RandomSSIBEA'};
+elseif strcmp(mode,'NSGAII')
+    benchmark_names = {'NSGAII','best1opNSGAII','RandomNSGAII'};
+elseif strcmp(mode,'IBEA')
+    benchmark_names = {'IBEA','best1opIBEA','RandomIBEA'};
 end
 
 vals = zeros(30,length(benchmark_names));
@@ -21,7 +21,7 @@ for i=1:length(benchmark_names)
     %string names together to load m file containing results
     algorithm = benchmark_names{i};
     
-    if strcmp(algorithm,'best1opMOEAD') || strcmp(algorithm,'best1opSSNSGAII') || strcmp(algorithm,'best1opSSIBEA')
+    if strcmp(algorithm,'best1opMOEAD') || strcmp(algorithm,'best1opNSGAII') || strcmp(algorithm,'best1opIBEA')
         file = dir(strcat(path2benchmark,filesep,indicator,algorithm,filesep,prob_name,'*'));
         mfilename = strcat(path2benchmark,filesep,indicator,algorithm,filesep,file(1).name);
         str = strsplit(file(1).name,'.');
@@ -29,13 +29,13 @@ for i=1:length(benchmark_names)
         str = strsplit(str{1},'_');
         if strcmp(algorithm,'best1opMOEAD')
             str{end-1} = 'MOEAD*';
-        elseif strcmp(algorithm,'best1opSSNSGAII')
-            str{end-1} = 'SSNSGAII*';
-        elseif strcmp(algorithm,'best1opSSIBEA')
-            str{end-1} = 'SSIBEA*';
+        elseif strcmp(algorithm,'best1opNSGAII')
+            str{end-1} = 'NSGAII*';
+        elseif strcmp(algorithm,'best1opIBEA')
+            str{end-1} = 'IBEA*';
         end
         out{i} = strcat('{',str{end-1},'-',upper(str{end}),'}');
-    elseif strcmp(algorithm,'MOEAD') || strcmp(algorithm,'SSNSGAII') || strcmp(algorithm,'SSIBEA')
+    elseif strcmp(algorithm,'MOEAD') || strcmp(algorithm,'NSGAII') || strcmp(algorithm,'IBEA')
         file = dir(strcat(path2benchmark,filesep,'Default',algorithm,filesep,prob_name,'*', algorithm,'*.mat'));
         mfilename = strcat(path2benchmark,filesep,'Default',algorithm,filesep,file(1).name);
         out{i} = mode;
