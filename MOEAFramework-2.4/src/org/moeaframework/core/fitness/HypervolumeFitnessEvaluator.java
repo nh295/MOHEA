@@ -49,7 +49,7 @@ public class HypervolumeFitnessEvaluator extends IndicatorFitnessEvaluator {
 	}
 
 	@Override
-	protected double calculateIndicator(Solution solution1, 
+	public double calculateIndicator(Solution solution1, 
 			Solution solution2) {
 		if (dominanceComparator.compare(solution1, solution2) < 0) {
 			return -calculateHypervolume(solution1, solution2, getProblem()

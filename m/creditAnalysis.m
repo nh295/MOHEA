@@ -3,10 +3,11 @@ function creditAnalysis(mode)
 
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};%,'UF8','UF9','UF10'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7'};
-problemName = {'DTLZ7_3'};
+problemName = {'WFG7'};
 selectors = {'Probability'};
 % creditDef = {'OP-De','SI-De','CS-De'};
-creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
+% creditDef = {'OP-Do','SI-PF','CS-Do-PF'};
+creditDef = {'OP-I','SI-I-Pop','CS-I-POPULATION'};
 path = '/Users/nozomihitomi/Dropbox/MOHEA/';
 % path = 'C:\Users\SEAK1\Dropbox\MOHEA\';
 % respath = strcat(path,'results');

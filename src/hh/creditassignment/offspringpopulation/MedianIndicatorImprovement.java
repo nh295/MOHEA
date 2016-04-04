@@ -46,13 +46,17 @@ public class MedianIndicatorImprovement extends AbstractOffspringPopulation {
     public double compute(Solution offspring, Population population) {
         
         double[] fitnessvals = new double[population.size()];
+        double minFitness = Double.POSITIVE_INFINITY;
+        double maxFitness = Double.NEGATIVE_INFINITY;
         //find sum of the fitness minus the offspring
         for (int i = 0; i < population.size() - 1; i++) {
             fitnessvals[i] = (double) population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
+            minFitness = Math.min(minFitness, fitnessvals[i]);
+            maxFitness = Math.max(maxFitness, fitnessvals[i]);
         }
         double median = medianCompute.evaluate(fitnessvals, 50.0);
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
-        return Math.max((offspringFit - median)/median, 0.0);
+        return Math.max((offspringFit - median)/(maxFitness-minFitness), 0.0);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class AdditiveEpsilonIndicatorFitnessEvaluator extends
 	 * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 	 */
 	@Override
-	protected double calculateIndicator(Solution solution1, 
+	public double calculateIndicator(Solution solution1, 
 			Solution solution2) {
 		double eps = Double.NEGATIVE_INFINITY;
 

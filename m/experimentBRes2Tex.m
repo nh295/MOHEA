@@ -5,15 +5,41 @@ problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',..
     'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 selector = {'Probability','Adaptive'};
 type = {'OP','SI','CS'};
-fitness = 'De';
+fitness = 'I';
 path = '/Users/nozomihitomi/Dropbox/MOHEA/mResExperimentB2';
-indicator = 'finalHV';
-% indicator = 'finalIGD';
+% indicator = 'finalHV';
+indicator = 'finalIGD';
 origin = cd(path);
 
 string = '';
 for i=1:length(problemName)
     string = sprintf('%s%s ',string,problemName{i});
+    
+    %get best default-operator MOEA
+    if strcmp(fitness,'De')
+        if strcmp(indicator,'finalIGD')
+            cd(strcat(path,filesep,'DefaultMOEAD'))
+        elseif strcmp(indicator,'finalHV')
+            cd(strcat(path,filesep,'DefaultMOEAD'))
+        end
+    elseif strcmp(fitness,'Do')
+        if strcmp(indicator,'finalIGD')
+            cd(strcat(path,filesep,'DefaultNSGAII'))
+        elseif strcmp(indicator,'finalHV')
+            cd(strcat(path,filesep,'DefaultNSGAII'))
+        end
+    elseif strcmp(fitness,'I')
+        if strcmp(indicator,'finalIGD')
+            cd(strcat(path,filesep,'DefaultIBEA'))
+        elseif strcmp(indicator,'finalHV')
+            cd(strcat(path,filesep,'DefaultIBEA'))
+        end
+    end
+    files = dir(strcat(problemName{i},'*'));
+    load(files.name);
+    data = getfield(res,indicator);
+    string = sprintf('%s & %1.4f & (%1.3f)',string, mean(data),std(data));
+    
     %get best single-operator MOEA
     if strcmp(fitness,'De')
         if strcmp(indicator,'finalIGD')
@@ -37,7 +63,7 @@ for i=1:length(problemName)
     files = dir(strcat(problemName{i},'*'));
     load(files.name);
     data = getfield(res,indicator);
-    string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
+    string = sprintf('%s & %1.4f & (%1.3f)',string, mean(data),std(data));
     
     %get random select
     if strcmp(fitness,'De')
@@ -50,7 +76,7 @@ for i=1:length(problemName)
     files = dir(strcat(problemName{i},'*'));
     load(files.name);
     data = getfield(res,indicator);
-    string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
+    string = sprintf('%s & %1.4f & (%1.3f)',string, mean(data),std(data));
     
     cd(path)
     %get all tested AOS
@@ -59,7 +85,7 @@ for i=1:length(problemName)
             files = dir(strcat(problemName{i},'*',selector{j},'*',type{k},'*',fitness,'*'));
             load(files.name);
             data = getfield(res,indicator);
-            string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
+            string = sprintf('%s & %1.4f & (%1.3f)',string, mean(data),std(data));
         end
     end
     string = sprintf('%s\\\\ \n',string);

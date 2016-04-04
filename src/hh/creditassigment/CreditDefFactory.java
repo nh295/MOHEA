@@ -90,7 +90,7 @@ public class CreditDefFactory {
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPI" :
-                credDef = new ParentIndicator();
+                credDef = new ParentIndicator(problem);
                 break;
 //            case "OPIAE": //offspring parent additive epsilon indicator using pareto front
 //                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa,problem);

@@ -1,16 +1,18 @@
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 
-problemName = {'WFG7'};
+problemName = {'WFG7','DTLZ7'};
 % problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
 % problemName = {'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
-% problemName = {'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
+% problemName = {%'UF1_','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10',...
 %             'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9',...
 %             'DTLZ1_','DTLZ2_','DTLZ3_','DTLZ4_','DTLZ5_','DTLZ6_','DTLZ7_'};
 selectors = {'Probability','Adaptive'};
+% selectors = {'Probability'};
 selectorShort = {'PM','AP'};
-base = 'De';
+% selectorShort = {'PM'};
+base = 'I';
 
 switch base
     case {'De'}
@@ -25,7 +27,7 @@ switch base
 end
 
 path = '/Users/nozomihitomi/Dropbox/MOHEA';
-% path = 'C:\Users\SEAK2\Nozomi\MOHEA\';
+% path = 'C:\Users\SEAK2\Nozomi\MOHEA';
 mres_path =strcat(path,filesep,'mResExperimentB2');
 % res_path = '/Users/nozomihitomi/Desktop/untitled folder';
 
@@ -168,6 +170,7 @@ for i=1:length(problemName)
             
             if strcmp(mode,'MOEAD');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalIGDbest1opMOEAD'),'MOEAD',probName,'finalIGD');
+
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultMOEAD'),'MOEAD',probName,'finalIGD');
                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomMOEAD'),'Random_OP-De',probName,'finalIGD');
             elseif strcmp(mode,'NSGAII')
@@ -203,6 +206,7 @@ for i=1:length(problemName)
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'finalHVbest1opIBEA'),'IBEA',probName,'finalHV');
 %                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'DefaultIBEA'),'IBEA',probName,'finalHV');
                 [p,sig] = runMWUsignificance(mres_path,selectors{j},creditDef{k},strcat(mres_path,filesep,'RandomIBEA'),'Random_OP-I',probName,'finalHV');
+
             end
             extra = '';
             if sig==1

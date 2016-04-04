@@ -189,41 +189,6 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
             throw new FrameworkException("evaluate must be called first");
         }
 
-        //need to resum fitness if only the max indicator value changes
-        if (removeIndex == maxij[0] || removeIndex == maxij[1]) {
-            resumFitness = true;
-        }
-
-        //need to reevaluate if the bounds need updating
-        Solution removeSolution = population.get(removeIndex);
-        if (!needsEvaulate) {
-            for (int i = 0; i < removeSolution.getNumberOfObjectives(); i++) {
-                if (removeSolution.getObjective(i) == upperbound[i]
-                        || removeSolution.getObjective(i) == lowerbound[i]) {
-                    //if need to reevaluate in next iteration, just remove this index
-                    needsEvaulate = true;
-                    population.remove(removeIndex);
-                    return;
-                }
-            }
-        }
-        if (resumFitness) {
-            for (int i = 0; i < population.size(); i++) {
-                for (int j = removeIndex + 1; j < population.size(); j++) {
-                    fitcomp[i][j - 1] = fitcomp[i][j];
-                }
-
-                if (i > removeIndex) {
-                    fitcomp[i - 1] = fitcomp[i];
-                }
-            }
-
-            population.remove(removeIndex);
-            normalizedPopulation.remove(removeIndex);
-            findMaxIndicatorValue(population);
-            sumFitness(population, removeIndex);
-        } else {
-
             for (int i = 0; i < population.size(); i++) {
                 if (i != removeIndex) {
                     Solution solution = population.get(i);
@@ -246,15 +211,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
                 }
             }
 
-            for (int i = 0; i < maxij.length; i++) {
-                if (maxij[i] > removeIndex) {
-                    maxij[i] = maxij[i] - 1;
-                }
-            }
-
             population.remove(removeIndex);
-            normalizedPopulation.remove(removeIndex);
-        }
     }
 
     /**
@@ -359,7 +316,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
                         normalizedPopulation.get(lastIndex));
                 fitcomp[lastIndex][i] = calculateIndicator(normalizedPopulation.get(lastIndex),
                         normalizedPopulation.get(i));
-            }
+        }
                 //update values for all incumbent solutions
                 for (int i = 0; i < population.size() - 1; i++) {
                     double prevFitness = (double) population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
@@ -388,7 +345,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
         }
     }
 
-    private Solution normalize(Solution solution) {
+    public Solution normalize(Solution solution) {
         Solution out = solution.copy();
         for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
             out.setObjective(i, (solution.getObjective(i) - lowerbound[i]) / (upperbound[i] - lowerbound[i]));
@@ -403,7 +360,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
      * @param solution2 the second solution
      * @return the indicator value relative to the two solutions
      */
-    protected abstract double calculateIndicator(Solution solution1,
+    public abstract double calculateIndicator(Solution solution1,
             Solution solution2);
 
 }

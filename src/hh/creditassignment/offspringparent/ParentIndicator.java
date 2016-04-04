@@ -9,7 +9,9 @@ import hh.creditassigment.CreditDefinedOn;
 import hh.creditassigment.CreditFitnessFunctionType;
 import org.moeaframework.core.FitnessEvaluator;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.fitness.HypervolumeFitnessEvaluator;
 
 /**
  * This credit assignment strategies compares the offspring indicator-based
@@ -18,11 +20,14 @@ import org.moeaframework.core.Solution;
  * @author nozomihitomi
  */
 public class ParentIndicator extends AbstractOffspringParent {
+    
+    private HypervolumeFitnessEvaluator hvFitnessEvaluator;
 
-    public ParentIndicator() {
+    public ParentIndicator(Problem problem) {
         super();
         operatesOn = CreditDefinedOn.PARENT;
         fitType = CreditFitnessFunctionType.I;
+        this.hvFitnessEvaluator = new HypervolumeFitnessEvaluator(problem);
     }
     
 
@@ -42,6 +47,8 @@ public class ParentIndicator extends AbstractOffspringParent {
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         double parentFit = (double) parent.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         return Math.max((offspringFit - parentFit)/parentFit, 0.0);
+//        double cred = Math.max(hvFitnessEvaluator.calculateIndicator(parent, offspring),0.0);
+//        return cred;
     }
 
     @Override
