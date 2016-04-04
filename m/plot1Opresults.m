@@ -3,13 +3,13 @@ function plot1Opresults
 %plots the boxplots of each UF1-10 problem and the IGD, fast hypervolume
 %(jmetal) and the additive epsilon values for each algorithm
 % 
-problemName = {'DTLZ7'};
+problemName = {'WFG7'};
 % problemName = {'UF1','UF2','UF3','UF4','UF5','UF6','UF7','UF8','UF9','UF10'};
 % problemName = { 'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 %  problemName = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9'};
-% MOEA =  {'MOEAD','NSGAII'};
-% MOEA =  {'MOEAD'};
-MOEA =  {'IBEA'};
+% MOEA =  {'MOEAD','IBEA','NSGAII'};
+MOEA =  {'MOEAD'};
+% MOEA =  {'IBEA'};
 % MOEA =  {'NSGAII'};
 operator = {'sbx+pm','de+pm','um','pcx+pm','undx+pm','spx+pm'};
 operatorName = {'SBX','DE','UM','PCX','UNDX','SPX'};
@@ -136,7 +136,7 @@ for i=1:length(problemName)
     [~,ind]=min(mean(datafinalIGD,1));
     meanIGD = sprintf(' %0.3e',mean(datafinalIGD(:,ind)));
     stdIGD = sprintf('%0.3e',std(datafinalIGD(:,ind)));
-    bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
+     bestOpsIGD{i} = strcat(operatorName{ind},' & ', meanIGD,' (',stdIGD,')');
     label_names_IGD{ind} = strcat('\bf{',label_names_IGD{ind},'}');
     boxplot(hsubplot1{i},datafinalIGD,label_names_IGD,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
     title(hsubplot1{i},probName)
@@ -154,7 +154,7 @@ for i=1:length(problemName)
     [~,ind]=max(mean(datafinalHV,1));
     meanHV = sprintf(' %0.3e',mean(datafinalHV(:,ind)));
     stdHV = sprintf('%0.3e',std(datafinalHV(:,ind)));
-    bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
+     bestOpsHV{i} = strcat(operatorName{ind},' & ', meanHV,' (',stdHV,')');
     label_names_finalHV{ind} = strcat('\bf{',label_names_finalHV{ind},'}');
     boxplot(hsubplot2{i},datafinalHV,label_names_finalHV,'colors',boxColors,'boxstyle','filled','medianstyle','target','symbol','+')
     title(hsubplot2{i},probName)

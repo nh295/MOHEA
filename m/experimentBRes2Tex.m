@@ -37,7 +37,7 @@ for i=1:length(problemName)
     files = dir(strcat(problemName{i},'*'));
     load(files.name);
     data = getfield(res,indicator);
-    string = sprintf('%s & %1.2e & (%1.1e)',string, mean(data),std(data));
+    string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
     
     %get random select
     if strcmp(fitness,'De')
@@ -50,7 +50,7 @@ for i=1:length(problemName)
     files = dir(strcat(problemName{i},'*'));
     load(files.name);
     data = getfield(res,indicator);
-    string = sprintf('%s & %1.2e & (%1.1e)',string, mean(data),std(data));
+    string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
     
     cd(path)
     %get all tested AOS
@@ -59,7 +59,7 @@ for i=1:length(problemName)
             files = dir(strcat(problemName{i},'*',selector{j},'*',type{k},'*',fitness,'*'));
             load(files.name);
             data = getfield(res,indicator);
-            string = sprintf('%s & %1.2e & (%1.1e)',string, mean(data),std(data));
+            string = sprintf('%s & %1.4f & (%1.4f)',string, mean(data),std(data));
         end
     end
     string = sprintf('%s\\\\ \n',string);
