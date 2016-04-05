@@ -56,7 +56,7 @@ public class MedianIndicatorImprovement extends AbstractOffspringPopulation {
         }
         double median = medianCompute.evaluate(fitnessvals, 50.0);
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
-        return Math.max((offspringFit - median)/(maxFitness-minFitness), 0.0);
+        return Math.max((median - offspringFit)/(maxFitness-minFitness), 0.0);
     }
 
     @Override

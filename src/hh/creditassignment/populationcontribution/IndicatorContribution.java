@@ -53,22 +53,24 @@ public class IndicatorContribution extends AbstractPopulationContribution {
             creditVals.put(operator.toString(), 0.0);
         }
 
-        double sumFitness = 0.0;
+        double minFitness = Double.POSITIVE_INFINITY;
+        double maxFitness = Double.NEGATIVE_INFINITY;
         for (Solution soln : population) {
             if (soln.hasAttribute("heuristic")) {
                 String operator = ((SerializableVal) soln.getAttribute("heuristic")).getSval();
                 double fitness = (double) soln.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
                 creditVals.put(operator, creditVals.get(operator) + fitness);
-
+                
+                minFitness = Math.min(minFitness, fitness);
+                maxFitness = Math.max(maxFitness, fitness);
             }
-            sumFitness += (double) soln.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         }
 
         //normalize the reward values
 
         HashMap<Variation, Credit> rewards = new HashMap();
         for (Variation heuristic : heuristics) {
-            double normalizedCredit = creditVals.get(heuristic.toString()) / sumFitness;
+            double normalizedCredit = (creditVals.get(heuristic.toString())-minFitness) / (maxFitness - minFitness);
             rewards.put(heuristic, new Credit(iteration, normalizedCredit));
         }
         return rewards;

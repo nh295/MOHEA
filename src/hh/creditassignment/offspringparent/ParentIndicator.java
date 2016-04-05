@@ -46,9 +46,7 @@ public class ParentIndicator extends AbstractOffspringParent {
     public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
         double offspringFit = (double) offspring.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
         double parentFit = (double) parent.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
-        return Math.max((offspringFit - parentFit)/parentFit, 0.0);
-//        double cred = Math.max(hvFitnessEvaluator.calculateIndicator(parent, offspring),0.0);
-//        return cred;
+        return Math.max((parentFit - offspringFit)/parentFit, 0.0);
     }
 
     @Override
