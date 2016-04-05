@@ -45,15 +45,14 @@ public class HHCreditTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] problems = new String[]{"WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};//,"UF11","UF12,""UF13"};
+//        String[] problems = new String[]{"WFG7_2","DTLZ7_3"};//,"UF11","UF12,""UF13"};
 //          String[] problems = new String[]{ "UF8"};
 //        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
-//        String[] problems = new String[]{//"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
-//            "DTLZ1_3", "DTLZ2_3", "DTLZ3_3", "DTLZ4_3", "DTLZ5_3", "DTLZ6_3", "DTLZ7_3",
-//            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
-//            };
+        String[] problems = new String[]{//"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
+            "DTLZ1_3", "DTLZ2_3", "DTLZ3_3", "DTLZ4_3", "DTLZ5_3", "DTLZ6_3", "DTLZ7_3",
+            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 
 //        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
         pool = Executors.newFixedThreadPool(15);
@@ -78,7 +77,7 @@ public class HHCreditTest {
 //            setup credit definitions
 //            String[] creditDefs = new String[]{"OPDe"};//,"SIDe","CSDe","OPDo","SIDoPF","CSDoPF","OPI","SIIPop","CSIPop"};
 //            String[] creditDefs = new String[]{"OPDo","SIDoPF","CSDoPF"};
-            String[] creditDefs = new String[]{"OPI","SIIPop","CSIPop"};
+            String[] creditDefs = new String[]{"OPI"};
 
             //for single operator MOEA
             String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};

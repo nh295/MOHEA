@@ -84,6 +84,10 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
      */
     private final ParallelPRNG pprng;
 
+    private double[] upperbound;
+
+    private double[] lowerbound;
+
     /**
      * Name to id the hyper-heuristic
      */
@@ -114,6 +118,8 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
 
         Population offspring = new Population();
         int populationSize = population.size();
+        lowerbound = fitnessEvaluator.getLowerbound();
+        upperbound = fitnessEvaluator.getUpperbound();
 
         while (offspring.size() < populationSize) {
 
@@ -134,9 +140,10 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
                     for (Solution child : children) {
                         Solution refParent = parents[pprng.nextInt(parents.length)];
                         fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
+                        updatedBound(child);
                         switch (creditDef.getOperatesOn()) {
                             case PARENT:
-                                creditValue += ((AbstractOffspringParent) creditDef).compute(child, refParent, population, null);
+                                creditValue += ((AbstractOffspringParent) creditDef).compute(normalize(child), normalize(refParent), population, null);
                                 break;
                             default:
                                 throw new NullPointerException("Credit definition not "
@@ -204,6 +211,21 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
             fitnessEvaluator.removeAndUpdate(population, worstIndex);
         }
 
+    }
+
+    private void updatedBound(Solution solution) {
+        for (int i = 0; i < lowerbound.length; i++) {
+            lowerbound[i] = Math.min(lowerbound[i], solution.getObjective(i));
+            upperbound[i] = Math.max(upperbound[i], solution.getObjective(i));
+        }
+    }
+
+    public Solution normalize(Solution solution) {
+        Solution out = solution.copy();
+        for (int i = 0; i < solution.getNumberOfObjectives(); i++) {
+            out.setObjective(i, (solution.getObjective(i) - lowerbound[i]) / (upperbound[i] - lowerbound[i]));
+        }
+        return out;
     }
 
     /**
