@@ -142,7 +142,7 @@ public class TestRun implements Callable {
         Population population = new Population();
 
 //        IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
-        int numVectors = (int) properties.getDouble("r2_numberVectors", 100);
+        int numVectors = (int) properties.getDouble("r2.numberVectors", 100);
         R2FitnessEvaluator fitnesseval = new R2FitnessEvaluator(problem,numVectors,1.0);
 
         FitnessComparator fitnessComparator = new FitnessComparator(fitnesseval.areLargerValuesPreferred());

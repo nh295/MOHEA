@@ -10,8 +10,11 @@ import hh.creditassigment.CreditFunctionInputType;
 import hh.creditassigment.CreditFitnessFunctionType;
 import hh.creditassigment.Credit;
 import hh.creditassigment.CreditDefinedOn;
+import hh.creditassignment.fitnessindicator.IIndicator;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import org.moeaframework.core.FitnessEvaluator;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
@@ -26,16 +29,16 @@ import org.moeaframework.core.Variation;
  * @author SEAK2
  */
 public class IndicatorContribution extends AbstractPopulationContribution {
-
+    private final IIndicator indicator;
     /**
      *
-     * @param operatesOn Enum to specify whether to compare the improvement on
-     * the population or the archive
+     * @param indicator
      */
-    public IndicatorContribution(CreditDefinedOn operatesOn) {
-        this.operatesOn = operatesOn;
+    public IndicatorContribution(IIndicator indicator) {
+        this.operatesOn = CreditDefinedOn.POPULATION;
         this.fitType = CreditFitnessFunctionType.I;
         this.inputType = CreditFunctionInputType.CS;
+        this.indicator = indicator;
     }
 
     /**
@@ -47,6 +50,8 @@ public class IndicatorContribution extends AbstractPopulationContribution {
     @Override
     public HashMap<Variation, Credit> compute(Population population,
             Collection<Variation> heuristics, int iteration) {
+        
+        indicator.computeContributions(population);
 
         HashMap<String, Double> creditVals = new HashMap<>();
         for (Variation operator : heuristics) {
@@ -55,11 +60,12 @@ public class IndicatorContribution extends AbstractPopulationContribution {
 
         double minCredit = Double.POSITIVE_INFINITY;
         double maxCredit = Double.NEGATIVE_INFINITY;
+        
         for (Solution soln : population) {
-            double fitness = (double) soln.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
+            double contribution = (double) soln.getAttribute("contribution");
             if (soln.hasAttribute("heuristic")) {
                 String operator = ((SerializableVal) soln.getAttribute("heuristic")).getSval();
-                creditVals.put(operator, creditVals.get(operator) + fitness);
+                creditVals.put(operator, creditVals.get(operator) + contribution);
             }
         }
         

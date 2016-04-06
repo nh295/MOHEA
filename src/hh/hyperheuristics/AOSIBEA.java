@@ -123,10 +123,9 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
 
         Population offspring = new Population();
         int populationSize = population.size();
+        Population prevGen = new Population(population);
         lowerbound = fitnessEvaluator.getLowerbound();
         upperbound = fitnessEvaluator.getUpperbound();
-
-        Population prevGen = copyPrevGen(population);
 
         while (offspring.size() < populationSize) {
 
@@ -145,11 +144,9 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
                 double creditValue = 0.0;
                 for (Solution child : children) {
                     Solution refParent = parents[pprng.nextInt(parents.length)];
-//                    fitnessEvaluator.addAndUpdateFitnessOnly(prevGen,child);
-//                    updatedBound(child);
                     switch (creditDef.getOperatesOn()) {
                         case PARENT:
-                            creditValue += ((AbstractOffspringParent) creditDef).compute(fitnessEvaluator.normalize(child), fitnessEvaluator.normalize(refParent), prevGen, null);
+                            creditValue += ((AbstractOffspringParent) creditDef).compute(fitnessEvaluator.normalize(child), fitnessEvaluator.normalize(refParent), null, null);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
@@ -163,11 +160,10 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
             } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
                 double creditValue = 0.0;
                 for (Solution child : children) {
-//                        evaluate(child);
-                        fitnessEvaluator.addAndUpdateFitnessOnly(prevGen, child);
                     switch (creditDef.getOperatesOn()) {
                         case POPULATION:
-                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, population);
+                            prevGen.add(child);
+                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, prevGen);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
@@ -179,15 +175,14 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
                 creditHistory.add(operator, reward);
             } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
                 for (Solution child : children) {
-//                        evaluate(child);
+                    prevGen.add(child);
                     child.setAttribute("heuristic", new SerializableVal(operator.toString()));
-                    fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
                 }
                 HashMap<Variation, Credit> popContRewards;
                 switch (creditDef.getOperatesOn()) {
                     case POPULATION:
                         popContRewards = ((AbstractPopulationContribution) creditDef).
-                                compute(population, heuristics, this.numberOfEvaluations);
+                                compute(prevGen, heuristics, this.numberOfEvaluations);
                         break;
                     default:
                         throw new NullPointerException("Credit definition not "

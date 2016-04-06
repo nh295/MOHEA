@@ -25,7 +25,7 @@ public interface IIndicator {
      * @param refPt some indicators require a reference point
      * @return a list of contributions in the order of the population's Iterator
      */
-    public List<Double> computeContributions(Population popA, Solution refPt);
+    public List<Double> computeContributions(Population popA);
 
     /**
      * Computes the indicator value when comparing solution A to solution B.
@@ -36,7 +36,7 @@ public interface IIndicator {
      * @param refPt some indicators require a reference point
      * @return
      */
-    public double compute(Solution solnA, Solution solnB, Solution refPt);
+    public double compute(Solution solnA, Solution solnB);
 
     /**
      * Computes the contributions of specified solution to the nondominated
@@ -51,6 +51,10 @@ public interface IIndicator {
      * @param refPt some indicators require a reference point
      * @return
      */
-    public double computeContribution(Population pop, Solution offspring, Solution refPt);
+    public double computeContribution(Population pop, Solution offspring);
 
+    
+    public Solution getReferencePoint();
+    
+    public void setReferencePoint(Solution solution);
 }

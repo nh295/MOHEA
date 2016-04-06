@@ -7,6 +7,7 @@ package hh.creditassigment;
 
 //import hh.creditassignment.fitnessindicator.HypervolumeIndicator;
 import hh.creditassignment.fitnessindicator.R2Indicator;
+import hh.creditassignment.offspringparent.OPBinaryIndicator;
 //import hh.creditassignment.offspringparent.OPBinaryIndicator;
 import hh.creditassignment.offspringparent.ParentDecomposition;
 import hh.creditassignment.offspringparent.ParentDomination;
@@ -15,7 +16,7 @@ import hh.creditassignment.offspringpopulation.MedianIndicatorImprovement;
 import hh.creditassignment.offspringpopulation.OffspringArchiveDominance;
 import hh.creditassignment.offspringpopulation.OffspringNeighborhood;
 import hh.creditassignment.offspringpopulation.OffspringParetoFrontDominance;
-import hh.creditassignment.offspringpopulation.PFIndicatorImprovement;
+import hh.creditassignment.offspringpopulation.IndicatorImprovement;
 //import hh.creditassignment.offspringpopulation.OffspringPopulationIndicator;
 import hh.creditassignment.populationcontribution.DecompositionContribution;
 import hh.creditassignment.populationcontribution.EArchiveContribution;
@@ -24,6 +25,7 @@ import hh.creditassignment.populationcontribution.ParetoFrontContribution;
 import java.io.IOException;
 import java.util.Arrays;
 import org.moeaframework.core.Problem;
+import org.moeaframework.core.Solution;
 import org.moeaframework.util.TypedProperties;
 
 /**
@@ -70,7 +72,7 @@ public class CreditDefFactory {
         double[] refPoint = prop.getDoubleArray("ref point", defRef);
         //ideal point used in R family indicators
         double[] defIdeal = new double[problem.getNumberOfObjectives()];
-        Arrays.fill(defIdeal, 0.0);
+        Arrays.fill(defIdeal, -1.0);
         double[] idealPoint = prop.getDoubleArray("ref point", defIdeal);
         
         int numVec=0;
@@ -90,7 +92,7 @@ public class CreditDefFactory {
                 credDef = new ParentDomination(satisfy, neither, disatisfy);
                 break;
             case "OPI" :
-                credDef = new ParentIndicator(problem);
+                credDef = new OPBinaryIndicator(new R2Indicator(problem, numVec, new Solution(idealPoint)),problem);
                 break;
 //            case "OPIAE": //offspring parent additive epsilon indicator using pareto front
 //                credDef = new OPBinaryIndicator(new AdditiveEpsilonIndicator(), kappa,problem);
@@ -128,8 +130,8 @@ public class CreditDefFactory {
 //            case "SIR2A": //offpsring improvement to R2 indicator value for epsilon archive
 //                credDef = new OffspringPopulationIndicator(new R2Indicator(numObj,numVec),CreditDefinedOn.ARCHIVE);
 //                break;
-            case "SIIPop" : //offspring improvement to the mean indicator-based fitness value
-                credDef = new MedianIndicatorImprovement();
+            case "SII" : //offspring improvement to the mean indicator-based fitness value
+                credDef = new IndicatorImprovement(new R2Indicator(problem, numVec, new Solution(idealPoint)));
                 break;
             case "CSDe": //contribution to the subproblem's neighborhood
                 credDef = new DecompositionContribution(satisfy, disatisfy);
@@ -140,11 +142,8 @@ public class CreditDefFactory {
             case "CSDoA": //contribution to epsilon archive
                 credDef = new EArchiveContribution(satisfy, disatisfy);
                 break;
-            case "CSIPF": //Contribution to indicator fitness of Pareto front
-                credDef = new IndicatorContribution(CreditDefinedOn.PARETOFRONT);
-                break;
-            case "CSIPop": //Contribution to indicator fitness of entire population
-                credDef = new IndicatorContribution(CreditDefinedOn.POPULATION);
+            case "CSI": //Contribution to indicator fitness of entire population
+                credDef = new IndicatorContribution(new R2Indicator(problem, numVec, new Solution(idealPoint)));
                 break;
             default:
                 throw new IllegalArgumentException("No such credit defintion: " + name);

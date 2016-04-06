@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Population;
+import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 /**
@@ -47,21 +48,37 @@ public class R2Indicator implements IIndicator {
      * Value of the 2nd smallest population utility
      */
     private double[] minPopUtil2;
+    
+    private Solution referencePoint;
 
     /**
      * Constructor to initialize the weight vectors
      *
-     * @param numObjs number of objectives
+     * @param problem
      * @param numVecs number of vectors
+     * @param referencePoint
      */
-    public R2Indicator(int numObjs, int numVecs) {
+    public R2Indicator(Problem problem, int numVecs, Solution referencePoint){
         wtVecs = new ArrayList<>();
-        initializeWts(numObjs, numVecs);
+        initializeWts(problem.getNumberOfObjectives(), numVecs);
+        this.referencePoint = referencePoint;
+    }
+    
+    public double computeR2(Population population){
+        double value = 0.0;
+        for(WtVector vec : wtVecs){
+            value += popUtility(vec, population);
+        }
+        return value;
     }
 
     @Override
-    public List<Double> computeContributions(Population pop, Solution refPt) {
-        computeContributors(pop, refPt);
+    public List<Double> computeContributions(Population pop) {
+        for(Solution solution : pop){
+            solution.setAttribute("contribution", 0.0);
+        }
+        
+        computeContributors(pop, referencePoint);
         Double[] contributionsWPt = new Double[pop.size()];
         Double[] contributionsWoPt = new Double[pop.size()];
         Arrays.fill(contributionsWPt, 0.0);
@@ -77,9 +94,10 @@ public class R2Indicator implements IIndicator {
             }
         }
 
-        ArrayList out = new ArrayList(pop.size());
+        ArrayList<Double> out = new ArrayList(pop.size());
         for (int i=0; i<pop.size();i++) {
-            out.add(i, (contributionsWPt[i]-contributionsWoPt[i]) / wtVecs.size()); 
+            out.add(i, (contributionsWoPt[i] - contributionsWPt[i]) / wtVecs.size()); 
+            pop.get(i).setAttribute("contribution", out.get(i));
         }
         return out;
     }
@@ -130,16 +148,16 @@ public class R2Indicator implements IIndicator {
     }
 
     @Override
-    public double computeContribution(Population pop, Solution offspring, Solution refPt) {
+    public double computeContribution(Population pop, Solution offspring) {
 
         //Create a nondominated popualtion without the offspring
         int offspringInd = -1;
         for (int i = 0; i < pop.size(); i++) {
-            if (Arrays.equals(pop.get(i).getObjectives(), offspring.getObjectives())) {
+            if (offspring.equals(pop.get(i))) {
                 offspringInd=i;
             }
         }
-        computeContributors(pop, refPt);
+        computeContributors(pop, referencePoint);
         double contributionsWPt = 0;
         double contributionsWoPt = 0;
         for(int j=0; j<minInd1.length;j++){
@@ -149,7 +167,7 @@ public class R2Indicator implements IIndicator {
                 else
                     contributionsWoPt+=minPopUtil2[j];
             }
-        double out = (contributionsWPt - contributionsWoPt)/wtVecs.size();
+        double out = (contributionsWoPt - contributionsWPt)/wtVecs.size();
         if(out<0){
             throw new IllegalStateException("Negative reward even though solution added");
         }
@@ -168,13 +186,13 @@ public class R2Indicator implements IIndicator {
      * @return
      */
     @Override
-    public double compute(Solution solnA, Solution solnB, Solution refPt) {
+    public double compute(Solution solnA, Solution solnB) {
         double valA = 0.0;
         double valB = 0.0;
         for (WtVector vec : wtVecs) {
-            double solnAUtil = solnUtility(vec, solnA, refPt);
+            double solnAUtil = solnUtility(vec, solnA, referencePoint);
             valA += solnAUtil;
-            valB += Math.min(solnAUtil, solnUtility(vec, solnB, refPt));
+            valB += Math.min(solnAUtil, solnUtility(vec, solnB, referencePoint));
         }
         return (valA / wtVecs.size()) - (valB / wtVecs.size());
     }
@@ -188,10 +206,10 @@ public class R2Indicator implements IIndicator {
      * @param refPt reference point
      * @return the utility of the nondominated population
      */
-    protected double popUtility(WtVector vec, NondominatedPopulation pop, Solution refPt) {
+    protected double popUtility(WtVector vec, Population pop) {
         double popUtil = Double.POSITIVE_INFINITY;
         for (Solution solution : pop) {
-            popUtil = Math.min(popUtil, solnUtility(vec, solution, refPt));
+            popUtil = Math.min(popUtil, solnUtility(vec, solution, referencePoint));
         }
         return popUtil;
     }
@@ -264,6 +282,16 @@ public class R2Indicator implements IIndicator {
     @Override
     public String toString() {
         return "R2";
+    }
+
+    @Override
+    public Solution getReferencePoint() {
+        return referencePoint;
+    }
+
+    @Override
+    public void setReferencePoint(Solution solution) {
+        referencePoint = solution;
     }
 
     protected class WtVector {

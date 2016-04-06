@@ -25,8 +25,6 @@ public class R2FitnessEvaluator extends IndicatorFitnessEvaluator {
 
     private final R2Indicator r2indicator;
 
-    private Solution refPoint;
-
     /**
      *
      * @param problem
@@ -36,24 +34,24 @@ public class R2FitnessEvaluator extends IndicatorFitnessEvaluator {
      */
     public R2FitnessEvaluator(Problem problem, int numVecs, double offset) {
         super(problem);
-        this.refPoint = problem.newSolution();
+        Solution refPoint = problem.newSolution();
         for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
             refPoint.setObjective(i, -offset);
         }
-        this.r2indicator = new R2Indicator(problem.getNumberOfObjectives(), numVecs);
+        this.r2indicator = new R2Indicator(problem, numVecs, refPoint);
     }
     
     public void setRefPoint(Solution solution){
-        this.refPoint = solution;
+        r2indicator.setReferencePoint(solution);
     }
     
-    public Solution setRefPoint(){
-        return refPoint;
+    public Solution getRefPoint(){
+        return r2indicator.getReferencePoint();
     }
 
     @Override
     public double calculateIndicator(Solution solution1, Solution solution2) {
-        return r2indicator.compute(solution1, solution2, refPoint);
+        return r2indicator.compute(solution1, solution2);
     }
 
     @Override

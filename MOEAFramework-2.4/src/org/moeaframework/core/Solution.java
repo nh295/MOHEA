@@ -18,9 +18,11 @@
 package org.moeaframework.core;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A solution to an optimization problem, storing the decision variables,
@@ -390,5 +392,33 @@ public class Solution implements Serializable {
 	public void clearAttributes() {
 		attributes.clear();
 	}
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + Arrays.deepHashCode(this.variables);
+        hash = 97 * hash + Objects.hashCode(this.attributes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Solution other = (Solution) obj;
+        if (!Arrays.deepEquals(this.variables, other.variables)) {
+            return false;
+        }
+        if (!Objects.equals(this.attributes, other.attributes)) {
+            return false;
+        }
+        return true;
+    }
+        
+        
 
 }
