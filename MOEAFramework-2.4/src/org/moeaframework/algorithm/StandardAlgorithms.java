@@ -49,7 +49,7 @@ import org.moeaframework.core.fitness.AdditiveEpsilonIndicatorFitnessEvaluator;
 import org.moeaframework.core.fitness.HypervolumeContributionFitnessEvaluator;
 import org.moeaframework.core.fitness.HypervolumeFitnessEvaluator;
 import org.moeaframework.core.fitness.IndicatorFitnessEvaluator;
-import org.moeaframework.core.fitness.R2ContributionFitnessEvaluator;
+import org.moeaframework.core.fitness.R2FitnessEvaluator;
 import org.moeaframework.core.operator.RandomInitialization;
 import org.moeaframework.core.operator.TournamentSelection;
 import org.moeaframework.core.operator.UniformSelection;
@@ -801,6 +801,9 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		} else if ("epsilon".equals(indicator)) {
 			fitnessEvaluator = new AdditiveEpsilonIndicatorFitnessEvaluator(
 					problem);
+                } else if ("r2".equals(indicator)) {
+                        int numVectors =  properties.getInt("rnumberVectors", 100);
+			fitnessEvaluator = new R2FitnessEvaluator(problem, numVectors, 1);
 		} else {
 			throw new IllegalArgumentException("invalid indicator: " +
 					indicator);
@@ -882,7 +885,7 @@ public class StandardAlgorithms extends AlgorithmProvider {
 		Variation variation = OperatorFactory.getInstance().getVariation(null, 
 				properties, problem);
 
-		return new SMSEMOA(problem, initialization, variation, new R2ContributionFitnessEvaluator(problem, numVecs, offset));
+		return new SMSEMOA(problem, initialization, variation, new R2FitnessEvaluator(problem, numVecs, offset));
     }
 
 	

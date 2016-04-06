@@ -50,6 +50,7 @@ import org.moeaframework.core.comparator.FitnessComparator;
 import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.fitness.HypervolumeFitnessEvaluator;
 import org.moeaframework.core.fitness.IndicatorFitnessEvaluator;
+import org.moeaframework.core.fitness.R2FitnessEvaluator;
 import org.moeaframework.core.indicator.InvertedGenerationalDistance;
 import org.moeaframework.core.indicator.jmetal.FastHypervolume;
 import org.moeaframework.core.operator.RandomInitialization;
@@ -140,7 +141,9 @@ public class TestRun implements Callable {
 
         Population population = new Population();
 
-        IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
+//        IndicatorFitnessEvaluator fitnesseval = new HypervolumeFitnessEvaluator(problem);
+        int numVectors = (int) properties.getDouble("r2_numberVectors", 100);
+        R2FitnessEvaluator fitnesseval = new R2FitnessEvaluator(problem,numVectors,1.0);
 
         FitnessComparator fitnessComparator = new FitnessComparator(fitnesseval.areLargerValuesPreferred());
         TournamentSelection selection = new TournamentSelection(fitnessComparator);

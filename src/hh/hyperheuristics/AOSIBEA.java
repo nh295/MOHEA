@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import hh.moea.SteadyStateIBEA;
 import org.moeaframework.algorithm.IBEA;
+import org.moeaframework.core.FitnessEvaluator;
+import org.moeaframework.core.Indicator;
 import org.moeaframework.core.Initialization;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.ParallelPRNG;
@@ -88,6 +90,8 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
 
     private double[] lowerbound;
 
+    private NondominatedPopulation paretofront;
+
     /**
      * Name to id the hyper-heuristic
      */
@@ -110,6 +114,7 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
 
         //Initialize 
         super.initialize();
+        paretofront = new NondominatedPopulation(getPopulation());
 
     }
 
@@ -120,6 +125,8 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
         int populationSize = population.size();
         lowerbound = fitnessEvaluator.getLowerbound();
         upperbound = fitnessEvaluator.getUpperbound();
+
+        Population prevGen = copyPrevGen(population);
 
         while (offspring.size() < populationSize) {
 
@@ -134,76 +141,70 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
             offspring.addAll(children);
             evaluateAll(children);
 
-            if (!operatorSelector.toString().equalsIgnoreCase("RandomSelect")) {
-                if (creditDef.getInputType() == CreditFunctionInputType.OP) {
-                    double creditValue = 0.0;
-                    for (Solution child : children) {
-                        Solution refParent = parents[pprng.nextInt(parents.length)];
-                        fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
-                        updatedBound(child);
-                        switch (creditDef.getOperatesOn()) {
-                            case PARENT:
-                                creditValue += ((AbstractOffspringParent) creditDef).compute(normalize(child), normalize(refParent), population, null);
-                                break;
-                            default:
-                                throw new NullPointerException("Credit definition not "
-                                        + "recognized. Used " + creditDef.getInputType() + ".");
-                        }
-                    }
-
-                    Credit reward = new Credit(this.numberOfEvaluations, creditValue);
-                    operatorSelector.update(reward, operator);
-                    creditHistory.add(operator, reward);
-                } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
-                    double creditValue = 0.0;
-                    for (Solution child : children) {
-//                        evaluate(child);
-                        fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
-
-                        switch (creditDef.getOperatesOn()) {
-                            case POPULATION:
-                                creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, population);
-                                break;
-                            default:
-                                throw new NullPointerException("Credit definition not "
-                                        + "recognized. Used " + creditDef.getInputType() + ".");
-
-                        }
-                    }
-                    Credit reward = new Credit(this.numberOfEvaluations, creditValue);
-                    operatorSelector.update(reward, operator);
-                    creditHistory.add(operator, reward);
-                } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
-                    for (Solution child : children) {
-//                        evaluate(child);
-                        child.setAttribute("heuristic", new SerializableVal(operator.toString()));
-                        fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
-                    }
-                    HashMap<Variation, Credit> popContRewards;
+            if (creditDef.getInputType() == CreditFunctionInputType.OP) {
+                double creditValue = 0.0;
+                for (Solution child : children) {
+                    Solution refParent = parents[pprng.nextInt(parents.length)];
+//                    fitnessEvaluator.addAndUpdateFitnessOnly(prevGen,child);
+//                    updatedBound(child);
                     switch (creditDef.getOperatesOn()) {
-                        case POPULATION:
-                            popContRewards = ((AbstractPopulationContribution) creditDef).
-                                    compute(population, heuristics, this.numberOfEvaluations);
+                        case PARENT:
+                            creditValue += ((AbstractOffspringParent) creditDef).compute(fitnessEvaluator.normalize(child), fitnessEvaluator.normalize(refParent), prevGen, null);
                             break;
                         default:
                             throw new NullPointerException("Credit definition not "
                                     + "recognized. Used " + creditDef.getInputType() + ".");
                     }
-                    Iterator<Variation> iter = popContRewards.keySet().iterator();
-                    while (iter.hasNext()) {
-                        Variation operator_i = iter.next();
-                        operatorSelector.update(popContRewards.get(operator_i), operator_i);
-                        creditHistory.add(operator_i, new Credit(this.numberOfEvaluations, popContRewards.get(operator_i).getValue()));
-                    }
-                } else {
-                    throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
                 }
-//        updateQualityHistory();
+
+                Credit reward = new Credit(this.numberOfEvaluations, creditValue);
+                operatorSelector.update(reward, operator);
+                creditHistory.add(operator, reward);
+            } else if (creditDef.getInputType() == CreditFunctionInputType.SI) {
+                double creditValue = 0.0;
+                for (Solution child : children) {
+//                        evaluate(child);
+                        fitnessEvaluator.addAndUpdateFitnessOnly(prevGen, child);
+                    switch (creditDef.getOperatesOn()) {
+                        case POPULATION:
+                            creditValue += ((AbstractOffspringPopulation) creditDef).compute(child, population);
+                            break;
+                        default:
+                            throw new NullPointerException("Credit definition not "
+                                    + "recognized. Used " + creditDef.getInputType() + ".");
+                    }
+                }
+                Credit reward = new Credit(this.numberOfEvaluations, creditValue);
+                operatorSelector.update(reward, operator);
+                creditHistory.add(operator, reward);
+            } else if (creditDef.getInputType() == CreditFunctionInputType.CS) {
+                for (Solution child : children) {
+//                        evaluate(child);
+                    child.setAttribute("heuristic", new SerializableVal(operator.toString()));
+                    fitnessEvaluator.addAndUpdateFitnessOnly(population, child);
+                }
+                HashMap<Variation, Credit> popContRewards;
+                switch (creditDef.getOperatesOn()) {
+                    case POPULATION:
+                        popContRewards = ((AbstractPopulationContribution) creditDef).
+                                compute(population, heuristics, this.numberOfEvaluations);
+                        break;
+                    default:
+                        throw new NullPointerException("Credit definition not "
+                                + "recognized. Used " + creditDef.getInputType() + ".");
+                }
+                Iterator<Variation> iter = popContRewards.keySet().iterator();
+                while (iter.hasNext()) {
+                    Variation operator_i = iter.next();
+                    operatorSelector.update(popContRewards.get(operator_i), operator_i);
+                    creditHistory.add(operator_i, new Credit(this.numberOfEvaluations, popContRewards.get(operator_i).getValue()));
+                }
+            } else {
+                throw new UnsupportedOperationException("RewardDefinitionType not recognized ");
             }
+//        updateQualityHistory();
         }
-        if (operatorSelector.toString().equalsIgnoreCase("RandomSelect")) {
-            population.addAll(offspring);
-        }
+        population.addAll(offspring);
         fitnessEvaluator.evaluate(population);
 
         while (population.size() > populationSize) {
@@ -211,6 +212,16 @@ public class AOSIBEA extends IBEA implements IHyperHeuristic {
             fitnessEvaluator.removeAndUpdate(population, worstIndex);
         }
 
+    }
+
+    private Population copyPrevGen(Population pop) {
+        Population copyPop = new Population();
+        for (Solution solution : pop) {
+            Solution copySolution = solution.copy();
+            copySolution.setAttribute("prevfitness", (double) solution.getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE));
+            copyPop.add(copySolution);
+        }
+        return copyPop;
     }
 
     private void updatedBound(Solution solution) {

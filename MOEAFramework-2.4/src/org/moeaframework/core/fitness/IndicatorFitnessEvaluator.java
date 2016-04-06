@@ -22,6 +22,7 @@ import org.moeaframework.core.FrameworkException;
 import org.moeaframework.core.Population;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
+import org.moeaframework.core.comparator.ParetoDominanceComparator;
 import org.moeaframework.core.indicator.Normalizer;
 
 /**
@@ -137,15 +138,14 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
         for (int i = 0; i < population.size(); i++) {
             double sum = 0.0;
             for (int j = 0; j < population.size(); j++) {
+                if (i != j) {
                 fitcomp[j][i] = calculateIndicator(normalizedPopulation.get(j),
                         normalizedPopulation.get(i));
-
                 if (Math.abs(fitcomp[j][i]) > maxAbsIndicatorValue) {
                     maxAbsIndicatorValue = Math.abs(fitcomp[j][i]);
                     maxij[0] = j;
                     maxij[1] = i;
                 }
-                if (i != j) {
                     sum += Math.exp((-fitcomp[j][i] / maxAbsIndicatorValue) / kappa);
                 }
             }
@@ -319,7 +319,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
         }
                 //update values for all incumbent solutions
                 for (int i = 0; i < population.size() - 1; i++) {
-                    double prevFitness = (double) population.get(i).getAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE);
+                    double prevFitness = (double) population.get(i).getAttribute("prevfitness");
                     double newFitness = prevFitness + Math.exp((-fitcomp[lastIndex][i] / maxAbsIndicatorValue) / kappa);
                     population.get(i).setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, newFitness);
                 }
@@ -330,6 +330,7 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
                     sum += Math.exp((-fitcomp[i][lastIndex] / maxAbsIndicatorValue) / kappa);
                 }
                 population.get(lastIndex).setAttribute(FitnessEvaluator.FITNESS_ATTRIBUTE, sum);
+                population.get(lastIndex).setAttribute("prevfitness", sum);
     }
 
     private void findMaxIndicatorValue(Population population) {
@@ -351,6 +352,14 @@ public abstract class IndicatorFitnessEvaluator implements FitnessEvaluator {
             out.setObjective(i, (solution.getObjective(i) - lowerbound[i]) / (upperbound[i] - lowerbound[i]));
         }
         return out;
+    }
+
+    public double[] getUpperbound() {
+        return upperbound;
+    }
+
+    public double[] getLowerbound() {
+        return lowerbound;
     }
 
     /**

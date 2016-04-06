@@ -60,8 +60,8 @@ public class HHCreditTest {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -80,17 +80,17 @@ public class HHCreditTest {
             String[] creditDefs = new String[]{"OPI"};
 
             //for single operator MOEA
-            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-//            String[] ops = new String[]{"undx+pm","pcx+pm","spx+pm"};
+//            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
+            String[] ops = new String[]{"sbx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
-            for (String selector : selectors) {
-                for (String credDefStr : creditDefs) {
+//            for (String selector : selectors) {
+//                for (String credDefStr : creditDefs) {
             //parallel process all runs
             futures.clear();
 
-//            for (String op : ops) {
+            for (String op : ops) {
                 for (int k = 0; k < numberOfSeeds; k++) {
 
                     Problem prob = ProblemFactory.getInstance().getProblem(probName);
@@ -125,15 +125,16 @@ public class HHCreditTest {
                         throw new IllegalArgumentException("Problem not recognized: " + probName);
                     }
 
+                    prop.put("indicator", "r2");
                     if (prob.getNumberOfObjectives() == 2) {
-                        prop.put("r2.numberVectors", 50);
+                        prop.put("rnumberVectors", "50");
                     } else if (prob.getNumberOfObjectives() == 3) {
-                        prop.put("r2.numberVectors", 91);
+                        prop.put("rnumberVectors", "91");
                     }
 
                     prop.put("populationSize", popSize);
-                        prop.put("HH", selector);
-                        prop.put("CredDef", credDefStr);
+//                        prop.put("HH", selector);
+//                        prop.put("CredDef", credDefStr);
 
                     //saving results settings
                     prop.put("saveFolder", "results2");
@@ -157,17 +158,17 @@ public class HHCreditTest {
                     NondominatedPopulation refSet = ProblemFactory.getInstance().getReferenceSet(probName);
 
                     TypedProperties typeProp = new TypedProperties(prop);
-                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
-                        TestRun test = new TestRun(path, prob, probName,refSet,
-                                typeProp, heuristics, maxEvaluations);
-                        futures.add(pool.submit(test));
+//                        typeProp.setDoubleArray("ArchiveEpsilon", epsilonDouble);
+//                        TestRun test = new TestRun(path, prob, probName,refSet,
+//                                typeProp, heuristics, maxEvaluations);
+//                        futures.add(pool.submit(test));
 
                     //benchmark built-in MOEA
-//                    System.out.println(op);
-//                    prop.put("operator", op);
-//                    typeProp = new TypedProperties(prop);
-//                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
-//                            typeProp, "MOEAD", maxEvaluations);
+                    System.out.println(op);
+                    prop.put("operator", op);
+                    typeProp = new TypedProperties(prop);
+                    TestRunBenchmark test = new TestRunBenchmark(path, prob, probName, refSet,
+                            typeProp, "IBEA", maxEvaluations);
                     futures.add(pool.submit(test));
                 }
                 for (Future<IHyperHeuristic> run : futures) {
@@ -179,7 +180,7 @@ public class HHCreditTest {
                 }
             }
         }
-        }
+//        }
         pool.shutdown();
     }
 }

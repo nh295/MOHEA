@@ -5,7 +5,6 @@
  */
 package hh.creditassigment;
 
-import hh.creditassignment.fitnessindicator.AdditiveEpsilonIndicator;
 //import hh.creditassignment.fitnessindicator.HypervolumeIndicator;
 import hh.creditassignment.fitnessindicator.R2Indicator;
 //import hh.creditassignment.offspringparent.OPBinaryIndicator;
@@ -16,6 +15,7 @@ import hh.creditassignment.offspringpopulation.MedianIndicatorImprovement;
 import hh.creditassignment.offspringpopulation.OffspringArchiveDominance;
 import hh.creditassignment.offspringpopulation.OffspringNeighborhood;
 import hh.creditassignment.offspringpopulation.OffspringParetoFrontDominance;
+import hh.creditassignment.offspringpopulation.PFIndicatorImprovement;
 //import hh.creditassignment.offspringpopulation.OffspringPopulationIndicator;
 import hh.creditassignment.populationcontribution.DecompositionContribution;
 import hh.creditassignment.populationcontribution.EArchiveContribution;

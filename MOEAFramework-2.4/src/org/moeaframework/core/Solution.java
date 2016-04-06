@@ -19,6 +19,7 @@ package org.moeaframework.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -119,6 +120,11 @@ public class Solution implements Serializable {
 		for (int i = 0; i < getNumberOfConstraints(); i++) {
 			setConstraint(i, solution.getConstraint(i));
 		}
+                Iterator<String> iter = solution.getAttributes().keySet().iterator();
+                while(iter.hasNext()){
+                    String key = iter.next();
+                    this.setAttribute(key, (Serializable)solution.getAttribute(key));
+                }
 	}
 
 	/**

@@ -5,9 +5,8 @@
  */
 package hh.creditassignment.fitnessindicator;
 
-import java.util.ArrayList;
 import java.util.List;
-import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -26,7 +25,7 @@ public interface IIndicator {
      * @param refPt some indicators require a reference point
      * @return a list of contributions in the order of the population's Iterator
      */
-    public List<Double> computeContributions(NondominatedPopulation popA, Solution refPt);
+    public List<Double> computeContributions(Population popA, Solution refPt);
 
     /**
      * Computes the indicator value when comparing solution A to solution B.
@@ -52,6 +51,6 @@ public interface IIndicator {
      * @param refPt some indicators require a reference point
      * @return
      */
-    public double computeContribution(NondominatedPopulation pop, Solution offspring, Solution refPt);
+    public double computeContribution(Population pop, Solution offspring, Solution refPt);
 
 }

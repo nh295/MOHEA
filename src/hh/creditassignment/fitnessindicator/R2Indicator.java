@@ -17,6 +17,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.moeaframework.core.NondominatedPopulation;
+import org.moeaframework.core.Population;
 import org.moeaframework.core.Solution;
 
 /**
@@ -59,7 +60,7 @@ public class R2Indicator implements IIndicator {
     }
 
     @Override
-    public List<Double> computeContributions(NondominatedPopulation pop, Solution refPt) {
+    public List<Double> computeContributions(Population pop, Solution refPt) {
         computeContributors(pop, refPt);
         Double[] contributionsWPt = new Double[pop.size()];
         Double[] contributionsWoPt = new Double[pop.size()];
@@ -78,7 +79,7 @@ public class R2Indicator implements IIndicator {
 
         ArrayList out = new ArrayList(pop.size());
         for (int i=0; i<pop.size();i++) {
-            out.add(i, (contributionsWoPt[i]-contributionsWPt[i]) / wtVecs.size()); 
+            out.add(i, (contributionsWPt[i]-contributionsWoPt[i]) / wtVecs.size()); 
         }
         return out;
     }
@@ -100,7 +101,7 @@ public class R2Indicator implements IIndicator {
      * @param pop
      * @param refPt
      */
-    private void computeContributors(NondominatedPopulation pop, Solution refPt) {
+    private void computeContributors(Population pop, Solution refPt) {
         minInd1 = new int[wtVecs.size()];
         Arrays.fill(minInd1, -1);
         minInd2 = new int[wtVecs.size()];
@@ -124,13 +125,12 @@ public class R2Indicator implements IIndicator {
                     minInd2[vecInd] = i;
                 }
             }
-
             vecInd++;
         }
     }
 
     @Override
-    public double computeContribution(NondominatedPopulation pop, Solution offspring, Solution refPt) {
+    public double computeContribution(Population pop, Solution offspring, Solution refPt) {
 
         //Create a nondominated popualtion without the offspring
         int offspringInd = -1;
@@ -149,7 +149,7 @@ public class R2Indicator implements IIndicator {
                 else
                     contributionsWoPt+=minPopUtil2[j];
             }
-        double out = (contributionsWoPt-contributionsWPt)/wtVecs.size();
+        double out = (contributionsWPt - contributionsWoPt)/wtVecs.size();
         if(out<0){
             throw new IllegalStateException("Negative reward even though solution added");
         }
@@ -157,7 +157,7 @@ public class R2Indicator implements IIndicator {
     }
     
     /**
-     * TODO this is really slow! In this implementation the order of the inputs
+     * In this implementation the order of the inputs
      * matter. formula based on Phan, D. H., & Suzuki, J. (2013). R2-IBEA: R2
      * indicator based evolutionary algorithm for multiobjective optimization.
      * IEEE Congress on Evolutionary Computation, 1836–1845.
