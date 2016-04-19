@@ -46,22 +46,22 @@ public class HHCreditTest {
      */
     public static void main(String[] args) {
 //        String[] problems = new String[]{"WFG7_2","DTLZ7_3"};//,"UF11","UF12,""UF13"};
-//          String[] problems = new String[]{ "UF8"};
-        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
+          String[] problems = new String[]{"WFG1_2"};
+//        String[] problems = new String[]{"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10"};
 //        String[] problems = new String[]{"DTLZ1_3","DTLZ2_3","DTLZ3_3","DTLZ4_3","DTLZ5_3","DTLZ6_3","DTLZ7_3"};
 //        String[] problems = new String[]{"WFG1_2","WFG2_2","WFG3_2","WFG4_2","WFG5_2","WFG6_2","WFG7_2","WFG8_2","WFG9_2"};
 //        String[] problems = new String[]{//"UF1","UF2","UF3","UF4","UF5","UF6","UF7","UF8","UF9","UF10",
 //            "DTLZ1_3", "DTLZ2_3", "DTLZ3_3", "DTLZ4_3", "DTLZ5_3", "DTLZ6_3", "DTLZ7_3",
 //            "WFG1_2", "WFG2_2", "WFG3_2", "WFG4_2", "WFG5_2", "WFG6_2", "WFG7_2", "WFG8_2", "WFG9_2"};
 
-//        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
-        pool = Executors.newFixedThreadPool(15);
+        pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()-1);
+//        pool = Executors.newFixedThreadPool(1);
         for (String problem : problems) {
             String path;
             if (args.length == 0) //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             {
-                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
-//                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
+//                path = "C:\\Users\\SEAK2\\Nozomi\\MOHEA";
+                path = "C:\\Users\\SEAK1\\Dropbox\\MOHEA";
 //                path = "/Users/nozomihitomi/Dropbox/MOHEA";
             } else {
                 path = args[0];
@@ -72,16 +72,16 @@ public class HHCreditTest {
             int numberOfSeeds = 30;
 
             //Setup heuristic selectors
-            String[] selectors = new String[]{"PM","AP"};
-//            String[] selectors = new String[]{"Random"};
+//            String[] selectors = new String[]{"PM","AP"};
+            String[] selectors = new String[]{"PM"};
 //            setup credit definitions
-//            String[] creditDefs = new String[]{"OPDe"};//,"SIDe","CSDe","OPDo","SIDoPF","CSDoPF","OPI","SIIPop","CSIPop"};
+//            String[] creditDefs = new String[]{"OPDe"};//,"SIDe","CSDe","OPDo","SIDoPF","CSDoPF","OPI","SII","CSI"};
 //            String[] creditDefs = new String[]{"OPDo","SIDoPF","CSDoPF"};
             String[] creditDefs = new String[]{"OPI","SII","CSI"};
 
             //for single operator MOEA
 //            String[] ops = new String[]{"um","sbx+pm","de+pm","pcx+pm","undx+pm","spx+pm"};
-//            String[] ops = new String[]{"sbx+pm"};
+            String[] ops = new String[]{"undx+pm","spx+pm"};
 
             futures = new ArrayList<>();
             //loop through the set of algorithms to experiment with
@@ -140,7 +140,7 @@ public class HHCreditTest {
                     prop.put("saveFolder", "results2");
                     prop.put("saveIndicators", "true");
                     prop.put("saveFinalPopulation", "false");
-                    prop.put("saveOperatorCreditHistory", "false");
+                    prop.put("saveOperatorCreditHistory", "true");
                     prop.put("saveOperatorSelectionHistory", "false");
                     prop.put("saveOperatorQualityHistory", "false");
 
@@ -173,12 +173,12 @@ public class HHCreditTest {
                 }
                 for (Future<IHyperHeuristic> run : futures) {
                     try {
-                        IHyperHeuristic hh = run.get();
+                        run.get();
                     } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(HHCreditTest.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            }
+        }
         }
         }
         pool.shutdown();

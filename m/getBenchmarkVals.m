@@ -34,7 +34,7 @@ for i=1:length(benchmark_names)
         elseif strcmp(algorithm,'best1opIBEA')
             str{end-1} = 'IBEA*';
         end
-        out{i} = strcat('{',str{end-1},'-',upper(str{end}),'}');
+        out{i} = strcat(str{end-1},'-',upper(str{end}));
     elseif strcmp(algorithm,'MOEAD') || strcmp(algorithm,'NSGAII') || strcmp(algorithm,'IBEA')
         file = dir(strcat(path2benchmark,filesep,'Default',algorithm,filesep,prob_name,'*', algorithm,'*.mat'));
         mfilename = strcat(path2benchmark,filesep,'Default',algorithm,filesep,file(1).name);
@@ -44,7 +44,7 @@ for i=1:length(benchmark_names)
         mfilename = strcat(path2benchmark,filesep,algorithm,filesep,file(1).name);
         out{i} = strcat('Rand-',mode);
     end
-    load(mfilename)
+    load(mfilename);
     %assumes that mat file was saved with variable results containing all
     %MOEA indicator metrics
     vals(:,i) = getfield(res,indicator);

@@ -802,7 +802,7 @@ public class StandardAlgorithms extends AlgorithmProvider {
 			fitnessEvaluator = new AdditiveEpsilonIndicatorFitnessEvaluator(
 					problem);
                 } else if ("r2".equals(indicator)) {
-                        int numVectors =  properties.getInt("rnumberVectors", 100);
+                        int numVectors =  properties.getInt("r2.numberVectors", 100);
 			fitnessEvaluator = new R2FitnessEvaluator(problem, numVectors, 1);
 		} else {
 			throw new IllegalArgumentException("invalid indicator: " +

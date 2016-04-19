@@ -58,7 +58,7 @@ public class OPBinaryIndicator extends AbstractOffspringParent {
      */
     @Override
     public double compute(Solution offspring, Solution parent, Population pop, Solution removedSolution) {
-        return Math.max(0.0, indicator.compute(offspring, parent));
+        return Math.max(0.0, indicator.compute(parent, offspring));
     }
 
     @Override
